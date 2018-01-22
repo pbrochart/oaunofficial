@@ -1,0 +1,1781 @@
+Index: code/cgame/cg_draw.c
+===================================================================
+--- code/cgame/cg_draw.c	(Revision 182)
++++ code/cgame/cg_draw.c	(Arbeitskopie)
+@@ -209,7 +209,7 @@
+ ==============
+ */
+ #ifndef MISSIONPACK
+-static void CG_DrawField (int x, int y, int width, int value) {
++static void CG_DrawField (int x, int y, int width, int value, float size) {
+ 	char	num[16], *ptr;
+ 	int		l;
+ 	int		frame;
+@@ -246,7 +246,7 @@
+ 	l = strlen(num);
+ 	if (l > width)
+ 		l = width;
+-	x += 2 + CHAR_WIDTH*(width - l);
++	x += 2 + CHAR_WIDTH*size*(width - l);
+ 
+ 	ptr = num;
+ 	while (*ptr && l)
+@@ -256,8 +256,8 @@
+ 		else
+ 			frame = *ptr -'0';
+ 
+-		CG_DrawPic( x,y, CHAR_WIDTH, CHAR_HEIGHT, cgs.media.numberShaders[frame] );
+-		x += CHAR_WIDTH;
++		CG_DrawPic( x,y, CHAR_WIDTH*size, CHAR_HEIGHT*size, cgs.media.numberShaders[frame] );
++		x += CHAR_WIDTH*size;
+ 		ptr++;
+ 		l--;
+ 	}
+@@ -560,59 +560,16 @@
+ 	}
+ 
+ 	// draw the team background
+-	if ( !(cg.snap->ps.pm_flags & PMF_FOLLOW) ) //If not following anybody:
++	/**if ( !(cg.snap->ps.pm_flags & PMF_FOLLOW) ) //If not following anybody:
+ 		CG_DrawTeamBackground( 0, 420, 640, 60, 0.33f, cg.snap->ps.persistant[PERS_TEAM] );
+ 	else //Sago: If we follow find the teamcolor of the guy we follow. It might not be our own team!
+ 		CG_DrawTeamBackground( 0, 420, 640, 60, 0.33f, cgs.clientinfo[ cg.snap->ps.clientNum ].team );
+-
++	**/
+ 	cent = &cg_entities[cg.snap->ps.clientNum];
+ 	ps = &cg.snap->ps;
+ 
+ 	VectorClear( angles );
+ 
+-	// draw any 3D icons first, so the changes back to 2D are minimized
+-	if ( cent->currentState.weapon && cg_weapons[ cent->currentState.weapon ].ammoModel ) {
+-		origin[0] = 70;
+-		origin[1] = 0;
+-		origin[2] = 0;
+-		angles[YAW] = 90 + 20 * sin( cg.time / 1000.0 );
+-		CG_Draw3DModel( CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE,
+-					   cg_weapons[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
+-	}
+-
+-	CG_DrawStatusBarHead( 185 + CHAR_WIDTH*3 + TEXT_ICON_SPACE );
+-
+-	if( cg.predictedPlayerState.powerups[PW_REDFLAG] ) {
+-		CG_DrawStatusBarFlag( 185 + CHAR_WIDTH*3 + TEXT_ICON_SPACE + ICON_SIZE, TEAM_RED );
+-	} else if( cg.predictedPlayerState.powerups[PW_BLUEFLAG] ) {
+-		CG_DrawStatusBarFlag( 185 + CHAR_WIDTH*3 + TEXT_ICON_SPACE + ICON_SIZE, TEAM_BLUE );
+-	} else if( cg.predictedPlayerState.powerups[PW_NEUTRALFLAG] ) {
+-		CG_DrawStatusBarFlag( 185 + CHAR_WIDTH*3 + TEXT_ICON_SPACE + ICON_SIZE, TEAM_FREE );
+-	}
+-
+-	if ( ps->stats[ STAT_ARMOR ] ) {
+-		origin[0] = 90;
+-		origin[1] = 0;
+-		origin[2] = -10;
+-		angles[YAW] = ( cg.time & 2047 ) * 360 / 2048.0;
+-		CG_Draw3DModel( 370 + CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE,
+-					   cgs.media.armorModel, 0, origin, angles );
+-	}
+-        
+-        if( cgs.gametype == GT_HARVESTER ) {
+-		origin[0] = 90;
+-		origin[1] = 0;
+-		origin[2] = -10;
+-		angles[YAW] = ( cg.time & 2047 ) * 360 / 2048.0;
+-		if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE ) {
+-			handle = cgs.media.redCubeModel;
+-		} else {
+-			handle = cgs.media.blueCubeModel;
+-		}
+-		CG_Draw3DModel( 470 + CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, handle, 0, origin, angles );
+-	}
+-        
+-        
+ 	//
+ 	// ammo
+ 	//
+@@ -631,25 +588,57 @@
+ 				}
+ 			}
+ 			trap_R_SetColor( colors[color] );
+-			
+-			CG_DrawField (0, 432, 3, value);
++			if( value >= 100 )
++				CG_DrawField (320 - 3*CHAR_WIDTH/4, 452, 3, value, 0.5f);
++			else if( value >= 10 )
++				CG_DrawField (320 - 2*CHAR_WIDTH/4, 452, 2, value, 0.5f);
++			else
++				CG_DrawField (320 - CHAR_WIDTH/4, 452, 1, value, 0.5f);
++
+ 			trap_R_SetColor( NULL );
+ 
+-			// if we didn't draw a 3D icon, draw a 2D icon for ammo
+-			if ( !cg_draw3dIcons.integer && cg_drawIcons.integer ) {
+-				qhandle_t	icon;
++		}
++		if ( cent->currentState.weapon && cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon ) {
++			CG_DrawPic( 320-ICON_SIZE/4, 420, ICON_SIZE/2, ICON_SIZE/2, cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon );
++		}
++	}
+ 
+-				icon = cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon;
+-				if ( icon ) {
+-					CG_DrawPic( CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, icon );
+-				}
+-			}
++	
++
++	if( cg.predictedPlayerState.powerups[PW_REDFLAG] ) {
++		CG_DrawStatusBarFlag( 20, TEAM_RED );
++	} else if( cg.predictedPlayerState.powerups[PW_BLUEFLAG] ) {
++		CG_DrawStatusBarFlag( 20, TEAM_BLUE );
++	} else if( cg.predictedPlayerState.powerups[PW_NEUTRALFLAG] ) {
++		CG_DrawStatusBarFlag( 20, TEAM_FREE );
++	}
++        
++        if( cgs.gametype == GT_HARVESTER ) {
++		origin[0] = 90;
++		origin[1] = 0;
++		origin[2] = -10;
++		angles[YAW] = ( cg.time & 2047 ) * 360 / 2048.0;
++		if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE ) {
++			handle = cgs.media.redCubeModel;
++		} else {
++			handle = cgs.media.blueCubeModel;
+ 		}
++		CG_Draw3DModel( 470 + CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, handle, 0, origin, angles );
+ 	}
+ 
+ 	//
+ 	// health
+ 	//
++
++	//CG_DrawStatusBarHead( 320 - 3*CHAR_WIDTH/4 - 5*TEXT_ICON_SPACE - ICON_SIZE );
++	
++	if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE ) 
++		CG_DrawPic( 320 - 3*CHAR_WIDTH/4 - 5*TEXT_ICON_SPACE - ICON_SIZE, 432, ICON_SIZE, ICON_SIZE, cgs.media.healthBlue );
++	else if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_RED )
++		CG_DrawPic( 320 - 3*CHAR_WIDTH/4 - 5*TEXT_ICON_SPACE - ICON_SIZE, 432, ICON_SIZE, ICON_SIZE, cgs.media.healthRed );
++	else
++		CG_DrawPic( 320 - 3*CHAR_WIDTH/4 - 5*TEXT_ICON_SPACE - ICON_SIZE, 432, ICON_SIZE, ICON_SIZE, cgs.media.healthYellow );
++	
+ 	value = ps->stats[STAT_HEALTH];
+ 	if ( value > 100 ) {
+ 		trap_R_SetColor( colors[3] );		// white
+@@ -663,7 +652,7 @@
+ 	}
+ 
+ 	// stretch the health up when taking damage
+-	CG_DrawField ( 185, 432, 3, value);
++	CG_DrawField ( 320 - 3*CHAR_WIDTH/2 - 4*TEXT_ICON_SPACE - 3*CHAR_WIDTH - ICON_SIZE, 432, 3, value,1.0f);
+ 	CG_ColorForHealth( hcolor );
+ 	trap_R_SetColor( hcolor );
+ 
+@@ -672,16 +661,22 @@
+ 	// armor
+ 	//
+ 	value = ps->stats[STAT_ARMOR];
+-	if (value > 0 ) {
+-		trap_R_SetColor( colors[0] );
+-		CG_DrawField (370, 432, 3, value);
+-		trap_R_SetColor( NULL );
+-		// if we didn't draw a 3D icon, draw a 2D icon for armor
+-		if ( !cg_draw3dIcons.integer && cg_drawIcons.integer ) {
+-			CG_DrawPic( 370 + CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, cgs.media.armorIcon );
+-		}
++	trap_R_SetColor( colors[0] );
++        if ( value >= 100 )
++		CG_DrawField (320 + CHAR_WIDTH + 6*TEXT_ICON_SPACE + ICON_SIZE, 432, 3, value, 1.0f);
++        else
++		CG_DrawField (320 + CHAR_WIDTH + 6*TEXT_ICON_SPACE + ICON_SIZE, 432, 2, value, 1.0f);
++	trap_R_SetColor( NULL );
++	// if we didn't draw a 3D icon, draw a 2D icon for armor
++	if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE ) 
++		CG_DrawPic( 320 + CHAR_WIDTH + 4*TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, cgs.media.armorBlue );
++	else if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_RED )
++		CG_DrawPic( 320 + CHAR_WIDTH + 4*TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, cgs.media.armorRed );
++	else
++		CG_DrawPic( 320 + CHAR_WIDTH + 4*TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, cgs.media.armorYellow );
++		
+ 
+-	}
++	
+         
+         //Skulls!
+         if(cgs.gametype == GT_HARVESTER)
+@@ -689,7 +684,7 @@
+             value = ps->generic1;
+             if (value > 0 ) {
+                     trap_R_SetColor( colors[0] );
+-                    CG_DrawField (470, 432, 3, value);
++                    CG_DrawField (470, 432, 3, value, 1.0f);
+                     trap_R_SetColor( NULL );
+                     // if we didn't draw a 3D icon, draw a 2D icon for skull
+                     if ( !cg_draw3dIcons.integer && cg_drawIcons.integer ) {
+@@ -852,12 +847,12 @@
+ 		fps = 1000 * FPS_FRAMES / total;
+ 
+ 		s = va( "%ifps", fps );
+-		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
++		w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+ 
+-		CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
++		CG_DrawSmallString( 635 - w, y + 2, s, 1.0F);
+ 	}
+ 
+-	return y + BIGCHAR_HEIGHT + 4;
++	return y + SMALLCHAR_HEIGHT + 4;
+ }
+ 
+ /*
+@@ -865,7 +860,7 @@
+ CG_DrawTimer
+ =================
+ */
+-static float CG_DrawTimer( float y ) {
++void CG_DrawTimer() {
+ 	char		*s;
+ 	int			w;
+ 	int			mins, seconds, tens;
+@@ -882,9 +877,9 @@
+ 	s = va( "%i:%i%i", mins, tens, seconds );
+ 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+ 
+-	CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
++	CG_DrawBigString( 320 - w/2, 10, s, 1.0F);
+ 
+-	return y + BIGCHAR_HEIGHT + 4;
++	return;
+ }
+ 
+ /*
+@@ -1407,9 +1402,6 @@
+ 
+ 	y = CG_DrawFollowMessage( y );
+ 
+-	if ( cg_drawTimer.integer) {
+-		y = CG_DrawTimer( y );
+-	}
+ 	if ( cg_drawAttacker.integer ) {
+ 		y = CG_DrawAttacker( y );
+ 	}
+@@ -1690,7 +1682,7 @@
+ 		  y -= ICON_SIZE;
+ 
+ 		  trap_R_SetColor( colors[color] );
+-		  CG_DrawField( x, y, 2, sortedTime[ i ] / 1000 );
++		  CG_DrawField( x, y, 2, sortedTime[ i ] / 1000 , 1.0f);
+ 
+ 		  t = ps->powerups[ sorted[i] ];
+ 		  if ( t - cg.time >= POWERUP_BLINKS * POWERUP_BLINK_TIME ) {
+@@ -1811,8 +1803,8 @@
+ 	vec4_t		hcolor;
+ 	int		chatHeight;
+ 
+-#define CHATLOC_Y 420 // bottom end
+-#define CHATLOC_X 0
++#define TEAMCHATLOC_Y 420 // bottom end
++#define TEAMCHATLOC_X 0
+ 
+ 	if (cg_teamChatHeight.integer < TEAMCHAT_HEIGHT)
+ 		chatHeight = cg_teamChatHeight.integer;
+@@ -1856,15 +1848,15 @@
+ 		}
+ 
+ 		trap_R_SetColor( hcolor );
+-		CG_DrawPic( CHATLOC_X, CHATLOC_Y - h, 640, h, cgs.media.teamStatusBar );
++		CG_DrawPic( TEAMCHATLOC_X, TEAMCHATLOC_Y - h, 640, h, cgs.media.teamStatusBar );
+ 		trap_R_SetColor( NULL );
+ 
+ 		hcolor[0] = hcolor[1] = hcolor[2] = 1.0f;
+ 		hcolor[3] = 1.0f;
+ 
+ 		for (i = cgs.teamChatPos - 1; i >= cgs.teamLastChatPos; i--) {
+-			CG_DrawStringExt( CHATLOC_X + TINYCHAR_WIDTH, 
+-				CHATLOC_Y - (cgs.teamChatPos - i)*TINYCHAR_HEIGHT, 
++			CG_DrawStringExt( TEAMCHATLOC_X + TINYCHAR_WIDTH, 
++				TEAMCHATLOC_Y - (cgs.teamChatPos - i)*TINYCHAR_HEIGHT, 
+ 				cgs.teamChatMsgs[i % chatHeight], hcolor, qfalse, qfalse,
+ 				TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
+ 		}
+@@ -1873,6 +1865,125 @@
+ #endif // MISSIONPACK
+ 
+ /*
++=================
++CG_DrawChat
++=================
++*/
++static void CG_DrawChat(void)
++{
++  int w, h;
++  int i, len;
++  vec4_t hcolor;
++  int chatHeight;
++
++#define CHATLOC_Y 60
++#define CHATLOC_X 0
++
++  if (cg_chatHeight.integer < TEAMCHAT_HEIGHT)
++    chatHeight = cg_chatHeight.integer;
++  else
++    chatHeight = TEAMCHAT_HEIGHT;
++  if (chatHeight <= 0)
++    return;                     // disabled
++
++  if (cgs.lastChatPos != cgs.chatPos)
++  {
++    if (cg.time - cgs.chatMsgTimes[cgs.lastChatPos % chatHeight] >
++        cg_chatTime.integer)
++    {
++      cgs.lastChatPos++;
++    }
++
++    h = (cgs.chatPos - cgs.lastChatPos) * TINYCHAR_HEIGHT;
++
++    w = 0;
++
++    for (i = cgs.lastChatPos; i < cgs.chatPos; i++)
++    {
++      len = CG_DrawStrlen(cgs.chatMsgs[i % chatHeight]);
++      if (len > w)
++        w = len;
++    }
++    w *= TINYCHAR_WIDTH;
++    w += TINYCHAR_WIDTH * 2;
++
++    hcolor[0] = hcolor[1] = hcolor[2] = 1.0f;
++    hcolor[3] = 1.0f;
++
++    for (i = cgs.lastChatPos; i < cgs.chatPos; i++)
++    {
++      CG_DrawStringExt(CHATLOC_X,
++                       CHATLOC_Y + (i - cgs.lastChatPos ) * TINYCHAR_HEIGHT,
++                       cgs.chatMsgs[i % chatHeight], hcolor, qfalse,
++                       qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
++    }
++  }
++}
++
++/*
++=================
++CG_DrawDeathNotice
++=================
++*/
++
++static void CG_DrawDeathNotice(void){
++  int i;
++  int x;
++  int y;
++  vec4_t color1,color2;
++  qboolean setcolor1, setcolor2;
++  y=0;
++  for( i = DEATHNOTICE_HEIGHT - 1; i >= 0 ; i-- ) {
++    if( ( cgs.deathNoticeTime[ i ] != 0 ) && ( cg.time - cgs.deathNoticeTime[ i ] < cg_deathNoticeTime.integer ) ) {
++
++      if( cgs.deathNoticeTeam1[ i ] == TEAM_RED ){
++        color1[0]=color1[3]=1.0F;
++        color1[1]=color1[2]=0.2f;
++        setcolor1 = qtrue;
++      } else if ( cgs.deathNoticeTeam1[ i ] == TEAM_BLUE ) {
++        color1[2]=color1[3]=1.0F;
++        color1[1]=color1[0]=0.2f;
++        setcolor1 = qtrue;
++      } else {
++        color1[0]=color1[1]=color1[2]=color1[3]=1.0F;
++        setcolor1 = qfalse;
++      }
++
++      if( cgs.deathNoticeTeam2[ i ] == TEAM_RED ){
++        color2[0]=color2[3]=1.0F;
++        color2[1]=color2[2]=0.2f;
++        setcolor2 = qtrue;
++      } else if ( cgs.deathNoticeTeam2[ i ] == TEAM_BLUE ) {
++        color2[2]=color2[3]=1.0F;
++        color2[1]=color2[0]=0.2f;
++        setcolor2 = qtrue;
++      } else {
++        color2[0]=color2[1]=color2[2]=color2[3]=1.0F;
++        setcolor2 = qfalse;
++      }
++      
++      x = 0;
++      CG_DrawStringExt(x,y, cgs.deathNoticeName1[ i ], color1, setcolor1, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
++
++      x += TINYCHAR_WIDTH*( CG_DrawStrlen(cgs.deathNoticeName1[ i ]));
++
++      if( cgs.deathNoticeTwoIcons[ i ] ) {
++        CG_DrawPic(x + 1, y, 8, 8, cgs.deathNoticeIcon2[ i ]);
++        x += 10;
++      }
++
++      CG_DrawPic(x + 1, y, 8, 8, cgs.deathNoticeIcon1[ i ]);
++
++      x += 10;
++
++      CG_DrawStringExt(x, y, cgs.deathNoticeName2[ i ], color2, setcolor2, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
++
++      y += TINYCHAR_HEIGHT + 2;
++    }
++  }
++}
++
++/*
+ ===================
+ CG_DrawHoldableItem
+ ===================
+@@ -3252,6 +3363,8 @@
+ #endif
+ 		}
+ 	}
++	CG_DrawDeathNotice();
++	CG_DrawChat();
+ 
+ 	CG_DrawVote();
+ 	CG_DrawTeamVote();
+@@ -3261,9 +3374,15 @@
+ #ifdef MISSIONPACK
+ 	if (!cg_paused.integer) {
+ 		CG_DrawUpperRight(stereoFrame);
++		if ( cg_drawTimer.integer) {
++			CG_DrawTimer();
++		}
+ 	}
+ #else
+ 	CG_DrawUpperRight(stereoFrame);
++	if ( cg_drawTimer.integer) {
++		CG_DrawTimer();
++	}
+ #endif
+ 
+ #ifndef MISSIONPACK
+Index: code/cgame/cg_local.h
+===================================================================
+--- code/cgame/cg_local.h	(Revision 182)
++++ code/cgame/cg_local.h	(Arbeitskopie)
+@@ -76,6 +76,8 @@
+ #define	TEAMCHAT_WIDTH		80
+ #define TEAMCHAT_HEIGHT		8
+ 
++#define DEATHNOTICE_HEIGHT	5
++
+ // very large characters.pk
+ #define	GIANT_WIDTH			32
+ #define	GIANT_HEIGHT		48
+@@ -713,7 +715,17 @@
+ 
+ 	qhandle_t	armorModel;
+ 	qhandle_t	armorIcon;
++	
++	qhandle_t 	direct_hit;
++	qhandle_t 	skull;
+ 
++	qhandle_t	armorYellow;
++	qhandle_t	armorBlue;
++	qhandle_t	armorRed;
++	qhandle_t	healthYellow;
++	qhandle_t	healthBlue;
++	qhandle_t	healthRed;
++
+ 	qhandle_t	teamStatusBar;
+ 
+ 	qhandle_t	deferShader;
+@@ -752,6 +764,9 @@
+ 	qhandle_t	lagometerShader;
+ 	qhandle_t	backTileShader;
+ 	qhandle_t	noammoShader;
++        qhandle_t	selectionShaderLeft;
++	qhandle_t	selectionShaderMid;
++	qhandle_t	selectionShaderRight;
+ 
+ 	qhandle_t	smokePuffShader;
+ 	qhandle_t	smokePuffRageProShader;
+@@ -1094,6 +1109,20 @@
+ 	int				teamChatPos;
+ 	int				teamLastChatPos;
+ 
++	char chatMsgs[TEAMCHAT_HEIGHT][TEAMCHAT_WIDTH * 3 + 1];
++	int chatMsgTimes[TEAMCHAT_HEIGHT];
++	int chatPos;
++	int lastChatPos;
++
++	int deathNoticeTime[ DEATHNOTICE_HEIGHT ];
++	char deathNoticeName1[ DEATHNOTICE_HEIGHT ][ MAX_NAME_LENGTH ];
++	char deathNoticeName2[ DEATHNOTICE_HEIGHT ][ MAX_NAME_LENGTH ];
++	int deathNoticeTeam1[ DEATHNOTICE_HEIGHT ];
++	int deathNoticeTeam2[ DEATHNOTICE_HEIGHT ];
++	qhandle_t deathNoticeIcon1[ DEATHNOTICE_HEIGHT ];
++	qhandle_t deathNoticeIcon2[ DEATHNOTICE_HEIGHT ];
++	qboolean deathNoticeTwoIcons[ DEATHNOTICE_HEIGHT ];
++
+ 	int cursorX;
+ 	int cursorY;
+ 	qboolean eventHandling;
+@@ -1193,6 +1222,8 @@
+ extern	vmCvar_t		cg_synchronousClients;
+ extern	vmCvar_t		cg_teamChatTime;
+ extern	vmCvar_t		cg_teamChatHeight;
++extern  vmCvar_t 		cg_chatTime;
++extern  vmCvar_t 		cg_chatHeight;
+ extern	vmCvar_t		cg_stats;
+ extern	vmCvar_t 		cg_forceModel;
+ extern	vmCvar_t 		cg_buildScript;
+@@ -1305,6 +1336,8 @@
+ 
+ extern vmCvar_t			cg_weaponBarStyle;
+ 
++extern vmCvar_t 		cg_deathNoticeTime;
++
+ //unlagged - cg_unlagged.c
+ void CG_PredictWeaponEffects( centity_t *cent );
+ //void CG_AddBoundingBox( centity_t *cent );
+@@ -1495,15 +1528,11 @@
+ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team );
+ void CG_DrawWeaponSelect( void );
+ 
+-void CG_DrawWeaponBar0(int count, int bits);
+-void CG_DrawWeaponBar1(int count, int bits);
++void CG_DrawWeaponBar0(int count, int bits, float *color);
++void CG_DrawWeaponBar1(int count, int bits, float *color);
+ void CG_DrawWeaponBar2(int count, int bits, float *color);
+-void CG_DrawWeaponBar3(int count, int bits, float *color);
+-void CG_DrawWeaponBar4(int count, int bits, float *color);
+-void CG_DrawWeaponBar5(int count, int bits, float *color);
+-void CG_DrawWeaponBar6(int count, int bits, float *color);
+-void CG_DrawWeaponBar7(int count, int bits, float *color);
+ 
++
+ void CG_OutOfAmmoChange( void );	// should this be in pmove?
+ 
+ //
+Index: code/cgame/cg_weapons.c
+===================================================================
+--- code/cgame/cg_weapons.c	(Revision 182)
++++ code/cgame/cg_weapons.c	(Arbeitskopie)
+@@ -1550,29 +1550,17 @@
+ 	
+ 	switch(cg_weaponBarStyle.integer){
+ 		case 0:
+-			CG_DrawWeaponBar0(count,bits);
++			CG_DrawWeaponBar0(count,bits, color);
+ 			break;
+ 		case 1:
+-			CG_DrawWeaponBar1(count,bits);
++			CG_DrawWeaponBar1(count,bits, color);
+ 			break;
+ 		case 2:
+ 			CG_DrawWeaponBar2(count,bits, color);
+ 			break;
+-		case 3:
+-			CG_DrawWeaponBar3(count,bits, color);
++		default:
++			CG_DrawWeaponBar0(count,bits, color);
+ 			break;
+-		case 4:
+-			CG_DrawWeaponBar4(count,bits, color);
+-			break;
+-		case 5:
+-			CG_DrawWeaponBar5(count,bits, color);
+-			break;
+-		case 6:
+-			CG_DrawWeaponBar6(count,bits, color);
+-			break;
+-		case 7:
+-			CG_DrawWeaponBar7(count,bits, color);
+-			break;
+ 	}
+ 	trap_R_SetColor(NULL);
+ 	return;
+@@ -1584,175 +1572,14 @@
+ ===============
+ */
+ 
+-void CG_DrawWeaponBar0(int count, int bits){
++void CG_DrawWeaponBar0(int count, int bits, float *color){
+ 
+-	int y = 380;
+-	int x = 320 - count * 20;
+-	int i;
+-	
+-	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
+-                //Sago: Do mad change of grapple placement:
+-                if(i==10)
+-                    continue;
+-                if(i==0)
+-                    i=10;
+-		if ( !( bits & ( 1 << i ) ) ) {
+-                    if(i==10)
+-                        i=0;
+-			continue;
+-		}
+-
+-		CG_RegisterWeapon( i );
+-		// draw weapon icon
+-		CG_DrawPic( x, y, 32, 32, cg_weapons[i].weaponIcon );
+-
+-		// draw selection marker
+-		if ( i == cg.weaponSelect ) {
+-			CG_DrawPic( x-4, y-4, 40, 40, cgs.media.selectShader );
+-		}
+-
+-		// no ammo cross on top
+-		if ( !cg.snap->ps.ammo[ i ] ) {
+-			  CG_DrawPic( x, y, 32, 32, cgs.media.noammoShader );
+-		}
+-
+-		x += 40;
+-                //Sago: Undo mad change of weapons
+-                if(i==10)
+-                        i=0;
+-	}
+-}
+-
+-/*
+-===============
+-CG_DrawWeaponBar1
+-===============
+-*/
+-
+-void CG_DrawWeaponBar1(int count, int bits){
+-
+-	int y = 380;
+-	int x = 320 - count * 20;
+-	int i;
+-	int ammo;
+-	int br;
+-	int max;
+-	float red[4];
+-	float yellow[4];
+-	float green[4];
+-	
+-	red[0] = 1.0f;
+-	red[1] = 0;
+-	red[2] = 0;
+-	red[3] = 1.0f;
+-	
+-	yellow[0] = 1.0f;
+-	yellow[1] = 0.6f;
+-	yellow[2] = 0;
+-	yellow[3] = 1.0f;
+-	
+-	green[0] = 0;
+-	green[1] = 1.0f;
+-	green[2] = 0;
+-	green[3] = 1.0f;
+-	
+-	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
+-                //Sago: Do mad change of grapple placement:
+-                if(i==10)
+-                    continue;
+-                if(i==0)
+-                    i=10;
+-		if ( !( bits & ( 1 << i ) ) ) {
+-                    if(i==10)
+-                        i=0;
+-			continue;
+-		}
+-		
+-		ammo=cg.snap->ps.ammo[i];
+-			
+-		switch(i) {
+-			case WP_MACHINEGUN: max = 100; break;
+-			case WP_SHOTGUN: max = 10; break;
+-			case WP_GRENADE_LAUNCHER: max = 10; break;
+-			case WP_ROCKET_LAUNCHER: max = 10; break;
+-			case WP_LIGHTNING: max = 100; break;
+-			case WP_RAILGUN: max = 10; break;
+-			case WP_PLASMAGUN: max = 50; break;
+-			case WP_BFG: max = 10; break;
+-			case WP_NAILGUN: max = 10; break;
+-			case WP_PROX_LAUNCHER: max = 5; break;
+-			case WP_CHAINGUN: max = 100; break;
+-			default: max = 1; break;
+-		}
+-			
+-		ammo = (ammo*100)/max;
+-		if(ammo >=100)
+-			ammo=100;
+-			
+-		br=ammo*32/100;
+-			
+-		if(i!=1){
+-			if(ammo <= 20)
+-				CG_FillRect( x, y+38, br,4, red);
+-			if(ammo > 20 && ammo <= 50)
+-				CG_FillRect( x, y+38, br, 4, yellow);
+-			if(ammo > 50)
+-				CG_FillRect( x, y+38, br, 4, green);
+-		}
+-
+-		CG_RegisterWeapon( i );
+-		// draw weapon icon
+-		CG_DrawPic( x, y, 32, 32, cg_weapons[i].weaponIcon );
+-
+-		// draw selection marker
+-		if ( i == cg.weaponSelect ) {
+-			CG_DrawPic( x-4, y-4, 40, 40, cgs.media.selectShader );
+-		}
+-
+-		// no ammo cross on top
+-		if ( !cg.snap->ps.ammo[ i ] ) {
+-			  CG_DrawPic( x, y, 32, 32, cgs.media.noammoShader );
+-		}
+-
+-		x += 40;
+-                //Sago: Undo mad change of weapons
+-                if(i==10)
+-                        i=0;
+-	}
+-}
+-
+-/*
+-===============
+-CG_DrawWeaponBar2
+-===============
+-*/
+-
+-void CG_DrawWeaponBar2(int count, int bits, float *color){
+-
+ 	int y = 200 + count * 12;
+ 	int x = 0;
+ 	int i;
+ 	int w;
+ 	char *s;
+-	float red[4];
+-	float yellow[4];
+-	float blue[4];
+ 	
+-	red[0] = 1.0f;
+-	red[1] = 0;
+-	red[2] = 0;
+-	red[3] = 0.4f;
+-	
+-	yellow[0] = 1.0f;
+-	yellow[1] = 1.0f;
+-	yellow[2] = 0;
+-	yellow[3] = 1.0f;
+-	
+-	blue[0] = 0;
+-	blue[1] = 0;
+-	blue[2] = 1.0f;
+-	blue[3] = 0.4f;
+-	
+ 	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
+                 //Sago: Do mad change of grapple placement:
+                 if(i==10)
+@@ -1764,28 +1591,17 @@
+                         i=0;
+ 		    continue;
+ 		}
+-			
+-		if(cg.snap->ps.ammo[i]){
++		if( i != WP_GAUNTLET ) {
++			// draw weapon icon
+ 			if ( i == cg.weaponSelect) {
+-				CG_FillRect( x, y, 50, 24, blue );
+-				CG_DrawRect( x, y, 50, 24, 2, yellow); 
++				CG_DrawPic( x, y, 50, 24, cgs.media.selectionShaderLeft );
+ 			}
+-			else{   
+-				CG_FillRect( x, y,50, 24, blue );
+-			}
+-		}
+-		else{ 
+-			if ( i == cg.weaponSelect) { 
+-				CG_FillRect( x, y, 50, 24, red );
+-				CG_DrawRect( x, y, 50, 24, 2, yellow);
+-			}
+-			else{
+-				CG_FillRect( x, y,50, 24, red );
+-			}
+-		}
+-		     
+-			// draw weapon icon
++
+ 			CG_DrawPic( x+2, y+4, 16, 16, cg_weapons[i].weaponIcon );
++
++			if(cg.snap->ps.ammo[i] == 0){
++				CG_DrawPic( x+2, y+4, 16, 16, cgs.media.noammoShader );
++			}	
+ 		
+ 			/** Draw Weapon Ammo **/
+ 			if(cg.snap->ps.ammo[ i ]!=-1){
+@@ -1795,6 +1611,7 @@
+ 			}
+ 
+ 			y -= 24;
++		}
+                 //Sago: Undo mad change of weapons
+                 if(i==10)
+                         i=0;
+@@ -1803,45 +1620,19 @@
+ 
+ /*
+ ===============
+-CG_DrawWeaponBar3
++CG_DrawWeaponBar1
+ ===============
+ */
+ 
+-void CG_DrawWeaponBar3(int count, int bits, float *color){
++void CG_DrawWeaponBar1(int count, int bits, float *color){
+ 
+-	int y = 200 + count * 12;
+-	int x = 0;
++	int y = 370;
++	int x = 320 - (count-1) * 15;
+ 	int i;
+-	int ammo;
+-	int max;
+-	int br;
+ 	int w;
+ 	char *s;
+-	float red[4];
+-	float yellow[4];
+-	float green[4];
+-	float blue[4];
+ 	
+-	red[0] = 1.0f;
+-	red[1] = 0;
+-	red[2] = 0;
+-	red[3] = 0.4f;
+ 	
+-	yellow[0] = 1.0f;
+-	yellow[1] = 1.0f;
+-	yellow[2] = 0;
+-	yellow[3] = 1.0f;
+-	
+-	green[0] = 0;
+-	green[1] = 1.0f;
+-	green[2] = 0;
+-	green[3] = 1.0f;
+-	
+-	blue[0] = 0;
+-	blue[1] = 0;
+-	blue[2] = 1.0f;
+-	blue[3] = 0.4f;
+-	
+ 	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
+                 //Sago: Do mad change of grapple placement:
+                 if(i==10)
+@@ -1853,70 +1644,27 @@
+                         i=0;
+ 			continue;
+ 		}
+-		
+-		ammo=cg.snap->ps.ammo[i];
+-
+-		switch(i) {
+-			case WP_MACHINEGUN: max = 100; break;
+-			case WP_SHOTGUN: max = 10; break;
+-			case WP_GRENADE_LAUNCHER: max = 10; break;
+-			case WP_ROCKET_LAUNCHER: max = 10; break;
+-			case WP_LIGHTNING: max = 100; break;
+-			case WP_RAILGUN: max = 10; break;
+-			case WP_PLASMAGUN: max = 50; break;
+-			case WP_BFG: max = 10; break;
+-			case WP_NAILGUN: max = 10; break;
+-			case WP_PROX_LAUNCHER: max = 5; break;
+-			case WP_CHAINGUN: max = 100; break;
+-			default: max = 1; break;
+-		}
+-			
+-		ammo = (ammo*100)/max;
+-		if(ammo >=100)
+-			ammo=100;
+-			
+-		br=ammo*20/100;
+-				
+-		if(i!=1){
+-			if(ammo <= 20)
+-				CG_FillRect( 51, y+2+20-br, 4,br, red);
+-			if(ammo > 20 && ammo <= 50)
+-				CG_FillRect( 51, y+2+20-br, 4,br, yellow);
+-			if(ammo > 50)
+-				CG_FillRect( 51, y+2+20-br, 4,br, green);
+-		}
+-			
+-		if(cg.snap->ps.ammo[i]){
++		if( i != WP_GAUNTLET ) {
++			// draw weapon icon
+ 			if ( i == cg.weaponSelect) {
+-				CG_FillRect( x, y, 50, 24, blue );
+-				CG_DrawRect( x, y, 50, 24, 2, yellow); 
++				CG_DrawPic( x, y, 30, 38, cgs.media.selectionShaderMid );
+ 			}
+-			else{   
+-				CG_FillRect( x, y,50, 24, blue );
++
++			CG_DrawPic( x+7, y+2, 16, 16, cg_weapons[i].weaponIcon );
++
++			if(cg.snap->ps.ammo[i] == 0){
++				CG_DrawPic( x+7, y+2, 16, 16, cgs.media.noammoShader );
+ 			}
+-		}
+-		else{ 
+-			if ( i == cg.weaponSelect) { 
+-				CG_FillRect( x, y, 50, 24, red );
+-				CG_DrawRect( x, y, 50, 24, 2, yellow);
+-			}
+-			else{
+-					CG_FillRect( x, y,50, 24, red );
+-			}
+-		}
+-		     
+-			// draw weapon icon
+-			CG_DrawPic( x+2, y+4, 16, 16, cg_weapons[i].weaponIcon );
+-		
+-			/** Draw Weapon Ammo **/
++	
+ 			if(cg.snap->ps.ammo[ i ]!=-1){
+ 				s = va("%i", cg.snap->ps.ammo[ i ] );
+ 				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+-				CG_DrawSmallStringColor(x - w/2 + 32, y+4, s, color);
++				CG_DrawSmallStringColor(x - w/2 + 15, y+20, s, color);
+ 			}
+-
+-			y -= 24;
+-                        //Sago: Undo mad change of weapons
++			
++			x += 30;
++		}
++                //Sago: Undo mad change of weapons
+                 if(i==10)
+                         i=0;
+ 	}
+@@ -1924,30 +1672,18 @@
+ 
+ /*
+ ===============
+-CG_DrawWeaponBar4
++CG_DrawWeaponBar2
+ ===============
+ */
+ 
+-void CG_DrawWeaponBar4(int count, int bits, float *color){
++void CG_DrawWeaponBar2(int count, int bits, float *color){
+ 
+ 	int y = 200 + count * 12;
+-	int x = 0;
++	int x = 640-50;
+ 	int i;
+-	float ammo;
+-	int max;
+ 	int w;
+ 	char *s;
+-	float boxColor[4];
+-	float yellow[4];
+ 	
+-	boxColor[1]=0;
+-	boxColor[3]=0.4f;
+-	
+-	yellow[0] = 1.0f;
+-	yellow[1] = 1.0f;
+-	yellow[2] = 0;
+-	yellow[3] = 1.0f;
+-	
+ 	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
+                 //Sago: Do mad change of grapple placement:
+                 if(i==10)
+@@ -1957,44 +1693,19 @@
+ 		if ( !( bits & ( 1 << i ) ) ) {
+                     if(i==10)
+                         i=0;
+-			continue;
++		    continue;
+ 		}
+-		
+-		ammo=cg.snap->ps.ammo[i];
+-
+-		switch(i) {
+-			case WP_MACHINEGUN: max = 100; break;
+-			case WP_SHOTGUN: max = 10; break;
+-			case WP_GRENADE_LAUNCHER: max = 10; break;
+-			case WP_ROCKET_LAUNCHER: max = 10; break;
+-			case WP_LIGHTNING: max = 100; break;
+-			case WP_RAILGUN: max = 10; break;
+-			case WP_PLASMAGUN: max = 50; break;
+-			case WP_BFG: max = 10; break;
+-			case WP_NAILGUN: max = 10; break;
+-			case WP_PROX_LAUNCHER: max = 5; break;
+-			case WP_CHAINGUN: max = 100; break;
+-			default: max = 1; break;
+-		}
+-			
+-		ammo = (ammo*100)/max;
+-			
+-		if((ammo >=100) || (ammo < 0))
+-			ammo=100;
+-			
+-		boxColor[2]=(ammo/100.0f)*1.0f;
+-		boxColor[0]=1.0f-(ammo/100.0f)*1.0f;	
+-		
+-		if ( i == cg.weaponSelect) {
+-			CG_FillRect( x, y, 50, 24, boxColor );
+-			CG_DrawRect( x, y, 50, 24, 2, yellow); 
+-		}
+-		else{   
+-			CG_FillRect( x, y,50, 24, boxColor );
+-		}
+-			
++		if( i != WP_GAUNTLET ) {
+ 			// draw weapon icon
++			if ( i == cg.weaponSelect) {
++				CG_DrawPic( x, y, 50, 24, cgs.media.selectionShaderRight );
++			}
++
+ 			CG_DrawPic( x+2, y+4, 16, 16, cg_weapons[i].weaponIcon );
++
++			if(cg.snap->ps.ammo[i] == 0){
++				CG_DrawPic( x+2, y+4, 16, 16, cgs.media.noammoShader );
++			}	
+ 		
+ 			/** Draw Weapon Ammo **/
+ 			if(cg.snap->ps.ammo[ i ]!=-1){
+@@ -2004,297 +1715,17 @@
+ 			}
+ 
+ 			y -= 24;
+-                        //Sago: Undo mad change of weapons
+-                if(i==10)
+-                        i=0;
+-	}
+-}
+-
+-/*
+-===============
+-CG_DrawWeaponBar5
+-===============
+-*/
+-
+-void CG_DrawWeaponBar5(int count, int bits, float *color){
+-
+-	int y = 380;
+-	int x = 320 - count * 15;
+-	int i;
+-	int w;
+-	char *s;
+-	float red[4];
+-	float yellow[4];
+-	float blue[4];
+-	
+-	red[0] = 1.0f;
+-	red[1] = 0;
+-	red[2] = 0;
+-	red[3] = 0.4f;
+-	
+-	yellow[0] = 1.0f;
+-	yellow[1] = 1.0f;
+-	yellow[2] = 0;
+-	yellow[3] = 1.0f;
+-	
+-	blue[0] = 0;
+-	blue[1] = 0;
+-	blue[2] = 1.0f;
+-	blue[3] = 0.4f;
+-	
+-	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
+-                //Sago: Do mad change of grapple placement:
+-                if(i==10)
+-                    continue;
+-                if(i==0)
+-                    i=10;
+-		if ( !( bits & ( 1 << i ) ) ) {
+-                    if(i==10)
+-                        i=0;
+-			continue;
+ 		}
+-			
+-		if(cg.snap->ps.ammo[i]){
+-			if ( i == cg.weaponSelect) {
+-				CG_FillRect( x, y , 30 , 38, blue );
+-				CG_DrawRect( x, y, 30 ,38 ,2, yellow); 
+-			}
+-			else{   
+-				CG_FillRect( x, y,30, 38, blue );
+-			}
+-		}
+-		else{ 
+-			if ( i == cg.weaponSelect) {
+-				CG_FillRect( x, y , 30 , 38, red );
+-				CG_DrawRect( x , y, 30,38,2, yellow); 
+-			}
+-			else{
+-				CG_FillRect( x, y,30, 38, red );
+-			}
+-		}
+-				
+-		CG_DrawPic( x+7, y+2, 16, 16, cg_weapons[i].weaponIcon );
+-			
+-		if(cg.snap->ps.ammo[ i ]!=-1){
+-			s = va("%i", cg.snap->ps.ammo[ i ] );
+-			w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+-			CG_DrawSmallStringColor(x - w/2 + 15, y+20, s, color);
+-		}
+-			
+-		x += 30;
+-                //Sago: Undo mad change of weapons
+-                if(i==10)
+-                        i=0;
+-	}
+-}
+ 
+-/*
+-===============
+-CG_DrawWeaponBar6
+-===============
+-*/
+-
+-void CG_DrawWeaponBar6(int count, int bits, float *color){
+-
+-	int y = 380;
+-	int x = 320 - count * 15;
+-	int i;
+-	int ammo;
+-	int max;
+-	int br;
+-	int w;
+-	char *s;
+-	float red[4];
+-	float yellow[4];
+-	float green[4];
+-	float blue[4];
+-	
+-	red[0] = 1.0f;
+-	red[1] = 0;
+-	red[2] = 0;
+-	red[3] = 0.4f;
+-	
+-	yellow[0] = 1.0f;
+-	yellow[1] = 1.0f;
+-	yellow[2] = 0;
+-	yellow[3] = 1.0f;
+-	
+-	green[0] = 0;
+-	green[1] = 1.0f;
+-	green[2] = 0;
+-	green[3] = 1.0f;
+-	
+-	blue[0] = 0;
+-	blue[1] = 0;
+-	blue[2] = 1.0f;
+-	blue[3] = 0.4f;
+-	
+-	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
+-                //Sago: Do mad change of grapple placement:
+-                if(i==10)
+-                    continue;
+-                if(i==0)
+-                    i=10;
+-		if ( !( bits & ( 1 << i ) ) ) {
+-                    if(i==10)
+-                        i=0;
+-			continue;
+-		}
+-		
+-		ammo=cg.snap->ps.ammo[i];
+-		
+-		switch(i) {
+-			case WP_MACHINEGUN: max = 100; break;
+-			case WP_SHOTGUN: max = 10; break;
+-			case WP_GRENADE_LAUNCHER: max = 10; break;
+-			case WP_ROCKET_LAUNCHER: max = 10; break;
+-			case WP_LIGHTNING: max = 100; break;
+-			case WP_RAILGUN: max = 10; break;
+-			case WP_PLASMAGUN: max = 50; break;
+-			case WP_BFG: max = 10; break;
+-			case WP_NAILGUN: max = 10; break;
+-			case WP_PROX_LAUNCHER: max = 5; break;
+-			case WP_CHAINGUN: max = 100; break;
+-			default: max = 1; break;
+-		}
+-			
+-		ammo = (ammo*100)/max;
+-			
+-		if(ammo >=100)
+-			ammo=100;
+-			
+-		br=ammo*26/100;
+-				
+-		if(i!=1){
+-			if(ammo <= 20)
+-				CG_FillRect( x+2, y +40, br, 4, red);
+-			if(ammo > 20 && ammo <= 50)
+-				CG_FillRect( x+2, y+40, br, 4, yellow);
+-			if(ammo > 50)
+-				CG_FillRect( x+2, y+40, br, 4, green);
+-		}
+-			
+-		if(cg.snap->ps.ammo[i]){
+-			if ( i == cg.weaponSelect) {
+-				CG_FillRect( x, y , 30 , 38, blue );
+-				CG_DrawRect( x, y, 30 ,38 ,2, yellow); 
+-			}
+-			else{   
+-					CG_FillRect( x, y,30, 38, blue );
+-			}
+-		}
+-		else{ 
+-			if ( i == cg.weaponSelect) {
+-				CG_FillRect( x, y , 30 , 38, red );
+-				CG_DrawRect( x , y, 30,38,2, yellow); 
+-			}
+-			else{
+-					CG_FillRect( x, y,30, 38, red );
+-			}
+-		}	
+-			
+-		CG_DrawPic( x+7, y+2, 16, 16, cg_weapons[i].weaponIcon );
+-			
+-		if(cg.snap->ps.ammo[ i ]!=-1){
+-			s = va("%i", cg.snap->ps.ammo[ i ] );
+-			w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+-			CG_DrawSmallStringColor(x - w/2 + 15, y+20, s, color);
+-		}
+-			
+-		x += 30;
+                 //Sago: Undo mad change of weapons
+                 if(i==10)
+                         i=0;
+ 	}	
+ }
+ 
+-/*
+-===============
+-CG_DrawWeaponBar7
+-===============
+-*/
+ 
+-void CG_DrawWeaponBar7(int count, int bits, float *color){
+ 
+-	int y = 380;
+-	int x = 320 - count * 15;
+-	int i;
+-	float ammo;
+-	float max;
+-	int w;
+-	char *s;
+-	float yellow[4];
+-	float boxColor[4];
+-	
+-	boxColor[1]=0;
+-	boxColor[3]=0.4f;
+-	
+-	yellow[0] = 1.0f;
+-	yellow[1] = 1.0f;
+-	yellow[2] = 0;
+-	yellow[3] = 1.0f;
+-	
+-	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
+-                //Sago: Do mad change of grapple placement:
+-                if(i==10)
+-                    continue;
+-                if(i==0)
+-                    i=10;
+-		if ( !( bits & ( 1 << i ) ) ) {
+-                    if(i==10)
+-                        i=0;
+-			continue;
+-		}
+-		
+-		ammo=cg.snap->ps.ammo[i];
+-		
+-		switch(i) {
+-			case WP_MACHINEGUN: max = 100; break;
+-			case WP_SHOTGUN: max = 10; break;
+-			case WP_GRENADE_LAUNCHER: max = 10; break;
+-			case WP_ROCKET_LAUNCHER: max = 10; break;
+-			case WP_LIGHTNING: max = 100; break;
+-			case WP_RAILGUN: max = 10; break;
+-			case WP_PLASMAGUN: max = 50; break;
+-			case WP_BFG: max = 10; break;
+-			case WP_NAILGUN: max = 10; break;
+-			case WP_PROX_LAUNCHER: max = 5; break;
+-			case WP_CHAINGUN: max = 100; break;
+-			default: max = 1; break;
+-		}
+-			
+-		ammo = (ammo*100)/max;
+-			
+-		if((ammo >=100) || (ammo < 0))
+-			ammo=100;
+-			
+-		boxColor[2]=(ammo/100.0f)*1.0f;
+-		boxColor[0]=1.0f-(ammo/100.0f)*1.0f;
+-				
+-		if ( i == cg.weaponSelect) {
+-			CG_FillRect( x, y , 30 , 38, boxColor );
+-			CG_DrawRect( x, y, 30 ,38 ,2, yellow); 
+-		}
+-		else{   
+-				CG_FillRect( x, y,30, 38, boxColor );
+-		}
+-			
+-		CG_DrawPic( x+7, y+2, 16, 16, cg_weapons[i].weaponIcon );
+-			
+-		if(cg.snap->ps.ammo[ i ]!=-1){
+-			s = va("%i", cg.snap->ps.ammo[ i ] );
+-			w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+-			CG_DrawSmallStringColor(x - w/2 + 15, y+20, s, color);
+-		}
+-		
+-		x += 30;
+-                //Sago: Undo mad change of weapons
+-                if(i==10)
+-                        i=0;
+-	}
+-}
+ 
+-
+ /*
+ ===============
+ CG_WeaponSelectable
+Index: code/cgame/cg_servercmds.c
+===================================================================
+--- code/cgame/cg_servercmds.c	(Revision 182)
++++ code/cgame/cg_servercmds.c	(Arbeitskopie)
+@@ -616,6 +616,89 @@
+ }
+ 
+ /*
++=======================
++CG_AddToChat
++
++=======================
++*/
++static void CG_AddToChat(const char *str)
++{
++  int len;
++  char *p, *ls;
++  int lastcolor;
++  int chatHeight;
++
++  if (cg_chatHeight.integer < TEAMCHAT_HEIGHT)
++  {
++    chatHeight = cg_chatHeight.integer;
++  }
++  else
++  {
++    chatHeight = TEAMCHAT_HEIGHT;
++  }
++
++  if (chatHeight <= 0 || cg_chatTime.integer <= 0)
++  {
++    // team chat disabled, dump into normal chat
++    cgs.chatPos = cgs.lastChatPos = 0;
++    return;
++  }
++
++  len = 0;
++
++  p = cgs.chatMsgs[cgs.chatPos % chatHeight];
++  *p = 0;
++
++  lastcolor = '7';
++
++  ls = NULL;
++  while (*str)
++  {
++    if (len > TEAMCHAT_WIDTH - 1)
++    {
++      if (ls)
++      {
++        str -= (p - ls);
++        str++;
++        p -= (p - ls);
++      }
++      *p = 0;
++
++      cgs.chatMsgTimes[cgs.chatPos % chatHeight] = cg.time;
++
++      cgs.chatPos++;
++      p = cgs.chatMsgs[cgs.chatPos % chatHeight];
++      *p = 0;
++      *p++ = Q_COLOR_ESCAPE;
++      *p++ = lastcolor;
++      len = 0;
++      ls = NULL;
++    }
++
++    if (Q_IsColorString(str))
++    {
++      *p++ = *str++;
++      lastcolor = *str;
++      *p++ = *str++;
++      continue;
++    }
++    if (*str == ' ')
++    {
++      ls = p;
++    }
++    *p++ = *str++;
++    len++;
++  }
++  *p = 0;
++
++  cgs.chatMsgTimes[cgs.chatPos % chatHeight] = cg.time;
++  cgs.chatPos++;
++
++  if (cgs.chatPos - cgs.lastChatPos > chatHeight)
++    cgs.lastChatPos = cgs.chatPos - chatHeight;
++}
++
++/*
+ ===============
+ CG_MapRestart
+ 
+@@ -1208,6 +1291,7 @@
+ 			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+ 			Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
+ 			CG_RemoveChatEscapeChar( text );
++			CG_AddToChat(text);
+ 			CG_Printf( "%s\n", text );
+ 		}
+ 		return;
+Index: code/cgame/cg_event.c
+===================================================================
+--- code/cgame/cg_event.c	(Revision 182)
++++ code/cgame/cg_event.c	(Arbeitskopie)
+@@ -90,7 +90,12 @@
+ 	char		attackerName[32];
+ 	gender_t	gender;
+ 	clientInfo_t	*ci;
++	qhandle_t icon1;
++	qhandle_t icon2;
++	qboolean twoIcons;
+ 
++	twoIcons = qfalse;
++
+ 	target = ent->otherEntityNum;
+ 	attacker = ent->otherEntityNum2;
+ 	mod = ent->eventParm;
+@@ -123,30 +128,39 @@
+         else
+             switch( mod ) {
+             case MOD_SUICIDE:
++		    icon1 = cgs.media.skull;
+                     message = "suicides";
+                     break;
+             case MOD_FALLING:
++		    icon1 = cgs.media.skull;
+                     message = "cratered";
+                     break;
+             case MOD_CRUSH:
++		    icon1 = cgs.media.skull;
+                     message = "was squished";
+                     break;
+             case MOD_WATER:
++		    icon1 = cgs.media.skull;
+                     message = "sank like a rock";
+                     break;
+             case MOD_SLIME:
++		    icon1 = cgs.media.skull;
+                     message = "melted";
+                     break;
+             case MOD_LAVA:
++		    icon1 = cgs.media.skull;
+                     message = "does a back flip into the lava";
+                     break;
+             case MOD_TARGET_LASER:
++		    icon1 = cgs.media.skull;
+                     message = "saw the light";
+                     break;
+             case MOD_TRIGGER_HURT:
++		    icon1 = cgs.media.skull;
+                     message = "was in the wrong place";
+                     break;
+             default:
++		    icon1 = cgs.media.skull;
+                     message = NULL;
+                     break;
+             }
+@@ -155,9 +169,11 @@
+ 		gender = ci->gender;
+ 		switch (mod) {
+ 		case MOD_KAMIKAZE:
++			icon1 = cgs.media.skull;
+ 			message = "goes out with a bang";
+ 			break;
+ 		case MOD_GRENADE_SPLASH:
++			icon1 = cg_weapons[WP_GRENADE_LAUNCHER].weaponIcon;
+ 			if ( gender == GENDER_FEMALE )
+ 				message = "tripped on her own grenade";
+ 			else if ( gender == GENDER_NEUTER )
+@@ -166,6 +182,7 @@
+ 				message = "tripped on his own grenade";
+ 			break;
+ 		case MOD_ROCKET_SPLASH:
++			icon1 = cg_weapons[WP_ROCKET_LAUNCHER].weaponIcon;
+ 			if ( gender == GENDER_FEMALE )
+ 				message = "blew herself up";
+ 			else if ( gender == GENDER_NEUTER )
+@@ -174,6 +191,7 @@
+ 				message = "blew himself up";
+ 			break;
+ 		case MOD_PLASMA_SPLASH:
++			icon1 = cg_weapons[WP_PLASMAGUN].weaponIcon;
+ 			if ( gender == GENDER_FEMALE )
+ 				message = "melted herself";
+ 			else if ( gender == GENDER_NEUTER )
+@@ -182,9 +200,11 @@
+ 				message = "melted himself";
+ 			break;
+ 		case MOD_BFG_SPLASH:
++			icon1 = cg_weapons[WP_BFG].weaponIcon;
+ 			message = "should have used a smaller gun";
+ 			break;
+ 		case MOD_PROXIMITY_MINE:
++			icon1 = cg_weapons[WP_PROX_LAUNCHER].weaponIcon;
+ 			if( gender == GENDER_FEMALE ) {
+ 				message = "found her prox mine";
+ 			} else if ( gender == GENDER_NEUTER ) {
+@@ -194,6 +214,7 @@
+ 			}
+ 			break;
+ 		default:
++			icon1 = cgs.media.skull;
+ 			if ( gender == GENDER_FEMALE )
+ 				message = "killed herself";
+ 			else if ( gender == GENDER_NEUTER )
+@@ -206,6 +227,7 @@
+ 
+         //If a suicide happens while disconnecting then we might not have a targetName
+ 	if (message && strlen(targetName)) {
++		CG_AddDeathNotice( "", cgs.clientinfo[attacker].team, va("%s",targetName), cgs.clientinfo[target].team, twoIcons, icon1, icon2 );
+ 		CG_Printf( "%s %s.\n", targetName, message);
+ 		return;
+ 	}
+@@ -257,96 +279,128 @@
+                 else
+ 		switch (mod) {
+ 		case MOD_GRAPPLE:
++			icon1 = cg_weapons[WP_GRAPPLING_HOOK].weaponIcon;
+ 			message = "was caught by";
+ 			break;
+ 		case MOD_GAUNTLET:
++			icon1 = cg_weapons[WP_GAUNTLET].weaponIcon;
+ 			message = "was pummeled by";
+ 			break;
+ 		case MOD_MACHINEGUN:
++			icon1 = cg_weapons[WP_MACHINEGUN].weaponIcon;
+ 			message = "was machinegunned by";
+ 			break;
+ 		case MOD_SHOTGUN:
++			icon1 = cg_weapons[WP_SHOTGUN].weaponIcon;
+ 			message = "was gunned down by";
+ 			break;
+ 		case MOD_GRENADE:
++			icon1 = cg_weapons[WP_GRENADE_LAUNCHER].weaponIcon;
++			icon2 = cgs.media.direct_hit;
++			twoIcons = qtrue;
+ 			message = "ate";
+ 			message2 = "'s grenade";
+ 			break;
+ 		case MOD_GRENADE_SPLASH:
++			icon1 = cg_weapons[WP_GRENADE_LAUNCHER].weaponIcon;
+ 			message = "was shredded by";
+ 			message2 = "'s shrapnel";
+ 			break;
+ 		case MOD_ROCKET:
++			icon1 = cg_weapons[WP_ROCKET_LAUNCHER].weaponIcon;
++			icon2 = cgs.media.direct_hit;
++			twoIcons = qtrue;
+ 			message = "ate";
+ 			message2 = "'s rocket";
+ 			break;
+ 		case MOD_ROCKET_SPLASH:
++			icon1 = cg_weapons[WP_ROCKET_LAUNCHER].weaponIcon;
+ 			message = "almost dodged";
+ 			message2 = "'s rocket";
+ 			break;
+ 		case MOD_PLASMA:
++			icon1 = cg_weapons[WP_PLASMAGUN].weaponIcon;
+ 			message = "was melted by";
+ 			message2 = "'s plasmagun";
+ 			break;
+ 		case MOD_PLASMA_SPLASH:
++			icon1 = cg_weapons[WP_PLASMAGUN].weaponIcon;
+ 			message = "was melted by";
+ 			message2 = "'s plasmagun";
+ 			break;
+ 		case MOD_RAILGUN:
++			icon1 = cg_weapons[WP_RAILGUN].weaponIcon;
+ 			message = "was railed by";
+ 			break;
+ 		case MOD_LIGHTNING:
++			icon1 = cg_weapons[WP_LIGHTNING].weaponIcon;
+ 			message = "was electrocuted by";
+ 			break;
+ 		case MOD_BFG:
++			icon2 = cgs.media.direct_hit;
++			twoIcons = qtrue;
+ 		case MOD_BFG_SPLASH:
++			icon1 = cg_weapons[WP_BFG].weaponIcon;
+ 			message = "was blasted by";
+ 			message2 = "'s BFG";
+ 			break;
+ 		case MOD_NAIL:
++			icon1 = cg_weapons[WP_NAILGUN].weaponIcon;
+ 			message = "was nailed by";
+ 			break;
+ 		case MOD_CHAINGUN:
++			icon1 = cg_weapons[WP_CHAINGUN].weaponIcon;
+ 			message = "got lead poisoning from";
+ 			message2 = "'s Chaingun";
+ 			break;
+ 		case MOD_PROXIMITY_MINE:
++			icon1 = cg_weapons[WP_PROX_LAUNCHER].weaponIcon;
+ 			message = "was too close to";
+ 			message2 = "'s Prox Mine";
+ 			break;
+ 		case MOD_KAMIKAZE:
++			icon1 = cgs.media.skull;
+ 			message = "falls to";
+ 			message2 = "'s Kamikaze blast";
+ 			break;
+ 		case MOD_JUICED:
++			icon1 = cgs.media.skull;	
+ 			message = "was juiced by";
+ 			break;
+ 		case MOD_TELEFRAG:
++			icon1 = cgs.media.skull;
+ 			message = "tried to invade";
+ 			message2 = "'s personal space";
+ 			break;
+                 case MOD_LAVA:
++			icon1 = cgs.media.skull;
+                         message = "was given a hot bath by";
+                         break;
+                 case MOD_SLIME:
++			icon1 = cgs.media.skull;
+                         message = "was given a acid bath by";
+                         break;
+                 case MOD_FALLING:
++			icon1 = cgs.media.skull;
+                         message = "was given a small push by";
+                         break;
+                 case MOD_TRIGGER_HURT:
++			icon1 = cgs.media.skull;
+                         message = "was helped on the way by";
+                         break;
+                 case MOD_CRUSH:
++			icon1 = cgs.media.skull;
+                         message = "was crushed in";
+                         message2 = "'s trap";
+                         break;
+ 		default:
++			icon1 = cgs.media.skull;
+ 			message = "was killed by";
+ 			break;
+ 		}
+ 
+ 		if (message) {
++			CG_AddDeathNotice( va("%s", attackerName), cgs.clientinfo[attacker].team, va("%s",targetName), cgs.clientinfo[target].team, twoIcons, icon1, icon2 );
+ 			CG_Printf( "%s %s %s%s\n", 
+ 				targetName, message, attackerName, message2);
+ 			return;
+@@ -357,6 +411,36 @@
+ 	CG_Printf( "%s died.\n", targetName );
+ }
+ 
++/*
++===============
++CG_AddDeathNotice
++===============
++*/
++
++void CG_AddDeathNotice( char name1[ MAX_NAME_LENGTH ], int team1, char name2[ MAX_NAME_LENGTH ], int team2, qboolean twoIcons, qhandle_t icon1, qhandle_t icon2 ) {
++  int i,j;
++  for( i=DEATHNOTICE_HEIGHT-1 ; i > 0 ; i-- ) {
++    if ( cgs.deathNoticeTime[ i-1 ] != 0 ) {
++      cgs.deathNoticeTime[ i ] = cgs.deathNoticeTime[ i-1 ];
++      Q_strncpyz(cgs.deathNoticeName1[ i ], cgs.deathNoticeName1[ i-1 ], sizeof(cgs.deathNoticeName1[ i ]));
++      Q_strncpyz(cgs.deathNoticeName2[ i ], cgs.deathNoticeName2[ i-1 ], sizeof(cgs.deathNoticeName2[ i ]));
++      cgs.deathNoticeTeam1[ i ] = cgs.deathNoticeTeam1[ i-1 ];
++      cgs.deathNoticeTeam2[ i ] = cgs.deathNoticeTeam2[ i-1 ];
++      cgs.deathNoticeIcon1[ i ] = cgs.deathNoticeIcon1[ i-1 ];
++      cgs.deathNoticeIcon2[ i ] = cgs.deathNoticeIcon2[ i-1 ];
++      cgs.deathNoticeTwoIcons[ i ] = cgs.deathNoticeTwoIcons[ i-1 ];
++    }
++  }
++  cgs.deathNoticeTime[ 0 ] = cg.time;
++  Q_strncpyz(cgs.deathNoticeName1[ 0 ], name1, sizeof(cgs.deathNoticeName1[ 0 ]));
++  Q_strncpyz(cgs.deathNoticeName2[ 0 ], name2, sizeof(cgs.deathNoticeName2[ 0 ]));
++  cgs.deathNoticeTeam1[ 0 ] = team1;
++  cgs.deathNoticeTeam2[ 0 ] = team2;
++  cgs.deathNoticeIcon1[ 0 ] = icon1;
++  cgs.deathNoticeIcon2[ 0 ] = icon2;
++  cgs.deathNoticeTwoIcons[ 0 ] = twoIcons;
++}
++
+ //==========================================================================
+ 
+ /*
+Index: code/cgame/cg_main.c
+===================================================================
+--- code/cgame/cg_main.c	(Revision 182)
++++ code/cgame/cg_main.c	(Arbeitskopie)
+@@ -149,6 +149,8 @@
+ vmCvar_t	cg_synchronousClients;
+ vmCvar_t 	cg_teamChatTime;
+ vmCvar_t 	cg_teamChatHeight;
++vmCvar_t 	cg_chatTime;
++vmCvar_t 	cg_chatHeight;
+ vmCvar_t 	cg_stats;
+ vmCvar_t 	cg_buildScript;
+ vmCvar_t 	cg_forceModel;
+@@ -265,6 +267,8 @@
+ 
+ vmCvar_t	cg_weaponBarStyle;
+ 
++vmCvar_t cg_deathNoticeTime;
++
+ typedef struct {
+ 	vmCvar_t	*vmCvar;
+ 	char		*cvarName;
+@@ -329,7 +333,10 @@
+ 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
+ 	{ &cg_thirdPerson, "cg_thirdPerson", "0", 0 },
+ 	{ &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE  },
+-	{ &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE  },
++	{ &cg_teamChatHeight, "cg_teamChatHeight", "5", CVAR_ARCHIVE  },
++	{ &cg_teamChatHeight, "cg_teamChatHeight", "5", CVAR_ARCHIVE},
++	{ &cg_chatTime, "cg_chatTime", "3000", CVAR_ARCHIVE},
++	{ &cg_chatHeight, "cg_chatHeight", "5", CVAR_ARCHIVE},
+ 	{ &cg_forceModel, "cg_forceModel", "0", CVAR_ARCHIVE  },
+ 	{ &cg_predictItems, "cg_predictItems", "1", CVAR_ARCHIVE },
+ #ifdef MISSIONPACK
+@@ -449,6 +456,8 @@
+         { &cg_crosshairColorBlue, "cg_crosshairColorBlue", "1.0", CVAR_ARCHIVE},
+ 
+ 	{ &cg_weaponBarStyle, "cg_weaponBarStyle", "0", CVAR_ARCHIVE},
++
++	{&cg_deathNoticeTime, "cg_deathNoticeTime", "3000", CVAR_ARCHIVE},
+ };
+ 
+ static int  cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
+@@ -1031,6 +1040,9 @@
+ 
+ 	cgs.media.backTileShader = trap_R_RegisterShader( "gfx/2d/backtile" );
+ 	cgs.media.noammoShader = trap_R_RegisterShader( "icons/noammo" );
++        cgs.media.selectionShaderLeft = trap_R_RegisterShader( "icons/selectionMarkerLeft.tga" );
++	cgs.media.selectionShaderMid = trap_R_RegisterShader( "icons/selectionMarkerMid.tga" );
++	cgs.media.selectionShaderRight = trap_R_RegisterShader( "icons/selectionMarkerRight.tga" );
+ 
+ 	// powerup shaders
+ 	cgs.media.quadShader = trap_R_RegisterShader("powerups/quad" );
+@@ -1120,6 +1132,15 @@
+ 	cgs.media.armorModel = trap_R_RegisterModel( "models/powerups/armor/armor_yel.md3" );
+ 	cgs.media.armorIcon  = trap_R_RegisterShaderNoMip( "icons/iconr_yellow" );
+ 
++	cgs.media.direct_hit = trap_R_RegisterShaderNoMip("icons/direct_hit.tga");
++	cgs.media.skull = trap_R_RegisterShaderNoMip("icons/skull.tga");
++
++	cgs.media.armorYellow  = trap_R_RegisterShaderNoMip( "icons/armorYellow.tga" );
++	cgs.media.armorBlue  = trap_R_RegisterShaderNoMip( "icons/armorBlue.tga" );
++	cgs.media.armorRed  = trap_R_RegisterShaderNoMip( "icons/armorRed.tga" );
++	cgs.media.healthYellow = trap_R_RegisterShaderNoMip( "icons/iconh_yellow.tga" );
++	cgs.media.healthBlue = trap_R_RegisterShaderNoMip( "icons/iconh_blue.tga" );
++	cgs.media.healthRed = trap_R_RegisterShaderNoMip( "icons/iconh_red.tga" );
+ 	cgs.media.machinegunBrassModel = trap_R_RegisterModel( "models/weapons2/shells/m_shell.md3" );
+ 	cgs.media.shotgunBrassModel = trap_R_RegisterModel( "models/weapons2/shells/s_shell.md3" );
+ 
