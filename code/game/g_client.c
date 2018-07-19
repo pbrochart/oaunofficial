@@ -569,7 +569,7 @@ void respawn( gentity_t *ent ) {
 					LMSpoint();	
                                 //Sago: This is really bad
                                 //TODO: Try not to make people spectators here
-				ent->client->sess.spectatorState = PM_SPECTATOR;
+				ent->client->sess.spectatorState = (spectatorState_t)PM_SPECTATOR;
                                 //We have to force spawn imidiantly to prevent lag.
                                 ClientSpawn(ent);
 			}
@@ -1356,7 +1356,7 @@ static void MD5Final(struct MD5Context *ctx, unsigned char *digest)
     
     if (digest!=NULL)
 	    memcpy(digest, ctx->buf, 16);
-    memset(ctx, 0, sizeof(ctx));	/* In case it's sensitive */
+    memset(ctx, 0, sizeof(*ctx));	/* In case it's sensitive */
 }
 
 char *G_MD5String( const char *in )
@@ -1365,10 +1365,10 @@ char *G_MD5String( const char *in )
 	unsigned char digest[16] = {""}; 
 
 	MD5_CTX md5;
-	byte buffer[2048];
+	//byte buffer[2048];
 	int i;
-	int r = 0;
-	int total = 0;
+	//int r = 0;
+	//int total = 0;
 
 	Q_strncpyz( final, "", sizeof( final ) );
 
@@ -1429,7 +1429,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	char	redTeam[MAX_INFO_STRING];
 	char	blueTeam[MAX_INFO_STRING];
 	char	userinfo[MAX_INFO_STRING];
-	int	i;
+	//int	i;
 	//char      buf[ MAX_INFO_STRING ];
 
 	ent = g_entities + clientNum;
@@ -2690,7 +2690,7 @@ void ClientSpawn(gentity_t *ent) {
 	
 	client->spawnTime = level.time;
 	//client->sendSpawnpoints = sendSpawnpoints;
-	/*if( !client->sendSpawnpoints /*&& g_gametype.integer < GT_TEAM*//* ){
+	/*if( !client->sendSpawnpoints && g_gametype.integer < GT_TEAM ){
 		G_SendSpawnpoints( ent );
 		client->sendSpawnpoints = qtrue;
 	}*/

@@ -91,7 +91,7 @@ static void CG_Obituary( entityState_t *ent ) {
     gender_t	gender;
     clientInfo_t	*ci;
     qhandle_t icon1;
-    qhandle_t icon2;
+    qhandle_t icon2 = 0;
     qboolean twoIcons;
 
     twoIcons = qfalse;

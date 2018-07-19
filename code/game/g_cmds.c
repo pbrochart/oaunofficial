@@ -271,7 +271,7 @@ void G_SendRespawnTimer( int entityNum, int type, int quantity, int respawnTime,
 	gentity_t	*ent;
 	int		i;
 	int team;
-	fileHandle_t f;
+	//fileHandle_t f;
 
 	//G_Printf("entityNum %i, type %i, quantity %i, respawnTime %i, nextItemEntityNum %i\n", entityNum, type, quantity, respawnTime, nextItemEntityNum);
 
@@ -327,7 +327,7 @@ TODO: add teamspawnpoint color for teambased gametypes
 ==================
 */
 void G_SendSpawnpoints( gentity_t *ent ){
-	gentity_t *spot;
+	gentity_t *spot = NULL;
 	int spotnumber = 0;
 	char entry[64];
 	char string[2048];
@@ -487,13 +487,13 @@ void G_StartServerDemos( void ) {
 		playerName[count] = '\0';
 		trap_Cvar_Set(va( "demopath%i", i ), va("%s/%s-POV(%s)", gamestring, matchstring, playerName));
 		//Com_sprintf(level.clients[i].demopath, MAX_QPATH, "%s/%s-POV(%s)", gamestring, matchstring, playerName );
-		trap_SendConsoleCommand(EXEC_APPEND, va("svrecord %i %s/%s-POV(%s) \n", &level.clients[i] - level.clients, gamestring, matchstring, playerName ) );
+		trap_SendConsoleCommand(EXEC_APPEND, va("svrecord %li %s/%s-POV(%s) \n", &level.clients[i] - level.clients, gamestring, matchstring, playerName ) );
 	}
 }
 
 void G_StopServerDemos( void ) {
 	int i;
-	char gamestring[128];
+	//char gamestring[128];
 	
 	//TODO: Add other gametypes
 	if( ( g_gametype.integer != GT_TOURNAMENT ) || !g_autoServerDemos.integer )
@@ -506,7 +506,7 @@ void G_StopServerDemos( void ) {
 		if ( g_entities[ &level.clients[i] - level.clients].r.svFlags & SVF_BOT)
 			continue;
 		
-		trap_SendConsoleCommand(EXEC_APPEND, va("stopsvrecord %i \n", &level.clients[i] - level.clients ) );
+		trap_SendConsoleCommand(EXEC_APPEND, va("stopsvrecord %li \n", &level.clients[i] - level.clients ) );
 	}
 }
 
@@ -1571,7 +1571,7 @@ void Cmd_FollowCycle_f( gentity_t *ent ) {
     int     count;
     char    args[11];
     int     dir;
-    int i;
+    //int i;
 
     /*for( i = 0 ; i < level.numConnectedClients; i++ ){
       if( level.clients[i].pers.demoClient )
@@ -2167,7 +2167,7 @@ static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *i
         return;
     }
     // no chatting to players in tournements
-    if ( (g_gametype.integer == GT_TOURNAMENT )) {
+    if ( g_gametype.integer == GT_TOURNAMENT ) {
         return;
     }
 
@@ -2780,7 +2780,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
         return;
     }
     if( level.time < g_disableVotingTime.integer * 1000 ) {
-        trap_SendServerCommand( ent-g_entities, va( "print \"You have to wait %i seconds to call a vote .\n\"", g_disableVotingTime.integer ) );
+        trap_SendServerCommand( ent-g_entities, va( "print \"You have to wait %i seconds to call a vote.\n\"", g_disableVotingTime.integer ) );
         return;
     }
 
@@ -2939,7 +2939,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
             }
         } else {
             if ( trap_Argc() >= 3  && mapAllowed) {
-                Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d; map", arg1, i, arg3);
+                Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d; map", arg1, i);
                 Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "Change gametype to: %s   Map: %s?", gameNames[i], arg3 );
             }
             else {
@@ -2975,13 +2975,13 @@ void Cmd_CallVote_f( gentity_t *ent ) {
         //Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
         Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "Change map to: %s?", arg2 );
     } else if ( !Q_stricmp( arg1, "nextmap" ) ) {
-        char	s[MAX_STRING_CHARS];
-        char		mapname[MAX_MAPNAME];
+        char s[MAX_STRING_CHARS];
+        char mapname[MAX_MAPNAME];
 
         if ( g_useMapcycle.integer ) {
             trap_Cvar_VariableStringBuffer("mapname", mapname, sizeof(mapname));
             Com_sprintf(level.voteString, sizeof( level.voteString ),"map %s", G_GetNextMap(mapname));
-	    Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s(%s)", "Next map?", mapname );
+	    Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s (%s)", "Next map?", G_GetNextMap(mapname) );
         }
         else {
             trap_Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
@@ -2990,7 +2990,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
                 return;
             }
             Com_sprintf( level.voteString, sizeof( level.voteString ), "vstr nextmap");
-	    Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", "Next map?" );
+	    Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s (%s)", "Next map?", G_GetNextMap(mapname) );
         }
         //Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
         

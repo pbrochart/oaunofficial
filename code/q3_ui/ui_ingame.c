@@ -177,7 +177,7 @@ void InGame_MenuInit( void ) {
 	int		y;
 	uiClientState_t	cs;
 	char	info[MAX_INFO_STRING];
-	int		team;
+	int		team = 0;
 
 	memset( &s_ingame, 0 ,sizeof(ingamemenu_t) );
 

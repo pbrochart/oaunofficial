@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #include "bg_public.h"
 #include "bg_local.h"
+#include "g_local.h"
 
 extern vmCvar_t g_aftershockPhysic;
 
@@ -1551,7 +1552,7 @@ static void PM_BeginWeaponChange( int weapon ) {
 PM_DelayedWeaponChange
 ===============
 */
-static void PM_DelayedWeaponChange( void ) {
+/*static void PM_DelayedWeaponChange( void ) {
 	int		weapon;
 
 	weapon = pm->cmd.weapon;
@@ -1566,8 +1567,7 @@ static void PM_DelayedWeaponChange( void ) {
 	pm->ps->weapon = weapon;
 	pm->ps->weaponstate = WEAPON_RAISING;
 	PM_StartTorsoAnim( TORSO_RAISE );
-}
-
+}*/
 
 /*
 ===============

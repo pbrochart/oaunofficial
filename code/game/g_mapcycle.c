@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_MAPCYCLECOUNT 64
 #define MAX_MAPCYCLELENGTH 4096
 #define MAX_MAPCYCLETOKENS 512
+#define MAX_BUFFERSIZE 2048 
 
 typedef struct mapcycle_s {
 	char *maps[MAX_MAPCYCLECOUNT];
@@ -152,7 +153,7 @@ returns qtrue if the argument
 is a char we should skip
 =================
 */
-static qboolean SkippedChar ( char in ) {
+qboolean SkippedChar ( char in ) {
 	return ( in == '\n' || in == '\r' || in == ';' || in == '\t' || in == ' ' );
 }
 
@@ -164,12 +165,10 @@ if the map is not found return qfalse
 =================
 */
 static qboolean G_MapAvailable ( char* map ) {
-	fileHandle_t	file;           //To check that the map actually exists.
-
 
 	if( !trap_FS_FOpenFile ( va ( "maps/%s.bsp",map ), NULL,FS_READ ) )
 		return qfalse; //maps/MAPNAME.bsp does not exist
-	
+
 	return qtrue;
 }
 
@@ -241,7 +240,7 @@ maps
 static void G_setAllowedMaps ( token_t *in, int min, int max ) {
 	int i;
 	int lpar,rpar,j;
-	
+
 	for ( i = min; i <= max; i++ ) {
 		if ( in[i].type == TOT_WORD ) {
 			//find '(' ')' for mapfiles
@@ -317,7 +316,6 @@ char *G_GetNextMap ( char *map ) {
 	} else {
 		return mapcycle.maps[G_getNextMapNumber ( i ) ];
 	}
-	return map;
 }
 
 /*
@@ -330,7 +328,7 @@ map in the cycle
 */
 void G_GetMapfile ( char *map ) {
 	int i;
-	char	command[1024];
+	//char	command[1024];
 
 	if ( mapcycle.mapcycleCount == 0 )
 		return;
@@ -390,13 +388,15 @@ voteable maps
 */
 void G_drawAllowedMaps ( gentity_t *ent ) {
 	int i;
-	char buffer[2048];
+	char buffer[MAX_BUFFERSIZE];
 
 	strcpy ( buffer,va ( "Allowed maps are: " ) );
 
 	for ( i = 0; i < mapcycle.mapcycleCount; i++ ) {
 		strcat ( buffer, va ( "^2%s ", mapcycle.maps[i] ) );
 	}
+	trap_SendServerCommand ( ent-g_entities, va ( "print \"%s\"", buffer ) );
+	memset ( &buffer[0], 0, sizeof(buffer ) );
 	for ( i = 0; i < mapcycle.allowedMapsCount; i++ ) {
 		strcat ( buffer, va ( "^1%s ", mapcycle.allowedMaps[i] ) );
 	}
@@ -414,14 +414,26 @@ information in the mapcycle
 */
 void G_drawMapcycle ( gentity_t *ent ) {
 	int i;
-	char buffer[2048];
+	char buffer[MAX_BUFFERSIZE];
 
+	if ( mapcycle.mapcycleCount == 0 )
+		return;
+
+	memset ( &buffer[0], 0, sizeof(buffer ) );
 	for ( i = 0; i < mapcycle.mapcycleCount; i++ ) {
-		strcat ( buffer, va ( "^3%i ^2%s(%s) ^3%i %i\n", i, mapcycle.maps[i], mapcycle.mapfiles[i], mapcycle.minplayers[i], mapcycle.maxplayers[i] ) );
+		if( !strcmp("", mapcycle.mapfiles[i]) )	
+			strcat ( buffer, va ( "^3%i ^2%s ^3%i %i\n", i, mapcycle.maps[i], mapcycle.minplayers[i], mapcycle.maxplayers[i] ) );
+		else
+			strcat ( buffer, va ( "^3%i ^2%s(%s) ^3%i %i\n", i, mapcycle.maps[i], mapcycle.mapfiles[i], mapcycle.minplayers[i], mapcycle.maxplayers[i] ) );
 	}
 	strcat ( buffer, va ( "\n" ) );
+	trap_SendServerCommand ( ent-g_entities, va ( "print \"%s\"", buffer ) );
+	memset ( &buffer[0], 0, sizeof(buffer ) );
 	for ( i = 0; i < mapcycle.allowedMapsCount; i++ ) {
-		strcat ( buffer, va ( "^1%s(%s) ", mapcycle.allowedMaps[i], mapcycle.allowedmapfiles[i] ) );
+		if( !strcmp("", mapcycle.allowedmapfiles[i]) )	
+			strcat ( buffer, va ( "^1%s ", mapcycle.allowedMaps[i] ) );
+		else
+			strcat ( buffer, va ( "^1%s(%s) ", mapcycle.allowedMaps[i], mapcycle.allowedmapfiles[i] ) );
 	}
 
 	strcat ( buffer, va ( "\n" ) );
@@ -439,38 +451,34 @@ useful for rcon and serverowners
 void G_sendMapcycle( void ){
 	int i;
 	char buffer[MAX_MAPCYCLELENGTH];
-	strcat ( buffer,va ( "mapcycle {\n" ) );
 	
 	if( !g_useMapcycle.integer ){
-		G_Printf("no mapcycle set on this server\n");
+		G_Printf("No mapcycle set on this server\n");
 		return;
 	}
-
+	memset ( &buffer[0], 0, sizeof(buffer ) );
+	strcat ( buffer,va ( "mapcycle {\n" ) );
 	for ( i = 0; i < mapcycle.mapcycleCount; i++ ) {
 		if( !strcmp("", mapcycle.mapfiles[i]) )
-			strcat ( buffer, va ( "    %s\n", mapcycle.maps[i] ) );
+			strcat ( buffer, va ( "    %s %i %i\n", mapcycle.maps[i], mapcycle.minplayers[i], mapcycle.maxplayers[i] ) );
 		else
-			strcat ( buffer, va ( "    %s(%s)\n", mapcycle.maps[i], mapcycle.mapfiles[i] ) );
+			strcat ( buffer, va ( "    %s(%s) %i %i\n", mapcycle.maps[i], mapcycle.mapfiles[i], mapcycle.minplayers[i], mapcycle.maxplayers[i] ) );
 	}
-	
 	strcat( buffer, "}\n" );
-	
+	G_Printf("%s", buffer);
+	memset ( &buffer[0], 0, sizeof(buffer ) );
 	if( !mapcycle.allAllowed ){
-	
 		strcat ( buffer, "\nallowed {\n");
-	
 		for ( i = 0; i < mapcycle.allowedMapsCount; i++ ) {
 			if( !strcmp("", mapcycle.allowedmapfiles[i]) )
 				strcat ( buffer, va ( "    %s\n", mapcycle.allowedMaps[i] ) );
 			else
 				strcat ( buffer, va ( "    %s(%s)\n", mapcycle.allowedMaps[i], mapcycle.allowedmapfiles[i] ) );
 		}
-
 		strcat ( buffer, va ( "}\n" ) );
 	}
-	
+
 	G_Printf("%s", buffer);
-  
 }
 
 /*

@@ -2328,7 +2328,7 @@ void CG_DrawRespawnTimers ( void ) {
             }
 
             if ( cgs.gametype == GT_CTF ) {
-                if ( ( cgs.respawnTimerTeam[ i ] == TEAM_RED ) ) {
+                if ( cgs.respawnTimerTeam[ i ] == TEAM_RED ) {
                     CG_DrawPic ( x + icon_xrel, y + icon_yrel + iconsize - iconsize/4, iconsize/4, iconsize/4, cgs.media.redMarker );
                 } else if ( cgs.respawnTimerTeam[ i ] == TEAM_BLUE ) {
                     CG_DrawPic ( x + icon_xrel, y + icon_yrel + iconsize - iconsize/4, iconsize/4, iconsize/4, cgs.media.blueMarker );

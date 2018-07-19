@@ -32,7 +32,7 @@ typedef struct {
     int taskNum;
 } orderTask_t;
 
-static const orderTask_t validOrders[] = {
+/*static const orderTask_t validOrders[] = {
     { VOICECHAT_GETFLAG,						TEAMTASK_OFFENSE },
     { VOICECHAT_OFFENSE,						TEAMTASK_OFFENSE },
     { VOICECHAT_DEFEND,							TEAMTASK_DEFENSE },
@@ -42,9 +42,9 @@ static const orderTask_t validOrders[] = {
     { VOICECHAT_FOLLOWME,						TEAMTASK_FOLLOW },
     { VOICECHAT_RETURNFLAG,					TEAMTASK_RETRIEVE },
     { VOICECHAT_FOLLOWFLAGCARRIER,	TEAMTASK_ESCORT }
-};
+};*/
 
-static const int numValidOrders = sizeof ( validOrders ) / sizeof ( orderTask_t );
+//static const int numValidOrders = sizeof ( validOrders ) / sizeof ( orderTask_t );
 
 #ifdef MISSIONPACK // bk001204
 static int CG_ValidOrder ( const char *p ) {

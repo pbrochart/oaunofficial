@@ -67,7 +67,7 @@ Adds score to both the client and his team
 ============
 */
 void AddScore( gentity_t *ent, vec3_t origin, int score ) {
-	int i;
+	//int i;
 
 	if ( !ent->client ) {
 		return;
@@ -1556,18 +1556,19 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if( g_gametype.integer == GT_CTF_ELIMINATION && g_elimination_ctf_oneway.integer != 0 && targ == attacker)
 		return;
 
+ 	if ( damage && targ->client && targ != attacker && g_damagePlums.integer ) {
+		if ( mod != MOD_SHOTGUN ) {
+			DamagePlum( attacker, targ->r.currentOrigin, damage );
+		}
+		else
+			targ->sumDamageShotgun += damage;
+	}
+
 	// do the damage
 	if (take) {
 		targ->health = targ->health - take;
 		if ( targ->client ) {
 			targ->client->ps.stats[STAT_HEALTH] = targ->health;
-			if ( targ != attacker && g_damagePlums.integer ) {
-				if ( mod != MOD_SHOTGUN ) {
-					DamagePlum( attacker, targ->r.currentOrigin, take );
-				}
-				else
-					targ->sumTakeShotgun += take;
-			}
 		}
 
 		if ( targ->health <= 0 ) {
@@ -1589,13 +1590,13 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 void G_Knockback( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			   vec3_t dir, vec3_t point, int damage ) {
 	gclient_t	*client;
-	int			take;
-	int			save;
-	int			asave;
+	//int			take;
+	//int			save;
+	//int			asave;
 	int			knockback;
-	int			max;
+	//int			max;
         
-	vec3_t		bouncedir, impactpoint;
+	//vec3_t		bouncedir, impactpoint;
 	
 
 	/*if ( targ != attacker) {
@@ -1802,11 +1803,11 @@ G_RadiusKnockback
 void G_RadiusKnockback ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					gentity_t *ignore) {
 	float		points, dist;
-	int			entityList[MAX_GENTITIES];
-	vec3_t		mins, maxs;
+	//int			entityList[MAX_GENTITIES];
+	//vec3_t		mins, maxs;
 	vec3_t		v;
 	vec3_t		dir;
-	int			i, e;
+	int		i;
 	
 	if ( radius < 1 ) {
 		radius = 1;

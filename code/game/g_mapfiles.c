@@ -127,7 +127,7 @@ char*	allowed[] = {
 
 qboolean G_ClassnameAllowed( char *input ){
 	gitem_t	*it;
-	int i;
+	//int i;
 	for ( it = bg_itemlist + 1 ; it->classname ; it++) {
 		if ( !strcmp(input, it->classname ) ) {
 			return qtrue;
@@ -303,9 +303,9 @@ char *G_ClearString( char *input ){
 
 static void G_LoadMapfileEntity( token_t *in, int min, int max ){
 	int i;
-	int j;
+	//int j;
 	char *buf;
-	float	v;
+	//float	v;
 	vec3_t	vec;
 	
 	fieldCopy_t *field;
@@ -511,7 +511,7 @@ void G_WriteMapfile_f( void ) {
 				}
 				break;
 			case F_VECTOR:
-				if( ((float *)(b+field->ofs))[0] && ((float *)(b+field->ofs))[1] && ((float *)(b+field->ofs))[2] || !strcmp(field->name,"origin") ){
+				if( (((float *)(b+field->ofs))[0] && ((float *)(b+field->ofs))[1] && ((float *)(b+field->ofs))[2]) || !strcmp(field->name,"origin") ){
 					string = va("   \"%s\"   \"%f %f %f\"\n", field->name, ((float *)(b+field->ofs))[0], ((float *)(b+field->ofs))[1], ((float *)(b+field->ofs))[2] );
 					trap_FS_Write(string, strlen(string), f);
 				}

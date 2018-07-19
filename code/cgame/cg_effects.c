@@ -585,7 +585,7 @@ void CG_DamagePlum( int client, vec3_t org, int score ) {
 	le->leFlags = 0;
 	le->leType = LE_DAMAGEPLUM;
 	le->startTime = cg.time;
-	le->endTime = cg.time + 1500;
+	le->endTime = cg.time + 1000;
 	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
 
 	

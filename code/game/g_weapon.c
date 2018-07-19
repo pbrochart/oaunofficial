@@ -395,7 +395,7 @@ qboolean ShotgunPellet( vec3_t start, vec3_t end, gentity_t *ent ) {
 		if ( traceEnt->takedamage) {
 			if ( oldTarg[countTarg-1] != traceEnt && countTarg < DEFAULT_SHOTGUN_COUNT ) {
 				oldTarg[countTarg] = traceEnt;
-				oldTarg[countTarg]->sumTakeShotgun = 0;
+				oldTarg[countTarg]->sumDamageShotgun = 0;
 				countTarg++;
 			}	
 			damage = DEFAULT_SHOTGUN_DAMAGE * s_quadFactor;
@@ -534,8 +534,8 @@ void ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 	}
 
 	for ( i = 0 ; i < countTarg ; i++ ) {
-		if ( oldTarg[i]->sumTakeShotgun && oldTarg[i] != oldAttacker && g_damagePlums.integer ) {
-			DamagePlum( oldAttacker, oldTarg[i]->r.currentOrigin, oldTarg[i]->sumTakeShotgun );
+		if ( oldTarg[i]->sumDamageShotgun && oldTarg[i] != oldAttacker && g_damagePlums.integer ) {
+			DamagePlum( oldAttacker, oldTarg[i]->r.currentOrigin, oldTarg[i]->sumDamageShotgun );
 		}
 	}
 	if( hitClient )

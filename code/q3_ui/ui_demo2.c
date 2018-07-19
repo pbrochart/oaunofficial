@@ -193,7 +193,7 @@ Demos_MenuInit
 ===============
 */
 static void Demos_MenuInit( qboolean firstStart ) {
-	int		i,j;
+	int		i;
 	int		len;
 	char	*demoname, extension[16];
 	char	folder[128];

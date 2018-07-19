@@ -154,7 +154,7 @@ struct gentity_s {
 	qboolean	takedamage;
 
 	int			damage;
-	int			sumTakeShotgun;
+	int			sumDamageShotgun;
 	int			splashDamage;	// quad will increase this without increasing radius
 	int			splashRadius;
 	int			methodOfDeath;
@@ -684,7 +684,7 @@ qboolean	G_SpawnInt( const char *key, const char *defaultString, int *out );
 qboolean	G_SpawnVector( const char *key, const char *defaultString, float *out );
 void		G_SpawnEntitiesFromString( void );
 char *G_NewString( const char *string );
-
+qboolean G_CallSpawn( gentity_t *ent );
 
 //
 // g_cmds.c
@@ -708,7 +708,9 @@ void SendReadymask( int clientnum );
 void Cmd_Timeout_f( gentity_t *player );
 void G_Timein( void );
 void G_SendLivingCount( void );
-
+void G_StopServerDemos( void );
+void G_StartServerDemos( void );
+void G_SendSpawnpoints( gentity_t *ent );
 
 // KK-OAX Added these in a seperate file to keep g_cmds.c familiar. 
 // g_cmds_ext.c
@@ -824,6 +826,7 @@ void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 void TossClientItems( gentity_t *self );
 void TossClientPersistantPowerups( gentity_t *self );
 void TossClientCubes( gentity_t *self );
+void DamagePlum( gentity_t *ent, vec3_t origin, int score ); 
 
 // damage flags
 #define DAMAGE_RADIUS				0x00000001	// damage was indirect
@@ -1014,6 +1017,7 @@ void ShuffleTeams(void);
 team_t G_TeamFromString( char *str );
 qboolean Team_GetDeathLocationMsg(gentity_t *ent, char *loc, int loclen);
 int G_FindNearestTeammate( gentity_t *ent );
+void TeamplaySpectatorMessage( void );
 
 //KK-OAX Removed these in Code in favor of bg_alloc.c from Tremulous
 // g_mem.c
@@ -1089,6 +1093,7 @@ void G_drawAllowedMaps ( gentity_t *ent );
 void G_drawMapcycle ( gentity_t *ent );
 void G_sendMapcycle( void );
 void G_LoadMapcycle ( void );
+qboolean SkippedChar ( char in );
 
 //
 // g_mapfiles.c

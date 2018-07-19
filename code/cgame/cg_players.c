@@ -340,7 +340,7 @@ static qboolean	CG_FindClientModelFile( char *filename, int length, clientInfo_t
 		switch ( ci->team ) {
 			case TEAM_BLUE: {
 				if( cg_forceteammodels.integer && cg_forceModel.integer ){
-					if( cg_blueteammodel.string && cg_forceModel.integer ){
+					if( cg_blueteammodel.string[0] != '\0' && cg_forceModel.integer ){
 						if( ( team = strchr( cg_blueteammodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
@@ -349,12 +349,12 @@ static qboolean	CG_FindClientModelFile( char *filename, int length, clientInfo_t
 					break;
 				}
 				else if( !cg_forceteammodels.integer && cg_forceModel.integer ){
-					if( enemy && cg_enemymodel.string ){
+					if( enemy && cg_enemymodel.string[0] != '\0' ){
 						if( ( team = strchr( cg_enemymodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
 							team++;
-					} else if ( !enemy && cg_teammodel.string ){
+					} else if ( !enemy && cg_teammodel.string[0] != '\0' ){
 						if( ( team = strchr( cg_teammodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
@@ -369,7 +369,7 @@ static qboolean	CG_FindClientModelFile( char *filename, int length, clientInfo_t
 			}
 			default: {
 				if( cg_forceteammodels.integer && cg_forceModel.integer ){
-					if( cg_redteammodel.string && cg_forceModel.integer ){
+					if( cg_redteammodel.string[0] != '\0' && cg_forceModel.integer ){
 						if( ( team = strchr( cg_redteammodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
@@ -378,12 +378,12 @@ static qboolean	CG_FindClientModelFile( char *filename, int length, clientInfo_t
 					break;
 				}
 				else if( !cg_forceteammodels.integer && cg_forceModel.integer ){
-					if( enemy && cg_enemymodel.string ){
+					if( enemy && cg_enemymodel.string[0] != '\0' ){
 						if( ( team = strchr( cg_enemymodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
 							team++;
-					} else if ( !enemy && cg_teammodel.string ){
+					} else if ( !enemy && cg_teammodel.string[0] != '\0' ){
 						if( ( team = strchr( cg_teammodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
@@ -399,7 +399,7 @@ static qboolean	CG_FindClientModelFile( char *filename, int length, clientInfo_t
 	}
 	else {
 		
-		if( cg_enemymodel.string && cg_forceModel.integer ){
+		if( cg_enemymodel.string[0] != '\0' && cg_forceModel.integer ){
 			if( ( team = strchr( cg_enemymodel.string, '/' ) ) == NULL )
 				team = "default";
 			else
@@ -546,7 +546,7 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 		switch ( ci->team ) {
 			case TEAM_BLUE: {
 				if( cg_forceteammodels.integer && cg_forceModel.integer ){
-					if( cg_blueteammodel.string && cg_forceModel.integer ){
+					if( cg_blueteammodel.string[0] != '\0' && cg_forceModel.integer ){
 						if( ( team = strchr( cg_blueteammodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
@@ -555,12 +555,12 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 					break;
 				}
 				else if( !cg_forceteammodels.integer && cg_forceModel.integer ){
-					if( enemy && cg_enemymodel.string ){
+					if( enemy && cg_enemymodel.string[0] != '\0' ){
 						if( ( team = strchr( cg_enemymodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
 							team++;
-					} else if ( !enemy && cg_teammodel.string ){
+					} else if ( !enemy && cg_teammodel.string[0] != '\0' ){
 						if( ( team = strchr( cg_teammodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
@@ -576,7 +576,7 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 			}
 			default: {
 				if( cg_forceteammodels.integer && cg_forceModel.integer ){
-					if( cg_redteammodel.string && cg_forceModel.integer ){
+					if( cg_redteammodel.string[0] != '\0' && cg_forceModel.integer ){
 						if( ( team = strchr( cg_redteammodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
@@ -585,12 +585,12 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 					break;
 				}
 				else if( !cg_forceteammodels.integer && cg_forceModel.integer ){
-					if( enemy && cg_enemymodel.string ){
+					if( enemy && cg_enemymodel.string[0] != '\0' ){
 						if( ( team = strchr( cg_enemymodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
 							team++;
-					} else if ( !enemy && cg_teammodel.string ){
+					} else if ( !enemy && cg_teammodel.string[0] != '\0' ){
 						if( ( team = strchr( cg_teammodel.string, '/' ) ) == NULL )
 							team = "default";
 						else
@@ -608,7 +608,7 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 	}
 	else {
 		
-		if( cg_enemymodel.string && cg_forceModel.integer ){
+		if( cg_enemymodel.string[0] != '\0' && cg_forceModel.integer ){
 			if( ( team = strchr( cg_enemymodel.string, '/' ) ) == NULL )
 				team = "default";
 			else
@@ -1287,7 +1287,7 @@ void CG_NewClientInfo( int clientNum ) {
 					Q_strncpyz( newInfo.skinName, skin, sizeof( newInfo.skinName ) );		
 				}	
 			}
-			else if( cg_teammodel.string && cg_enemymodel.string ){
+			else if( cg_teammodel.string[0] != '\0' && cg_enemymodel.string[0] != '\0' ){
 				if( enemy ){
 					trap_Cvar_VariableStringBuffer( "cg_enemymodel", modelStr, sizeof( modelStr ) );
 					if ( ( skin = strchr( modelStr, '/' ) ) == NULL) {
@@ -1347,7 +1347,7 @@ void CG_NewClientInfo( int clientNum ) {
 		}
 
 		if ( cgs.gametype >= GT_TEAM && cgs.ffa_gt!=1 ) {
-			if( !( cg_forceteammodels.integer || cg_enemymodel.string ) ){
+			if( !( cg_forceteammodels.integer || cg_enemymodel.string[0] != '\0' ) ){
 				// keep skin name
 				slash = strchr( v, '/' );
 				if ( slash ) {
@@ -1420,7 +1420,7 @@ void CG_NewClientInfo( int clientNum ) {
 					Q_strncpyz( newInfo.headSkinName, skin, sizeof( newInfo.headSkinName ) );	
 				}	
 			}
-			else if( cg_teammodel.string && cg_enemymodel.string ){
+			else if( cg_teammodel.string[0] != '\0' && cg_enemymodel.string[0] != '\0' ){
 				if( enemy ){
 					trap_Cvar_VariableStringBuffer( "cg_enemymodel", modelStr, sizeof( modelStr ) );
 					if ( ( skin = strchr( modelStr, '/' ) ) == NULL) {
@@ -1479,7 +1479,7 @@ void CG_NewClientInfo( int clientNum ) {
 		}
 
 		if ( cgs.gametype >= GT_TEAM && cgs.ffa_gt!=1) {
-			if( !( cg_forceteammodels.integer || cg_enemymodel.string ) ){
+			if( !( cg_forceteammodels.integer || cg_enemymodel.string[0] != '\0' ) ){
 				// keep skin name
 				slash = strchr( v, '/' );
 				if ( slash ) {
