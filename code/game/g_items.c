@@ -781,7 +781,6 @@ gentity_t *Drop_Item_Armor( gentity_t *ent, gitem_t *item, float angle ) {
 	vec3_t	velocity;
 	vec3_t	angles;
 	vec3_t position;
-	//int 	ammoCount;
 	int	dropTime;
 
 	VectorCopy( ent->s.apos.trBase, angles );
@@ -812,7 +811,6 @@ gentity_t *Drop_Item_Health( gentity_t *ent, gitem_t *item, float angle ) {
 	vec3_t	velocity;
 	vec3_t	angles;
 	vec3_t position;
-	//int 	ammoCount;
 	int	dropTime;
 
 	VectorCopy( ent->s.apos.trBase, angles );
@@ -844,7 +842,6 @@ gentity_t *Drop_Item_Ammo( gentity_t *ent, gitem_t *item, float angle ) {
 	vec3_t	velocity;
 	vec3_t	angles;
 	vec3_t position;
-	//int 	ammoCount;
 	int	dropTime;
 
 	VectorCopy( ent->s.apos.trBase, angles );

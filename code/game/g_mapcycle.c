@@ -328,7 +328,6 @@ map in the cycle
 */
 void G_GetMapfile ( char *map ) {
 	int i;
-	//char	command[1024];
 
 	if ( mapcycle.mapcycleCount == 0 )
 		return;

@@ -564,20 +564,58 @@ void CG_ScorePlum( int client, vec3_t org, int score ) {
 	AnglesToAxis( angles, re->axis );
 }
 
+/*
+==================
+CG_ParseDamagePlum
+==================
+*/
+#define MAX_DAMAGEPLUM_LENGTH 38 //currently the longest string is "/g/mg/sg/gl/rl/lg/rg/pg/bfg/cg/ng/pl/\0" (38 chars)
+qboolean CG_ParseDamagePlum( int mod ) {
+	int length;
+	char damagePlum[MAX_CVAR_VALUE_STRING];
+
+	trap_Cvar_VariableStringBuffer( "cg_damagePlum", damagePlum, sizeof( damagePlum ) );
+	length = strlen(cg_damagePlum.string);
+	if ( ( length > MAX_DAMAGEPLUM_LENGTH-1 ) || ( strcmp(&damagePlum[0], "/") && strcmp(&damagePlum[length-1], "/") ) )
+		return qtrue;
+
+	if ((Q_stristr(damagePlum,"/g/") && mod == MOD_GAUNTLET) ||
+		(Q_stristr(damagePlum,"/mg/") && mod == MOD_MACHINEGUN) ||
+		(Q_stristr(damagePlum,"/sg/") && mod == MOD_SHOTGUN) ||
+		(Q_stristr(damagePlum,"/gl/") && mod == MOD_GRENADE) ||
+		(Q_stristr(damagePlum,"/gl/") && mod == MOD_GRENADE_SPLASH) ||
+		(Q_stristr(damagePlum,"/rl/") && mod == MOD_ROCKET) ||
+		(Q_stristr(damagePlum,"/rl/") && mod == MOD_ROCKET_SPLASH) ||
+		(Q_stristr(damagePlum,"/lg/") && mod == MOD_LIGHTNING) ||
+		(Q_stristr(damagePlum,"/rg/") && mod == MOD_RAILGUN) ||
+		(Q_stristr(damagePlum,"/pg/") && mod == MOD_PLASMA) ||
+		(Q_stristr(damagePlum,"/pg/") && mod == MOD_PLASMA_SPLASH) ||
+		(Q_stristr(damagePlum,"/bfg/") && mod == MOD_BFG) ||
+		(Q_stristr(damagePlum,"/bfg/") && mod == MOD_BFG_SPLASH) ||
+		(Q_stristr(damagePlum,"/cg/") && mod == MOD_CHAINGUN) ||
+		(Q_stristr(damagePlum,"/ng/") && mod == MOD_NAIL) ||
+		(Q_stristr(damagePlum,"/pl/") && mod == MOD_PROXIMITY_MINE))
+			return qtrue;
+		else
+			return qfalse;
+}
 
 /*
 ==================
 CG_DamagePlum
 ==================
 */
-void CG_DamagePlum( int client, vec3_t org, int score ) {
+void CG_DamagePlum( int client, vec3_t org, int damage, int mod ) {
 	localEntity_t	*le;
 	refEntity_t		*re;
 	vec3_t			angles;
 	static vec3_t lastPos;
+	qboolean retDamagePlum;
 
-	// only visualize for the client that scored
-	if (client != cg.predictedPlayerState.clientNum || cg_damagePlums.integer == 0) {
+	retDamagePlum = CG_ParseDamagePlum ( mod );
+
+	// only visualize for the client that damaged
+	if (client != cg.predictedPlayerState.clientNum || cg_damagePlums.integer == 0 || !retDamagePlum) {
 		return;
 	}
 
@@ -590,7 +628,8 @@ void CG_DamagePlum( int client, vec3_t org, int score ) {
 
 	
 	le->color[0] = le->color[1] = le->color[2] = le->color[3] = 1.0;
-	le->radius = score;
+	le->radius = damage;
+	le->light = mod;
 	
 	VectorCopy( org, le->pos.trBase );
 	if (org[2] >= lastPos[2] - 20 && org[2] <= lastPos[2] + 20) {

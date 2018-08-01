@@ -10,3 +10,7 @@ indicator (works only if server has g_damagePlums enabled).
 Revision 308: With cg_damagePlums, sum the damages for the shotgun.
 Revision 309: Fix all compiler warnings, mapcycle and getmapcycle.
 Use damage without armour for cg_damagePlums and some minor bug fixes.
+Revision 310: Display damage indicator thru the walls.
+Fix duplicate damages with shotgun when they are multiple targets.
+Add cg_damagePlum: Controls which weapons will draw damage plumes.
+Default is all: "/g/mg/sg/gl/rl/lg/rg/pg/bfg/cg/ng/pl/".

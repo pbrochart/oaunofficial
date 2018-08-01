@@ -584,9 +584,9 @@ static void CG_RocketTrail( centity_t *ent, const weaponInfo_t *wi ) {
 				
 				if( !( ( wi->item->giTag == WP_GRENADE_LAUNCHER ) && ( cg_forceWeaponColor.integer & 2 ) ) ){
 				
-					re->shaderRGBA[0] = 1.0 * 255;
-					re->shaderRGBA[1] = 1.0 * 255;
-					re->shaderRGBA[2] = 0.0 * 255;
+					re->shaderRGBA[0] = 255;
+					re->shaderRGBA[1] = 255;
+					re->shaderRGBA[2] = 0;
 					re->shaderRGBA[3] = 255;
 
 				} else {
@@ -646,9 +646,9 @@ static void CG_RocketTrail( centity_t *ent, const weaponInfo_t *wi ) {
 				re->customShader = cgs.media.railCoreShader;
 				
 				if( !( ( wi->item->giTag == WP_ROCKET_LAUNCHER ) && ( cg_forceWeaponColor.integer & 4 ) ) ){
-					re->shaderRGBA[0] = 1.0 * 255;
-					re->shaderRGBA[1] = 1.0 * 255;
-					re->shaderRGBA[2] = 0.0 * 255;
+					re->shaderRGBA[0] = 255;
+					re->shaderRGBA[1] = 255;
+					re->shaderRGBA[2] = 0;
 					re->shaderRGBA[3] = 255;
 
 				} else {

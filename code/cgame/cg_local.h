@@ -1772,6 +1772,7 @@ extern vmCvar_t 		cg_explosion;
 extern vmCvar_t 		cg_drawSpawnpoints;
 extern vmCvar_t 		cg_mapoverview;
 extern vmCvar_t			cg_damagePlums;
+extern vmCvar_t			cg_damagePlum;
 extern vmCvar_t   		g_crosshairNamesFog;
 
 //unlagged - cg_unlagged.c
@@ -2034,7 +2035,7 @@ void CG_InvulnerabilityJuiced( vec3_t org );
 void CG_LightningBoltBeam( vec3_t start, vec3_t end );
 //#endif
 void CG_ScorePlum( int client, vec3_t org, int score );
-void CG_DamagePlum( int client, vec3_t org, int score );
+void CG_DamagePlum( int client, vec3_t org, int damage, int mod );
 void CG_GibPlayer( vec3_t playerOrigin );
 void CG_BigExplode( vec3_t playerOrigin );
 

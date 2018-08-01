@@ -1549,28 +1549,6 @@ static void PM_BeginWeaponChange( int weapon ) {
 
 /*
 ===============
-PM_DelayedWeaponChange
-===============
-*/
-/*static void PM_DelayedWeaponChange( void ) {
-	int		weapon;
-
-	weapon = pm->cmd.weapon;
-	if ( weapon < WP_NONE || weapon >= WP_NUM_WEAPONS ) {
-		weapon = WP_NONE;
-	}
-
-	if ( !( pm->ps->stats[STAT_WEAPONS] & ( 1 << weapon ) ) ) {
-		weapon = WP_NONE;
-	}
-
-	pm->ps->weapon = weapon;
-	pm->ps->weaponstate = WEAPON_RAISING;
-	PM_StartTorsoAnim( TORSO_RAISE );
-}*/
-
-/*
-===============
 PM_FinishWeaponChange
 ===============
 */

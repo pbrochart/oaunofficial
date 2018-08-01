@@ -31,6 +31,7 @@ static	vec3_t	muzzle;
 
 static gentity_t *oldTarg[DEFAULT_SHOTGUN_COUNT], *oldAttacker;
 int countTarg;
+qboolean sameTarg;
 
 #define NUM_NAILSHOTS 15
 
@@ -374,7 +375,7 @@ SHOTGUN
 
 qboolean ShotgunPellet( vec3_t start, vec3_t end, gentity_t *ent ) {
 	trace_t		tr;
-	int			damage, i, passent;
+	int			damage, i, j, passent;
 	gentity_t	*traceEnt;
 	vec3_t		impactpoint, bouncedir;
 	vec3_t		tr_start, tr_end;
@@ -393,7 +394,13 @@ qboolean ShotgunPellet( vec3_t start, vec3_t end, gentity_t *ent ) {
 		}
 
 		if ( traceEnt->takedamage) {
-			if ( oldTarg[countTarg-1] != traceEnt && countTarg < DEFAULT_SHOTGUN_COUNT ) {
+			for ( j = 0 ; j < countTarg ; j++ ) {
+				if ( oldTarg[j] == traceEnt ) {
+					sameTarg = qtrue;
+					break;
+				}
+			}				 
+			if ( !sameTarg && countTarg < DEFAULT_SHOTGUN_COUNT ) {
 				oldTarg[countTarg] = traceEnt;
 				oldTarg[countTarg]->sumDamageShotgun = 0;
 				countTarg++;
@@ -463,6 +470,7 @@ void ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 	for ( i = 0 ; i < DEFAULT_SHOTGUN_COUNT ; i++ ) {
 		/*r = Q_crandom( &seed ) * DEFAULT_SHOTGUN_SPREAD * 16;
 		u = Q_crandom( &seed ) * DEFAULT_SHOTGUN_SPREAD * 16;*/
+		sameTarg = qfalse;
 		
 		//NEW sg-pattern
 		switch(i){
@@ -535,7 +543,7 @@ void ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 
 	for ( i = 0 ; i < countTarg ; i++ ) {
 		if ( oldTarg[i]->sumDamageShotgun && oldTarg[i] != oldAttacker && g_damagePlums.integer ) {
-			DamagePlum( oldAttacker, oldTarg[i]->r.currentOrigin, oldTarg[i]->sumDamageShotgun );
+			DamagePlum( oldAttacker, oldTarg[i]->r.currentOrigin, oldTarg[i]->sumDamageShotgun, MOD_SHOTGUN );
 		}
 	}
 	if( hitClient )

@@ -809,22 +809,23 @@ void CG_AddDamagePlum( localEntity_t *le ) {
 	refEntity_t	*re;
 	vec3_t		origin, delta, dir, vec, up = {0, 0, 1};
 	float		c, len;
-	int			i, score, digits[10], numdigits, negative;
+	int			i, damage, mod, digits[10], numdigits, negative;
 
 	re = &le->refEntity;
 
 	c = ( le->endTime - cg.time ) * le->lifeRate;
 
-	score = le->radius;
-	if (score < 5) {
+	damage = le->radius;
+	mod = le->light;
+	if (damage < 5) {
 		re->shaderRGBA[0] = 0xff;
 		re->shaderRGBA[1] = 0xff;
 		re->shaderRGBA[2] = 0xff;
-	} else if (score < 30) {
+	} else if (damage < 30) {
 		re->shaderRGBA[0] = 0x9f;
 		re->shaderRGBA[1] = 0xff;
 		re->shaderRGBA[2] = 0xfd;
-	} else if (score < 50) {
+	} else if (damage < 50) {
 		re->shaderRGBA[0] = 0xfd;
 		re->shaderRGBA[1] = 0xff;
 		re->shaderRGBA[2] = 0x50;
@@ -861,14 +862,14 @@ void CG_AddDamagePlum( localEntity_t *le ) {
 	}
 
 	negative = qfalse;
-	if (score < 0) {
+	if (damage < 0) {
 		negative = qtrue;
-		score = -score;
+		damage = -damage;
 	}
 
-	for (numdigits = 0; !(numdigits && !score); numdigits++) {
-		digits[numdigits] = score % 10;
-		score = score / 10;
+	for (numdigits = 0; !(numdigits && !damage); numdigits++) {
+		digits[numdigits] = damage % 10;
+		damage = damage / 10;
 	}
 
 	if (negative) {
@@ -879,6 +880,7 @@ void CG_AddDamagePlum( localEntity_t *le ) {
 	for (i = 0; i < numdigits; i++) {
 		VectorMA(origin, (float) (((float) numdigits / 2) - i) * NUMBER_SIZE, vec, re->origin);
 		re->customShader = cgs.media.numberShaders[digits[numdigits-1-i]];
+		re->renderfx = RF_DEPTHHACK;
 		trap_R_AddRefEntityToScene( re );
 	}
 }

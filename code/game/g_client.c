@@ -1365,10 +1365,7 @@ char *G_MD5String( const char *in )
 	unsigned char digest[16] = {""}; 
 
 	MD5_CTX md5;
-	//byte buffer[2048];
 	int i;
-	//int r = 0;
-	//int total = 0;
 
 	Q_strncpyz( final, "", sizeof( final ) );
 
@@ -1429,8 +1426,6 @@ void ClientUserinfoChanged( int clientNum ) {
 	char	redTeam[MAX_INFO_STRING];
 	char	blueTeam[MAX_INFO_STRING];
 	char	userinfo[MAX_INFO_STRING];
-	//int	i;
-	//char      buf[ MAX_INFO_STRING ];
 
 	ent = g_entities + clientNum;
 	client = ent->client;
@@ -2685,16 +2680,7 @@ void ClientSpawn(gentity_t *ent) {
 	// clear entity state values
 	BG_PlayerStateToEntityState( &client->ps, &ent->s, qtrue );
 	
-	/*if(g_gametype.integer == GT_ELIMINATION || g_gametype.integer == GT_CTF_ELIMINATION )
-		G_SendLivingCount();*/
-	
 	client->spawnTime = level.time;
-	//client->sendSpawnpoints = sendSpawnpoints;
-	/*if( !client->sendSpawnpoints && g_gametype.integer < GT_TEAM ){
-		G_SendSpawnpoints( ent );
-		client->sendSpawnpoints = qtrue;
-	}*/
-	
 }
 
 

@@ -271,9 +271,6 @@ void G_SendRespawnTimer( int entityNum, int type, int quantity, int respawnTime,
 	gentity_t	*ent;
 	int		i;
 	int team;
-	//fileHandle_t f;
-
-	//G_Printf("entityNum %i, type %i, quantity %i, respawnTime %i, nextItemEntityNum %i\n", entityNum, type, quantity, respawnTime, nextItemEntityNum);
 
 	if ( level.warmupTime ) {
 		return;
@@ -493,7 +490,6 @@ void G_StartServerDemos( void ) {
 
 void G_StopServerDemos( void ) {
 	int i;
-	//char gamestring[128];
 	
 	//TODO: Add other gametypes
 	if( ( g_gametype.integer != GT_TOURNAMENT ) || !g_autoServerDemos.integer )
@@ -1571,7 +1567,6 @@ void Cmd_FollowCycle_f( gentity_t *ent ) {
     int     count;
     char    args[11];
     int     dir;
-    //int i;
 
     /*for( i = 0 ; i < level.numConnectedClients; i++ ){
       if( level.clients[i].pers.demoClient )
