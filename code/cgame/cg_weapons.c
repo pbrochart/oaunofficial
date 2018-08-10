@@ -1850,6 +1850,7 @@ The main player will have this called for BOTH cases, so effects like light and
 sound should only be done on the world model case.
 =============
 */
+#define DRAW_GUN_ELEMENTS 3
 void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team ) {
 	refEntity_t	gun;
 	refEntity_t	barrel;
@@ -1924,11 +1925,20 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	VectorMA(gun.origin, lerped.origin[0], parent->axis[0], gun.origin);
 
-	// Make weapon appear left-handed for 2 and centered for 3
-	if(ps && cg_drawGun.integer == 2)
+	// Make weapon appear left-handed for 2 and centered for 3 (also for 5 and 6 with ghost weapons)
+	if((ps && cg_drawGun.integer == 2) || (ps && cg_drawGun.integer == 5))
 		VectorMA(gun.origin, -lerped.origin[1], parent->axis[1], gun.origin);
-	else if(!ps || cg_drawGun.integer != 3)
-       	VectorMA(gun.origin, lerped.origin[1], parent->axis[1], gun.origin);
+	else if(((!ps || cg_drawGun.integer != 3) && cg_drawGun.integer < DRAW_GUN_ELEMENTS+1) ||
+		((!ps || cg_drawGun.integer != 6) && cg_drawGun.integer > DRAW_GUN_ELEMENTS))
+       		VectorMA(gun.origin, lerped.origin[1], parent->axis[1], gun.origin);
+
+	if ((ps && cg_drawGun.integer > DRAW_GUN_ELEMENTS) && (cg_drawGun.integer < (DRAW_GUN_ELEMENTS*2)+1)) {
+		gun.customShader = cgs.media.ghostWeaponShader;
+		gun.shaderRGBA[0] = 255;
+		gun.shaderRGBA[1] = 255;
+		gun.shaderRGBA[2] = 255;
+		gun.shaderRGBA[3] = 255;
+	}
 
 	VectorMA(gun.origin, lerped.origin[2], parent->axis[2], gun.origin);
 
@@ -1951,8 +1961,14 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		AnglesToAxis( angles, barrel.axis );
 
 		CG_PositionRotatedEntityOnTag( &barrel, &gun, weapon->weaponModel, "tag_barrel" );
-		
-		if( weapon->brightSkin && cg_brightItems.integer == 1 ) {
+
+		if ((ps && cg_drawGun.integer > DRAW_GUN_ELEMENTS) && (cg_drawGun.integer < (DRAW_GUN_ELEMENTS*2)+1)) {
+			barrel.customShader = cgs.media.ghostWeaponShader;
+			barrel.shaderRGBA[0] = 255;
+			barrel.shaderRGBA[1] = 255;
+			barrel.shaderRGBA[2] = 255;
+			barrel.shaderRGBA[3] = 255;
+		} else if( weapon->brightSkin && cg_brightItems.integer == 1 ) {
 			barrel.customShader = weapon->brightSkin;
 		} else if( cg_brightItems.integer == 2 ){
 			barrel.customShader = trap_R_RegisterShader("models/players/flat");

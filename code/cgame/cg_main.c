@@ -1662,6 +1662,7 @@ static void CG_RegisterGraphics( void ) {
 #endif
 	cgs.media.particleSpark = trap_R_RegisterShader("spark");
 	cgs.media.particlePlasma = trap_R_RegisterShader("plasmaSparkAs");
+	cgs.media.ghostWeaponShader = trap_R_RegisterShader("ghostWeaponShader");
 	
 	CG_ClearParticles ();
 	

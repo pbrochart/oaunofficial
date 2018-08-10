@@ -14,3 +14,5 @@ Revision 310: Display damage indicator thru the walls.
 Fix duplicate damages with shotgun when they are multiple targets.
 Add cg_damagePlum: Controls which weapons will draw damage plumes.
 Default is all: "/g/mg/sg/gl/rl/lg/rg/pg/bfg/cg/ng/pl/".
+Revision 311: Added new features for cg_drawGun (4,5,6).
+Same as 1,2,3 but the weapons are transparent.

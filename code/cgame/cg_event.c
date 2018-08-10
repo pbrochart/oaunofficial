@@ -1043,9 +1043,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
         else {
             if (es->clientNum == cg.snap->ps.clientNum && !cg.renderingThirdPerson)
             {
-                if (cg_drawGun.integer == 2)
+                if ((cg_drawGun.integer == 2) || (cg_drawGun.integer == 5))
                     VectorMA(es->origin2, 8, cg.refdef.viewaxis[1], es->origin2);
-                else if (cg_drawGun.integer == 3)
+                else if ((cg_drawGun.integer == 3) || (cg_drawGun.integer == 6))
                     VectorMA(es->origin2, 4, cg.refdef.viewaxis[1], es->origin2);
             }
 

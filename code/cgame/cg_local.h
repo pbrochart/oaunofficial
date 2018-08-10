@@ -1262,6 +1262,7 @@ typedef struct {
 	
 	qhandle_t	particleSpark;
 	qhandle_t	particlePlasma;
+	qhandle_t	ghostWeaponShader;
 	
 	qhandle_t	blueMarker;
 	qhandle_t	redMarker;
