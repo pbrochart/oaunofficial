@@ -153,7 +153,7 @@ go to a random point that doesn't telefrag
 ================
 */
 #define	MAX_SPAWN_POINTS	128
-gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
+gentity_t *SelectRandomDeathmatchSpawnPoint( qboolean isbot ) {
 	gentity_t	*spot;
 	int			count;
 	int			selection;
@@ -162,12 +162,18 @@ gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
 	count = 0;
 	spot = NULL;
 
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-		//Dont use spots that would telefrag
-		if ( SpotWouldTelefrag( spot ) ) {
+	while((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL && count < MAX_SPAWN_POINTS)
+	{
+		if(SpotWouldTelefrag(spot))
+			continue;
+ 		if(((spot->flags & FL_NO_BOTS) && isbot) ||
+		   ((spot->flags & FL_NO_HUMANS) && !isbot))
+		{
+			// spot is not for this human/bot player
 			continue;
 		}
-		spots[ count ] = spot;
+
+		spots[count] = spot;
 		count++;
 	}
 
@@ -186,53 +192,66 @@ SelectRandomFurthestSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles ) {
+gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot ) {
 	gentity_t	*spot;
 	vec3_t		delta;
 	float		dist;
-	float		list_dist[64];
-	gentity_t	*list_spot[64];
+	float		list_dist[MAX_SPAWN_POINTS];
+	gentity_t	*list_spot[MAX_SPAWN_POINTS];	
 	int			numSpots, rnd, i, j;
 
 	numSpots = 0;
 	spot = NULL;
 
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-		//dont take spots that would telefrag
-		if ( SpotWouldTelefrag( spot ) ) {
+	while((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
+	{
+		if(SpotWouldTelefrag(spot))
+			continue;
+ 		if(((spot->flags & FL_NO_BOTS) && isbot) ||
+		   ((spot->flags & FL_NO_HUMANS) && !isbot))
+		{
+			// spot is not for this human/bot player
 			continue;
 		}
 		//get distance from avoid point
 		VectorSubtract( spot->s.origin, avoidPoint, delta );
 		dist = VectorLength( delta );
-		//sort spots by distance
-		for (i = 0; i < numSpots; i++) {
-			if ( dist > list_dist[i] ) {
-				if ( numSpots >= 64 )
-					numSpots = 64-1;
-				for (j = numSpots; j > i; j--) {
+
+		for (i = 0; i < numSpots; i++)
+		{
+			if(dist > list_dist[i])
+			{
+				if (numSpots >= MAX_SPAWN_POINTS)
+					numSpots = MAX_SPAWN_POINTS - 1;
+					
+				for(j = numSpots; j > i; j--)
+				{
 					list_dist[j] = list_dist[j-1];
 					list_spot[j] = list_spot[j-1];
 				}
+
 				list_dist[i] = dist;
 				list_spot[i] = spot;
+
 				numSpots++;
-				if (numSpots > 64)
-					numSpots = 64;
 				break;
 			}
 		}
-		if (i >= numSpots && numSpots < 64) {
+		if(i >= numSpots && numSpots < MAX_SPAWN_POINTS)
+		{
 			list_dist[numSpots] = dist;
 			list_spot[numSpots] = spot;
 			numSpots++;
 		}
 	}
-	//no spot found? check if there is a spot or only all would telefrag
-	if (!numSpots) {
-		spot = G_Find( NULL, FOFS(classname), "info_player_deathmatch");
+
+	if(!numSpots)
+	{
+		spot = G_Find(NULL, FOFS(classname), "info_player_deathmatch");
+
 		if (!spot)
 			G_Error( "Couldn't find a spawn point" );
+
 		VectorCopy (spot->s.origin, origin);
 		origin[2] += 9;
 		VectorCopy (spot->s.angles, angles);
@@ -266,8 +285,8 @@ SelectSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles ) {
-	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles );
+gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot ) {
+	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, isbot );
 
 	/*
 	gentity_t	*spot;
@@ -310,22 +329,20 @@ gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles, qboolean isbot
 
 	spot = NULL;
 	
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-		
+	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
+	{
 		if(((spot->flags & FL_NO_BOTS) && isbot) ||
 		   ((spot->flags & FL_NO_HUMANS) && !isbot))
 		{
 			continue;
 		}
-		
-		if ( spot->spawnflags & 1 && !SpotWouldTelefrag( spot ) ) {
+
+		if((spot->spawnflags & 0x01 && !SpotWouldTelefrag(spot)))
 			break;
-		}
 	}
 
-	if ( !spot /*|| SpotWouldTelefrag( spot )*/ ) {
-		return SelectSpawnPoint( vec3_origin, origin, angles );
-	}
+	if (!spot /*|| SpotWouldTelefrag(spot)*/ )
+		return SelectSpawnPoint(vec3_origin, origin, angles, isbot);
 
 	VectorCopy (spot->s.origin, origin);
 	origin[2] += 9;
@@ -441,7 +458,7 @@ void CopyToBodyQue( gentity_t *ent ) {
 		body->s.eFlags |= EF_KAMIKAZE;
 
 		// check if there is a kamikaze timer around for this owner
-		for (i = 0; i < MAX_GENTITIES; i++) {
+		for (i = 0; i < level.num_entities; i++) {
 			e = &g_entities[i];
 			if (!e->inuse)
 				continue;
@@ -688,7 +705,7 @@ TeamCount
 Returns number of players on a team
 ================
 */
-team_t TeamCount( int ignoreClientNum, int team ) {
+int TeamCount( int ignoreClientNum, team_t team ) {
 	int		i;
 	int		count = 0;
 
@@ -2155,6 +2172,7 @@ void ClientSpawn(gentity_t *ent) {
 	index = ent - g_entities;
 	client = ent->client;
 	
+	VectorClear(spawn_origin);
 
 	//In Elimination the player should not spawn if he have already spawned in the round (but not for spectators)
 	// N_G: You've obviously wanted something ELSE
@@ -2220,55 +2238,38 @@ void ClientSpawn(gentity_t *ent) {
 		spawnPoint = SelectSpectatorSpawnPoint ( spawn_origin, spawn_angles);
 	} else if (g_gametype.integer == GT_DOUBLE_D) {
 		//Double Domination uses special spawn points:
-		spawnPoint = SelectDoubleDominationSpawnPoint (client->sess.sessionTeam, spawn_origin, spawn_angles);
+		spawnPoint = SelectDoubleDominationSpawnPoint (client->sess.sessionTeam, spawn_origin, spawn_angles, !!(ent->r.svFlags & SVF_BOT));
 	} else if (g_gametype.integer >= GT_CTF && g_ffa_gt==0) {
 		// all base oriented team games use the CTF spawn points
 		spawnPoint = SelectCTFSpawnPoint ( 
 						client->sess.sessionTeam, 
 						client->pers.teamState.state, 
-						spawn_origin, spawn_angles);
-	} else {
-		do {
-			// the first spawn should be at a good looking spot
-			if ( !client->pers.initialSpawn && client->pers.localClient ) {
-				client->pers.initialSpawn = qtrue; 					//The client had an initial spawn
-				spawnPoint = SelectInitialSpawnPoint( spawn_origin, spawn_angles,
-								      (ent->r.svFlags & SVF_BOT)); 
+						spawn_origin, spawn_angles,
+						!!(ent->r.svFlags & SVF_BOT));
+	}
+	else {
+		// the first spawn should be at a good looking spot
+		if ( !client->pers.initialSpawn && client->pers.localClient )
+		{
+			client->pers.initialSpawn = qtrue;
+			spawnPoint = SelectInitialSpawnPoint(spawn_origin, spawn_angles,
+							     !!(ent->r.svFlags & SVF_BOT));
+		}
+		else
+		{
+			// if aftershock spawnsystem is used, dont spawn near the killer( 3 furthest spawnpoints )
+			// if aftershock spawnsystem is not used, spawn on the other side of the map 
+			if( g_aftershockRespawn.integer && client->lastKiller >= 0){
+				spawnPoint = SelectSpawnPoint ( 
+					g_entities[client->lastKiller].client->ps.origin, 
+					spawn_origin, spawn_angles, !!(ent->r.svFlags & SVF_BOT));
 			} else {
-				// if aftershock spawnsystem is used, dont spawn near the killer( 3 furthest spawnpoints )
-				// if aftershock spawnsystem is not used, spawn on the other side of the map 
-				if( g_aftershockRespawn.integer && client->lastKiller >= 0){
-					spawnPoint = SelectSpawnPoint ( 
-						g_entities[client->lastKiller].client->ps.origin, 
-						spawn_origin, spawn_angles);
-				} else {
-					spawnPoint = SelectSpawnPoint ( 
-						client->ps.origin, 
-						spawn_origin, spawn_angles);
-				}
+				// don't spawn near existing origin if possible
+				spawnPoint = SelectSpawnPoint ( 
+				client->ps.origin, 
+				spawn_origin, spawn_angles, !!(ent->r.svFlags & SVF_BOT));
 			}
-
-			// Tim needs to prevent bots from spawning at the initial point
-			// on q3dm0...
-			if ( ( spawnPoint->flags & FL_NO_BOTS ) && ( ent->r.svFlags & SVF_BOT ) ) {
-                            //Sago: The game has a tendency to select the furtest spawn point
-                            //This is a problem if the fursest spawnpoint keeps being NO_BOTS and it does!
-                            //This is a hot fix that seeks a spawn point faraway from the the currently found one
-                            vec3_t old_origin;
-                            VectorCopy(spawn_origin,old_origin);
-                            spawnPoint = SelectSpawnPoint (old_origin, spawn_origin, spawn_angles);
-                            if ( ( spawnPoint->flags & FL_NO_BOTS ) && ( ent->r.svFlags & SVF_BOT ) ) {
-				continue;	// try again
-                            }
-			}
-			// just to be symetric, we have a nohumans option...
-			if ( ( spawnPoint->flags & FL_NO_HUMANS ) && !( ent->r.svFlags & SVF_BOT ) ) {
-				continue;	// try again
-			}
-
-			break;
-
-		} while ( 1 );
+		}
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
 

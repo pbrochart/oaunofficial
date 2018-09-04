@@ -155,7 +155,7 @@ static void UpdateIPBans (void)
 				Q_strcat(ip, sizeof(ip), va("%i", b[j]));
 			Q_strcat(ip, sizeof(ip), (j<3) ? "." : " ");
 		}		
-		if (strlen(iplist_final)+strlen(ip) < MAX_CVAR_VALUE_STRING)
+		if (strlen(iplist_final)+strlen(ip) < MAX_CVAR_VALUE_STRING - 1)
 		{
 			Q_strcat( iplist_final, sizeof(iplist_final), ip);
 		}
@@ -266,7 +266,7 @@ void Svcmd_AddIP_f (void)
 	char		str[MAX_TOKEN_CHARS];
 
 	if ( trap_Argc() < 2 ) {
-                G_Printf("Usage:  addip <ip-mask>\n");
+                G_Printf("Usage: addip <ip-mask>\n");
 		return;
 	}
 
@@ -288,7 +288,7 @@ void Svcmd_RemoveIP_f (void)
 	char		str[MAX_TOKEN_CHARS];
 
 	if ( trap_Argc() < 2 ) {
-                G_Printf("Usage:  sv removeip <ip-mask>\n");
+                G_Printf("Usage: removeip <ip-mask>\n");
 		return;
 	}
 
@@ -319,8 +319,8 @@ void	Svcmd_EntityList_f (void) {
 	int			e;
 	gentity_t		*check;
 
-	check = g_entities+1;
-	for (e = 1; e < level.num_entities ; e++, check++) {
+	check = g_entities;
+	for (e = 0; e < level.num_entities ; e++, check++) {
 		if ( !check->inuse ) {
 			continue;
 		}
@@ -419,6 +419,11 @@ forceteam <player> <team>
 void	Svcmd_ForceTeam_f( void ) {
 	gclient_t	*cl;
 	char		str[MAX_TOKEN_CHARS];
+
+	if ( trap_Argc() < 3 ) {
+		G_Printf("Usage: forceteam <player> <team>\n");
+		return;
+	}
 
 	// find the player
 	trap_Argv( 1, str, sizeof( str ) );

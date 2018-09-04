@@ -123,7 +123,7 @@ void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... ) {
     char		*p;
 
     va_start (argptr,fmt);
-    if (Q_vsnprintf (msg, sizeof(msg), fmt, argptr) > sizeof(msg)) {
+    if (Q_vsnprintf (msg, sizeof(msg), fmt, argptr) >= sizeof(msg)) {
         G_Error ( "PrintMsg overrun" );
     }
     va_end (argptr);
@@ -662,7 +662,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 
     if (carrier && carrier != attacker) {
         VectorSubtract(targ->r.currentOrigin, carrier->r.currentOrigin, v1);
-        VectorSubtract(attacker->r.currentOrigin, carrier->r.currentOrigin, v1);
+        VectorSubtract(attacker->r.currentOrigin, carrier->r.currentOrigin, v2);
 
         if ( ( ( VectorLength(v1) < CTF_ATTACKER_PROTECT_RADIUS &&
                  trap_InPVS(carrier->r.currentOrigin, targ->r.currentOrigin ) ) ||
@@ -1695,7 +1695,7 @@ qboolean Team_GetDeathLocationMsg(gentity_t *ent, char *loc, int loclen)
 
 /*
 ================
-SelectRandomDeathmatchSpawnPoint
+SelectRandomTeamSpawnPoint
 
 go to a random point that doesn't telefrag
 ================
@@ -1835,13 +1835,13 @@ SelectCTFSpawnPoint
 
 ============
 */
-gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles ) {
+gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot ) {
     gentity_t	*spot;
 
     spot = SelectRandomTeamSpawnPoint ( teamstate, team );
 
     if (!spot) {
-        return SelectSpawnPoint( vec3_origin, origin, angles );
+        return SelectSpawnPoint( vec3_origin, origin, angles, isbot );
     }
 
     VectorCopy (spot->s.origin, origin);
@@ -1857,7 +1857,7 @@ SelectDoubleDominationSpawnPoint
 
 ============
 */
-gentity_t *SelectDoubleDominationSpawnPoint ( team_t team, vec3_t origin, vec3_t angles ) {
+gentity_t *SelectDoubleDominationSpawnPoint ( team_t team, vec3_t origin, vec3_t angles, qboolean isbot ) {
     gentity_t	*spot;
 
     spot = SelectRandomTeamDDSpawnPoint( team );
@@ -1867,7 +1867,7 @@ gentity_t *SelectDoubleDominationSpawnPoint ( team_t team, vec3_t origin, vec3_t
     }
 
     if (!spot) {
-        return SelectSpawnPoint( vec3_origin, origin, angles );
+        return SelectSpawnPoint( vec3_origin, origin, angles, isbot );
     }
 
     VectorCopy (spot->s.origin, origin);

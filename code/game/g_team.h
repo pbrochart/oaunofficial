@@ -105,9 +105,9 @@ void Team_CheckHurtCarrier(gentity_t *targ, gentity_t *attacker);
 void Team_InitGame(void);
 void Team_ReturnFlag(int team);
 void Team_FreeEntity(gentity_t *ent);
-gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles );
+gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot );
 //For Double_D
-gentity_t *SelectDoubleDominationSpawnPoint ( team_t, vec3_t origin, vec3_t angles );
+gentity_t *SelectDoubleDominationSpawnPoint ( team_t, vec3_t origin, vec3_t angles, qboolean isbot );
 //For Standard D
 void Team_Dom_SpawnPoints( void );
 gentity_t *Team_GetLocation(gentity_t *ent);
