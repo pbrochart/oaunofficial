@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 #include "challenges.h"
+#include "bg_promode.h" 
 
 /*
 ============
@@ -1776,7 +1777,17 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 			VectorSubtract (ent->r.currentOrigin, origin, dir);
 			// push the center of mass higher than the origin so players
 			// get knocked into the air more
-			dir[2] += 24;
+			if ( g_aftershockPhysic.integer ) {
+				// CPM: Add some extra knockback
+				if (ent == attacker) { // rjumps are same as in normal Q3A
+					dir[2] += 24;
+				} else {
+					dir[2] += cpm_knockback_z;
+				}
+				// !CPM
+			}
+			else
+				dir[2] += 24;
 			G_Damage (ent, NULL, attacker, dir, origin, (int)points, DAMAGE_RADIUS, mod);
 		}
 	}

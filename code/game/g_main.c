@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
 #include "g_local.h"
+#include "bg_promode.h"
 
 level_locals_t	level;
 
@@ -892,6 +893,13 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
     
     //KK-OAX Changed to Tremulous's BG_InitMemory
 	BG_InitMemory();
+
+	// CPM: Initialize
+	// Update all settings
+	CPM_UpdateSettings(g_aftershockPhysic.integer);
+	// Set the config string
+	trap_SetConfigstring(CS_PRO_MODE, va("%d", g_aftershockPhysic.integer));
+	// !CPM
 
 	// set some level globals
 	memset( &level, 0, sizeof( level ) );

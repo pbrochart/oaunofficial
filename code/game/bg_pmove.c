@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "bg_public.h"
 #include "bg_local.h"
 #include "g_local.h"
+#include "bg_promode.h"
 
 extern vmCvar_t g_aftershockPhysic;
 
@@ -41,7 +42,6 @@ float	pm_wadeScale = 0.70f;
 
 float	pm_accelerate = 10.0f;
 float	pm_airaccelerate = 1.0f;
-float  pm_airaccelerateas = 1.0f;
 float	pm_wateraccelerate = 4.0f;
 float	pm_flyaccelerate = 8.0f;
 
@@ -202,12 +202,8 @@ static void PM_Friction( void ) {
 		if ( pml.walking && !(pml.groundTrace.surfaceFlags & SURF_SLICK) ) {
 			// if getting knocked back, no friction
 			if ( ! (pm->ps->pm_flags & PMF_TIME_KNOCKBACK) ) {
-				if( g_aftershockPhysic.integer && (pm->ps->pm_flags & PMF_DUCKED) && (speed >= pm_slideminspeed) ){
-					drop += speed*pm_slidefriction*pml.frametime;
-				} else {
-					control = speed < pm_stopspeed ? pm_stopspeed : speed;
-					drop += control*pm_friction*pml.frametime;
-				}
+				control = speed < pm_stopspeed ? pm_stopspeed : speed;
+				drop += control*pm_friction*pml.frametime;
 			}
 		}
 	}
@@ -397,23 +393,18 @@ static qboolean PM_CheckJump( void ) {
 	pm->ps->pm_flags |= PMF_JUMP_HELD;
 
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
-	
-	if ( g_aftershockPhysic.integer && /*( pm->ps->origin[2] > pml.preJumpHeight ) &&*/ (pm->ps->velocity[2] >= 0) ) {
-		if (pm->ps->stats[STAT_JUMPTIME] > 0) {
-			float speed = sqrt(pml.forward[0]*pml.forward[0] + pml.forward[1]*pml.forward[1]);
-			pm->ps->velocity[2] += JUMP_VELOCITY + 100;
-			//pm->ps->velocity[2] += JUMP_VELOCITY + ((JUMP_VELOCITY-100)*pm->ps->stats[STAT_JUMPTIME])/400 + 100;
-			pm->ps->velocity[0] += (pml.forward[0]/speed)*80;
-			pm->ps->velocity[1] += (pml.forward[1]/speed)*80;
-			
-			pml.preJumpHeight = pm->ps->origin[2];
-		} else {
-			pm->ps->velocity[2] += JUMP_VELOCITY;
-		}
-	} else {
-		pm->ps->velocity[2] = JUMP_VELOCITY;
+	pm->ps->velocity[2] = JUMP_VELOCITY;
+
+	if ( g_aftershockPhysic.integer ) {
+		// CPM: check for double-jump
+		if (cpm_pm_jump_z) {
+			if (pm->ps->stats[STAT_JUMPTIME] > 0) {
+				pm->ps->velocity[2] += cpm_pm_jump_z;
+			}
+			// pm->ps->stats[STAT_JUMPTIME] = 400;	// not needed here, it's just below
+		} // !CPM
 	}
-	
+
 	pm->ps->stats[STAT_JUMPTIME] = 400;
 	
 	//pm->ps->velocity[2] = JUMP_VELOCITY;
@@ -642,6 +633,8 @@ static void PM_AirMove( void ) {
 	float		wishspeed;
 	float		scale;
 	usercmd_t	cmd;
+	float		accel; 		// CPM
+	float		wishspeed2; 	// CPM
 
 	PM_Friction();
 
@@ -668,11 +661,27 @@ static void PM_AirMove( void ) {
 	VectorCopy (wishvel, wishdir);
 	wishspeed = VectorNormalize(wishdir);
 	wishspeed *= scale;
-	if( g_aftershockPhysic.integer )
-	  PM_Accelerate(wishdir, wishspeed, pm_airaccelerateas);
+	if( g_aftershockPhysic.integer ) {
+		// CPM: Air Control
+		wishspeed2 = wishspeed;
+		if (DotProduct(pm->ps->velocity, wishdir) < 0)
+			accel = cpm_pm_airstopaccelerate;
+		else
+			accel = pm_airaccelerate;
+		if (pm->ps->movementDir == 2 || pm->ps->movementDir == 6) {
+			if (wishspeed > cpm_pm_wishspeed)
+				wishspeed = cpm_pm_wishspeed;
+			accel = cpm_pm_strafeaccelerate;
+		}
+
+		PM_Accelerate (wishdir, wishspeed, accel);
+		if (cpm_pm_aircontrol)
+			CPM_PM_Aircontrol (pm, wishdir, wishspeed2);
+		// !CPM
+	}
 	else
 	// not on ground, so little effect on velocity
-	  PM_Accelerate (wishdir, wishspeed, pm_airaccelerate);
+		PM_Accelerate (wishdir, wishspeed, pm_airaccelerate);
 
 	// we may have a ground plane that is very steep, even
 	// though we don't have a groundentity
@@ -798,14 +807,8 @@ static void PM_WalkMove( void ) {
 		}
 
 		speed = VectorLength(vec);
-		if( g_aftershockPhysic.integer && (pm->ps->pm_flags & PMF_DUCKED) && (speed >= pm_slideminspeed) ){
-			if ( wishspeed > pm->ps->speed * pm_duckScale * 2 ) {
-				wishspeed = pm->ps->speed * pm_duckScale * 2;
-			}
-		} else {
-			if ( wishspeed > pm->ps->speed * pm_duckScale ) {
-				wishspeed = pm->ps->speed * pm_duckScale;
-			}
+		if ( wishspeed > pm->ps->speed * pm_duckScale ) {
+			wishspeed = pm->ps->speed * pm_duckScale;
 		}
 	}
 

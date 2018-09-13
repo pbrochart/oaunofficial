@@ -106,7 +106,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define CS_MAX				(CS_PARTICLES+MAX_LOCATIONS)
 
-#define REVISION			312
+#define REVISION			313
 #if (CS_MAX) > MAX_CONFIGSTRINGS
 #error overflow: (CS_MAX) > MAX_CONFIGSTRINGS
 #endif
@@ -245,7 +245,8 @@ typedef enum {
 	STAT_DEAD_YAW,					// look this direction when dead (FIXME: get rid of?)
 	STAT_CLIENTS_READY,				// bit mask of clients wishing to exit the intermission (FIXME: configstring?)
 	STAT_MAX_HEALTH,					// health / armor limit, changable by handicap
-	STAT_JUMPTIME					//rampjump
+	STAT_JUMPTIME,					//rampjump
+	STAT_ARMORTYPE
 } statIndex_t;
 
 
@@ -509,7 +510,6 @@ typedef enum {
 
 	EV_GIB_PLAYER,			// gib a previously living player
 	EV_SCOREPLUM,			// score plum
-	EV_DAMAGEPLUM,			// damage plum
 
 	EV_PROXIMITY_MINE_STICK,
 	EV_PROXIMITY_MINE_TRIGGER,
@@ -530,7 +530,8 @@ typedef enum {
 	EV_TAUNT_GUARDBASE,
 	EV_TAUNT_PATROL,
 	
-	EV_WEAPONDROP
+	EV_WEAPONDROP,
+	EV_DAMAGEPLUM			// damage plum
 
 } entity_event_t;
 
