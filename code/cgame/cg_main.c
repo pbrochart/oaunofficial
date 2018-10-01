@@ -375,7 +375,7 @@ vmCvar_t	cg_multiview4_width;
 vmCvar_t	cg_multiview4_height;
 vmCvar_t	cg_multiview4_client;
 
-vmCvar_t	g_aftershockPhysic;
+vmCvar_t	g_promode;
 
 vmCvar_t	cg_inverseTimer;
 
@@ -648,7 +648,7 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{&cg_multiview4_width, "cg_multiview4_width", "200", CVAR_ARCHIVE },
 	{&cg_multiview4_height, "cg_multiview4_height", "160", CVAR_ARCHIVE },
 	{&cg_multiview4_client, "cg_multiview2_client", "-1", CVAR_TEMP },
-	{&g_aftershockPhysic, "g_aftershockPhysic", "0", CVAR_SYSTEMINFO },
+	{&g_promode, "g_promode", "0", CVAR_SYSTEMINFO },
 	{&cg_inverseTimer, "cg_inverseTimer", "0", CVAR_ARCHIVE },
 	{&cg_grenadeTrail, "cg_grenadeTrail", "1", CVAR_ARCHIVE },
 	{&cg_rocketTrail, "cg_rocketTrail", "1", CVAR_ARCHIVE },
@@ -2537,7 +2537,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	CG_ParseServerinfo();
 
 	// CPM: Setup according to the pro mode settings
-	s = CG_ConfigString( CS_PRO_MODE );
+	s = CG_ConfigString( CS_PROMODE );
 	CPM_UpdateSettings( atoi( s ) );
 	// !CPM
 

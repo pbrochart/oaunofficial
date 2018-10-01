@@ -182,7 +182,7 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 	}
 	
         j = strlen(entry);
-        if (stringlength + j > 1024 ) {
+        if (stringlength + j > 1000 ) {
 		G_Printf("Too many clients connected for scoreboard info!\n");
 		break;
         }
@@ -1290,17 +1290,17 @@ void SetTeam( gentity_t *ent, char *s ) {
             if ( g_teamForceBalance.integer  ) {
                 int		counts[TEAM_NUM_TEAMS];
 
-                counts[TEAM_BLUE] = TeamCount( ent->client->ps.clientNum, TEAM_BLUE );
-                counts[TEAM_RED] = TeamCount( ent->client->ps.clientNum, TEAM_RED );
+                counts[TEAM_BLUE] = TeamCount( clientNum, TEAM_BLUE );
+                counts[TEAM_RED] = TeamCount( clientNum, TEAM_RED );
 
                 // We allow a spread of two
                 if ( team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] > 1 ) {
-                    trap_SendServerCommand( ent->client->ps.clientNum,
+                    trap_SendServerCommand( clientNum,
                                             "cp \"Red team has too many players.\n\"" );
                     return; // ignore the request
                 }
                 if ( team == TEAM_BLUE && counts[TEAM_BLUE] - counts[TEAM_RED] > 1 ) {
-                    trap_SendServerCommand( ent->client->ps.clientNum,
+                    trap_SendServerCommand( clientNum,
                                             "cp \"Blue team has too many players.\n\"" );
                     return; // ignore the request
                 }
@@ -2499,7 +2499,7 @@ void Cmd_Ref_f( gentity_t *ent ) {
             strcat(buffer, "startgame, ");
 
         buffer[strlen(buffer)-2] = 0;
-        strcat(buffer, ".\"");
+        strcat(buffer, ".\n\"");
         trap_SendServerCommand( ent-g_entities, buffer);
         return;
     }
@@ -2535,7 +2535,7 @@ void Cmd_Ref_f( gentity_t *ent ) {
         if (allowedRef("startgame"))
             strcat(buffer, "startgame, ");
         buffer[strlen(buffer)-2] = 0;
-        strcat(buffer, ".\"");
+        strcat(buffer, ".\n\"");
         trap_SendServerCommand( ent-g_entities, buffer);
         return;
     }
@@ -2669,6 +2669,7 @@ void Cmd_Ref_f( gentity_t *ent ) {
         }
         else {
             trap_SendServerCommand( ent-g_entities, "print \"Client is spec already.\n\"" );
+            return;
         }
     }
     else if ( !Q_stricmp( arg1, "remove" ) ) {
@@ -2686,6 +2687,7 @@ void Cmd_Ref_f( gentity_t *ent ) {
         }
         else {
             trap_SendServerCommand( ent-g_entities, "print \"Client is spec already.\n\"" );
+            return;
         }
     } else if ( !Q_stricmp( arg1, "lock" ) ) {
         if ( g_teamLock.integer ) {
@@ -2695,13 +2697,14 @@ void Cmd_Ref_f( gentity_t *ent ) {
                 trap_Cvar_Set("g_redLocked","1");
                 trap_Cvar_Set("g_blueLocked","1");
                 trap_SendServerCommand( ent-g_entities, "print \"Teams are locked now.\n\"" );
-                trap_SendServerCommand( -1, "screenPrint \"Teams are locked now.\n\"" );
+                trap_SendServerCommand( -1, "screenPrint \"Teams are locked now.\"" );
                 return;
             }
             trap_SendServerCommand( ent-g_entities, "print \"Teamlock not allowed in this gametype.\n\"" );
             return;
         }
         trap_SendServerCommand( ent-g_entities, "print \"Teamlock not allowed on this server.\n\"" );
+        return;
     } else if ( !Q_stricmp( arg1, "unlock" ) ) {
         if ( g_teamLock.integer ) {
             if ( g_gametype.integer >= GT_TEAM ) {
@@ -2710,13 +2713,14 @@ void Cmd_Ref_f( gentity_t *ent ) {
                 trap_Cvar_Set("g_redLocked","0");
                 trap_Cvar_Set("g_blueLocked","0");
                 trap_SendServerCommand( ent-g_entities, "print \"Teams are unlocked now.\n\"" );
-                trap_SendServerCommand( -1, "screenPrint \"Teams are unlocked now.\n\"" );
+                trap_SendServerCommand( -1, "screenPrint \"Teams are unlocked now.\"" );
                 return;
             }
             trap_SendServerCommand( ent-g_entities, "print \"Teamlock not allowed in this gametype.\n\"" );
             return;
         }
         trap_SendServerCommand( ent-g_entities, "print \"Teamlock not allowed on this server.\n\"" );
+        return;
     } else if ( !Q_stricmp( arg1, "startgame" ) ) {
         if ( !g_startWhenReady.integer ) {
             trap_SendServerCommand( ent-g_entities, "print \"g_startWhenReady not set on this server.\n\"" );
@@ -2815,6 +2819,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
     } else if ( !Q_stricmp( arg1, "fraglimit" ) ) {
     } else if ( !Q_stricmp( arg1, "custom" ) ) {
     } else if ( !Q_stricmp( arg1, "shuffle" ) ) {
+    } else if ( !Q_stricmp( arg1, "g_promode" ) ) {
     } else {
         trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
         //trap_SendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>.\n\"" );
@@ -2842,8 +2847,10 @@ void Cmd_CallVote_f( gentity_t *ent ) {
             strcat(buffer, "shuffle, ");
         if (allowedVote("custom"))
             strcat(buffer, "custom <special>, ");
+        if (allowedVote("g_promode"))
+            strcat(buffer, "g_promode <0/1>, ");
         buffer[strlen(buffer)-2] = 0;
-        strcat(buffer, ".\"");
+        strcat(buffer, ".\n\"");
         trap_SendServerCommand( ent-g_entities, buffer);
         return;
     }
@@ -2864,18 +2871,20 @@ void Cmd_CallVote_f( gentity_t *ent ) {
             strcat(buffer, "kick <player>, ");
         if (allowedVote("clientkick"))
             strcat(buffer, "clientkick <clientnum>, ");
-        if (allowedVote("shuffle"))
-            strcat(buffer, "shuffle, ");
         if (allowedVote("g_doWarmup"))
             strcat(buffer, "g_doWarmup, ");
         if (allowedVote("timelimit"))
             strcat(buffer, "timelimit <time>, ");
         if (allowedVote("fraglimit"))
             strcat(buffer, "fraglimit <frags>, ");
+        if (allowedVote("shuffle"))
+            strcat(buffer, "shuffle, ");
         if (allowedVote("custom"))
             strcat(buffer, "custom <special>, ");
+        if (allowedVote("g_promode"))
+            strcat(buffer, "g_promode <0/1>, ");
         buffer[strlen(buffer)-2] = 0;
-        strcat(buffer, ".\"");
+        strcat(buffer, ".\n\"");
         trap_SendServerCommand( ent-g_entities, buffer);
         return;
     }
@@ -3073,6 +3082,20 @@ void Cmd_CallVote_f( gentity_t *ent ) {
             Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", customvote.displayname );
         else
             Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", customvote.command );
+    } else if ( !Q_stricmp( arg1, "g_promode" ) ) {
+        i = atoi(arg2);
+        if (i == 1) {
+            Com_sprintf( level.voteString, sizeof( level.voteString ), "g_promode \"1\"" );
+            Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "Enable promode?" );
+        }
+        else if (i == 0) {
+            Com_sprintf( level.voteString, sizeof( level.voteString ), "g_promode \"0\"" );
+            Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "Disable promode?" );
+        }
+        else {
+            trap_SendServerCommand( ent-g_entities, "print \"Cannot set g_promode, bad value.\n\"" );
+            return;
+        }
     } else {
         //Com_sprintf( level.voteString, sizeof( level.voteString ), "%s \"%s\"", arg1, arg2 );
         //Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );

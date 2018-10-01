@@ -203,6 +203,10 @@ Speaker entities can automatically play sounds
 ==================
 */
 static void CG_Speaker( centity_t *cent ) {
+	if (! s_ambient.integer ) {
+		return;
+	}
+
 	if ( ! cent->currentState.clientNum ) {	// FIXME: use something other than clientNum...
 		return;		// not auto triggering
 	}

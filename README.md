@@ -19,3 +19,4 @@ Same as 1,2,3 but the weapons are transparent.
 Revision 312: Some bug fixes from ioquake3.
 Revision 313: Add double jump, air control and extra
 damage knockback from CPM physics to g_aftershockPhysic.
+Revision 314: Add g_promode and remove g_aftershockPhysic.

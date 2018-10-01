@@ -1360,7 +1360,7 @@ extern vmCvar_t	    g_useMapcycle;
 extern vmCvar_t	    g_allowMultiview;
 extern vmCvar_t	    g_disableSpecs;
 
-extern vmCvar_t	    g_aftershockPhysic;
+extern vmCvar_t	    g_promode;
 
 extern vmCvar_t	    g_friendsThroughWalls;
 

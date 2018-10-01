@@ -40,22 +40,22 @@ float	cpm_Gauntletknockback = 1;
 float	cpm_MGbox = 50;
 float	cpm_MGdmg = 7;
 float	cpm_MGdmg_tp = 5;
-int		cpm_MGweapon = 100;
+int	cpm_MGweapon = 100;
 
 // Shotgun
 float	cpm_SSGdmg = 10;
 float	cpm_SSGspread = 700;
-int		cpm_SSGcount = 11;
+int	cpm_SSGcount = 11;
 float	cpm_SSGknockback = 1;
-int		cpm_SSGmaxammo = 200;
+int	cpm_SSGmaxammo = 200;
 
 // Grenade Launcher
 float	cpm_GLreload = 800;
-int		cpm_GLmaxammo = 200;
+int	cpm_GLmaxammo = 200;
 
 // Rocket Launcher
 float	cpm_RLspeed = 900;
-int		cpm_RLmaxammo = 200;
+int	cpm_RLmaxammo = 200;
 float	cpm_RLsplashknockback = 1;
 float	cpm_RLknockback = 1;
 
@@ -63,8 +63,8 @@ float	cpm_RLknockback = 1;
 float	cpm_LGknockback = 1;
 
 // Railgun
-int		cpm_RGmaxammo = 200;
-int		cpm_RGbox = 10;
+int	cpm_RGmaxammo = 200;
+int	cpm_RGbox = 10;
 float	cpm_RGchange;
 
 // Plasma Gun
@@ -77,7 +77,7 @@ float	cpm_weaponraise = 250;
 float	cpm_outofammodelay = 500;
 
 // Armor system
-int		cpm_armorsystem = 0;
+int	cpm_armorsystem = 0;
 
 // Battle Suit
 float	cpm_BSprotection = 0.5;
@@ -86,32 +86,32 @@ float	cpm_BSprotection = 0.5;
 float	cpm_respawnhealth = 1.25;
 
 // Backpacks
-int		cpm_backpacks = 0;
+int	cpm_backpacks = 0;
 
 // Radius Damage Fix
-int		cpm_radiusdamagefix = 0;
+int	cpm_radiusdamagefix = 0;
 
 // Z Knockback
 float	cpm_knockback_z = 24;
 
 // Respawn Times
-int		cpm_itemrespawnhealth = 35;
-int		cpm_itemrespawnpowerup = 120;
-int		cpm_itemrespawnammo = 40;
-int		cpm_startpowerups = 0;
-int		cpm_itemrespawnBS = 120;
+int	cpm_itemrespawnhealth = 35;
+int	cpm_itemrespawnpowerup = 120;
+int	cpm_itemrespawnammo = 40;
+int	cpm_startpowerups = 0;
+int	cpm_itemrespawnBS = 120;
 
 // Megahealth
-int		cpm_megastyle = 0;
+int	cpm_megastyle = 0;
 
 // Respawn delay
 float	cpm_clientrespawndelay = 1700;
 
 // Hit tones
-int		cpm_hittones = 0;
+int	cpm_hittones = 0;
 
 // Item size
-int		cpm_itemsize = 36;
+int	cpm_itemsize = 36;
 
 // Lava damage
 float	cpm_lavadamage = 30;
@@ -321,7 +321,7 @@ void CPM_UpdateSettings(int num)
 void CPM_PM_Aircontrol (pmove_t *pm, vec3_t wishdir, float wishspeed )
 {
 	float	zspeed, speed, dot, k;
-	int		i;
+	int	i;
 
 	if ( (pm->ps->movementDir && pm->ps->movementDir !=4) || wishspeed == 0.0) 
 		return; // can't control movement if not moveing forward or backward

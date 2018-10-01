@@ -1070,7 +1070,7 @@ void CG_ParseServerinfo ( void ) {
 	    trap_Cvar_Set ( "cl_maxpackets", va ( "%i", (int)( atoi ( Info_ValueForKey ( info, "sv_fps" ) ) * 1.5f ) ) );
     }
 
-    trap_Cvar_Set ( "g_aftershockPhysic",va("%i",atoi (Info_ValueForKey ( info, "g_aftershockPhysic" ))) );
+    trap_Cvar_Set ( "g_promode",va("%i",atoi (Info_ValueForKey ( info, "g_promode" ))) );
 
     cgs.friendsThroughWalls = atoi ( Info_ValueForKey ( info, "g_friendsThroughWalls" ) );
     trap_Cvar_Set ( "g_friendsThroughWalls", va ( "%i", cgs.friendsThroughWalls ) );
@@ -1282,7 +1282,7 @@ static void CG_ConfigStringModified ( void ) {
 #endif
     } else if ( num == CS_SHADERSTATE ) {
         CG_ShaderStateChanged();
-    } else if ( num == CS_PRO_MODE ) {
+    } else if ( num == CS_PROMODE ) {
         CPM_UpdateSettings( atoi ( str ) );
     }
 

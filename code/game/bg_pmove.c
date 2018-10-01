@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "g_local.h"
 #include "bg_promode.h"
 
-extern vmCvar_t g_aftershockPhysic;
+extern vmCvar_t g_promode;
 
 pmove_t		*pm;
 pml_t		pml;
@@ -395,7 +395,7 @@ static qboolean PM_CheckJump( void ) {
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
 	pm->ps->velocity[2] = JUMP_VELOCITY;
 
-	if ( g_aftershockPhysic.integer ) {
+	if ( g_promode.integer ) {
 		// CPM: check for double-jump
 		if (cpm_pm_jump_z) {
 			if (pm->ps->stats[STAT_JUMPTIME] > 0) {
@@ -661,7 +661,7 @@ static void PM_AirMove( void ) {
 	VectorCopy (wishvel, wishdir);
 	wishspeed = VectorNormalize(wishdir);
 	wishspeed *= scale;
-	if( g_aftershockPhysic.integer ) {
+	if( g_promode.integer ) {
 		// CPM: Air Control
 		wishspeed2 = wishspeed;
 		if (DotProduct(pm->ps->velocity, wishdir) < 0)
@@ -1537,14 +1537,14 @@ static void PM_BeginWeaponChange( int weapon ) {
 
 	PM_AddEvent( EV_CHANGE_WEAPON );
 	pm->ps->weaponstate = WEAPON_DROPPING;
-	if( !g_aftershockPhysic.integer ){
+	if( !g_promode.integer ){
 		pm->ps->weaponTime += 200;
 	}
 	else {
 		pm->ps->weaponTime += 100;
 	}
 	PM_StartTorsoAnim( TORSO_DROP );
-	if( g_aftershockPhysic.integer ) {
+	if( g_promode.integer ) {
 		if( pm->ps->weaponTime > 500 )
 		    pm->ps->weaponTime = 500;
 	}
@@ -1569,7 +1569,7 @@ static void PM_FinishWeaponChange( void ) {
 
 	pm->ps->weapon = weapon;
 	pm->ps->weaponstate = WEAPON_RAISING;
-	if( !g_aftershockPhysic.integer ){
+	if( !g_promode.integer ){
 		pm->ps->weaponTime += 250;
 	}
 	else {

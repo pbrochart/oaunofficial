@@ -1777,7 +1777,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 			VectorSubtract (ent->r.currentOrigin, origin, dir);
 			// push the center of mass higher than the origin so players
 			// get knocked into the air more
-			if ( g_aftershockPhysic.integer ) {
+			if ( g_promode.integer ) {
 				// CPM: Add some extra knockback
 				if (ent == attacker) { // rjumps are same as in normal Q3A
 					dir[2] += 24;

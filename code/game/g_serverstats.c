@@ -307,9 +307,9 @@ void G_WriteXMLStats ( void ) {
 	trap_FS_FOpenFile ( va ( "%s/%s.xml", g_statsPath.string,gameString ), &f, FS_WRITE );
 
 	writeToFile ( "<?xml version=\"1.0\"?><?xml-stylesheet type=\"text/xsl\"?>\n", &f );
-	writeToFile ( va ( "<match datetime=\"%i/%02i/%02i %02i:%02i:%02i\" duration=\"%i\" map=\"%s\" type=\"%s\" isTeamGame=\"%s\" instagib=\"%i\" rocketsOnly=\"%s\" reducedLightning=\"%s\" reducedRail=\"%s\" aftershockRevision=\"%i\" g_aftershockPhysic=\"%i\" serverdemo=\"%s\">\n\n",
+	writeToFile ( va ( "<match datetime=\"%i/%02i/%02i %02i:%02i:%02i\" duration=\"%i\" map=\"%s\" type=\"%s\" isTeamGame=\"%s\" instagib=\"%i\" rocketsOnly=\"%s\" reducedLightning=\"%s\" reducedRail=\"%s\" aftershockRevision=\"%i\" g_promode=\"%i\" serverdemo=\"%s\">\n\n",
 	                   1900 + now.tm_year, 1 + now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec, level.time-level.startTime, mapname, gameShortNames[g_gametype.integer], boolToChar ( isTeamGame ),
-	                   g_instantgib.integer, boolToChar ( g_rockets.integer == 1 ), boolToChar( g_reduceLightningDamage.integer == 1 ), boolToChar( g_reduceRailDamage.integer == 1 ), REVISION, g_aftershockPhysic.integer, boolToChar( ( g_gametype.integer == GT_TOURNAMENT ) && g_autoServerDemos.integer ) ), &f );
+	                   g_instantgib.integer, boolToChar ( g_rockets.integer == 1 ), boolToChar( g_reduceLightningDamage.integer == 1 ), boolToChar( g_reduceRailDamage.integer == 1 ), REVISION, g_promode.integer, boolToChar( ( g_gametype.integer == GT_TOURNAMENT ) && g_autoServerDemos.integer ) ), &f );
 
 	if ( isTeamGame ) {
 		writeToFile ( va ( "\t<team name=\"Blue\" score=\"%i\">\n", level.teamScores[TEAM_BLUE] ), &f );

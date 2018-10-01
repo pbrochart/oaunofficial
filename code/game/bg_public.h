@@ -99,6 +99,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CS_ITEMS				27		// string of 0's and 1's that tell which items are present
 
 #define	CS_MODELS				32
+#define	CS_PROMODE				33
 #define	CS_SOUNDS				(CS_MODELS+MAX_MODELS)
 #define	CS_PLAYERS				(CS_SOUNDS+MAX_SOUNDS)
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)
@@ -106,7 +107,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define CS_MAX				(CS_PARTICLES+MAX_LOCATIONS)
 
-#define REVISION			313
+#define REVISION			314
 #if (CS_MAX) > MAX_CONFIGSTRINGS
 #error overflow: (CS_MAX) > MAX_CONFIGSTRINGS
 #endif
@@ -763,7 +764,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 //g_voteflags->integer
 //Autoparsed from allowedvote
-//List: "/map_restart/nextmap/map/g_gametype/kick/clientkick/g_doWarmup/timelimit/fraglimit/custom/shuffle/"
+//List: "/map_restart/nextmap/map/g_gametype/kick/clientkick/g_doWarmup/timelimit/fraglimit/custom/shuffle/g_promode/"
 #define VF_map_restart  1
 #define VF_nextmap      2
 #define VF_map          4
@@ -775,6 +776,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #define VF_fraglimit    128
 #define VF_custom       256
 #define VF_shuffle      512
+#define VF_g_promode    1024 
 
 // content masks
 #define	MASK_ALL				(-1)
