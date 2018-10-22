@@ -247,7 +247,7 @@ static qboolean	CG_ParseAnimationFile( const char *filename, clientInfo_t *ci ) 
 	}
 
 	if ( i != MAX_ANIMATIONS ) {
-		CG_Printf( "Error parsing animation file: %s", filename );
+		CG_Printf( "Error parsing animation file: %s\n", filename );
 		return qfalse;
 	}
 
@@ -784,9 +784,9 @@ CG_RegisterClientModelname
 ==========================
 */
 static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelName, const char *skinName, const char *headModelName, const char *headSkinName, const char *teamName ) {
-	char	filename[MAX_QPATH*2];
+	char	filename[MAX_QPATH];
 	const char		*headName;
-	char newTeamName[MAX_QPATH*2];
+	char newTeamName[MAX_QPATH];
 
 	if ( headModelName[0] == '\0' ) {
 		headName = modelName;
@@ -1514,7 +1514,7 @@ void CG_NewClientInfo( int clientNum ) {
 			CG_SetDeferredClientInfo( clientNum, &newInfo );
 			// if we are low on memory, leave them with this model
 			if ( forceDefer ) {
-				CG_Printf( "Memory is low.  Using deferred model.\n" );
+				CG_Printf( "Memory is low. Using deferred model.\n" );
 				newInfo.deferred = qfalse;
 			}
 		} else {
@@ -1549,7 +1549,7 @@ void CG_LoadDeferredPlayers( void ) {
 		if ( ci->infoValid && ci->deferred ) {
 			// if we are low on memory, leave it deferred
 			if ( trap_MemoryRemaining() < 4000000 ) {
-				CG_Printf( "Memory is low.  Using deferred model.\n" );
+				CG_Printf( "Memory is low. Using deferred model.\n" );
 				ci->deferred = qfalse;
 				continue;
 			}
@@ -1869,7 +1869,8 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 
 	// allow yaw to drift a bit
 	if ( ( cent->currentState.legsAnim & ~ANIM_TOGGLEBIT ) != LEGS_IDLE 
-		|| ( cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT ) != TORSO_STAND  ) {
+		|| ((cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT) != TORSO_STAND
+		&& (cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT) != TORSO_STAND2)) {
 		// if not standing still, always point all in the same direction
 		cent->pe.torso.yawing = qtrue;	// always center
 		cent->pe.torso.pitching = qtrue;	// always center
@@ -2024,7 +2025,7 @@ static void CG_BreathPuffs( centity_t *cent, refEntity_t *head) {
 	if ( cent->currentState.eFlags & EF_DEAD ) {
 		return;
 	}
-	contents = trap_CM_PointContents( head->origin, 0 );
+	contents = CG_PointContents( head->origin, 0 );
 	if ( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) {
 		return;
 	}
@@ -2556,7 +2557,7 @@ static void CG_PlayerSplash( centity_t *cent ) {
 
 	// if the feet aren't in liquid, don't make a mark
 	// this won't handle moving water brushes, but they wouldn't draw right anyway...
-	contents = trap_CM_PointContents( end, 0 );
+	contents = CG_PointContents( end, 0 );
 	if ( !( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) ) {
 		return;
 	}
@@ -2565,7 +2566,7 @@ static void CG_PlayerSplash( centity_t *cent ) {
 	start[2] += 32;
 
 	// if the head isn't out of liquid, don't make a mark
-	contents = trap_CM_PointContents( start, 0 );
+	contents = CG_PointContents( start, 0 );
 	if ( contents & ( CONTENTS_SOLID | CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) {
 		return;
 	}

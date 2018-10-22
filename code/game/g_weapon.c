@@ -128,6 +128,10 @@ qboolean CheckGauntletAttack( gentity_t *ent ) {
 		return qfalse;
 	}
 
+	if ( ent->client->noclip ) {
+		return qfalse;
+	}
+
 	traceEnt = &g_entities[ tr.entityNum ];
 
 	// send blood impact
@@ -171,33 +175,6 @@ MACHINEGUN
 ======================================================================
 */
 
-/*
-======================
-SnapVectorTowards
-
-Round a vector to integers for more efficient network
-transmission, but make sure that it rounds towards a given point
-rather than blindly truncating.  This prevents it from truncating 
-into a wall.
-======================
-*/
-//unlagged - attack prediction #3
-// moved to q_shared.c
-/*
-void SnapVectorTowards( vec3_t v, vec3_t to ) {
-	int		i;
-
-	for ( i = 0 ; i < 3 ; i++ ) {
-		if ( to[i] <= v[i] ) {
-			v[i] = (int)v[i];
-		} else {
-			v[i] = (int)v[i] + 1;
-		}
-	}
-}
-*/
-//unlagged - attack prediction #3
-
 //unlagged - attack prediction #3
 // moved from g_weapon.c
 /*
@@ -211,13 +188,13 @@ into a wall.
 ======================
 */
 void SnapVectorTowards( vec3_t v, vec3_t to ) {
-	int		i;
+	int i;
 
 	for ( i = 0 ; i < 3 ; i++ ) {
 		if ( to[i] <= v[i] ) {
-			v[i] = (int)v[i];
+			v[i] = floor(v[i]);
 		} else {
-			v[i] = (int)v[i] + 1;
+			v[i] = ceil(v[i]);
 		}
 	}
 }

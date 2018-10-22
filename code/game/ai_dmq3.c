@@ -172,20 +172,15 @@ BotTeam
 ==================
 */
 int BotTeam(bot_state_t *bs) {
-	char info[1024];
-
 	if (bs->client < 0 || bs->client >= MAX_CLIENTS) {
-		//BotAI_Print(PRT_ERROR, "BotCTFTeam: client out of range\n");
 		return qfalse;
 	}
-	trap_GetConfigstring(CS_PLAYERS+bs->client, info, sizeof(info));
-	//
-	/*if (atoi(Info_ValueForKey(info, "t")) == TEAM_RED) return TEAM_RED;
-	else if (atoi(Info_ValueForKey(info, "t")) == TEAM_BLUE) return TEAM_BLUE;
-	return TEAM_FREE;*/
-        if (level.clients[bs->client].sess.sessionTeam == TEAM_RED) return TEAM_RED;
-        else if (level.clients[bs->client].sess.sessionTeam == TEAM_BLUE) return TEAM_BLUE;
-        return TEAM_FREE;
+	if (level.clients[bs->client].sess.sessionTeam == TEAM_RED) {
+		return TEAM_RED;
+	} else if (level.clients[bs->client].sess.sessionTeam == TEAM_BLUE) {
+		return TEAM_BLUE;
+	}
+	return TEAM_FREE;
 }
 
 /*
@@ -1605,7 +1600,8 @@ char *EasyClientName(int client, char *buf, int size) {
 	char *str1, *str2, *ptr, c;
 	char name[128];
 
-	strcpy(name, ClientName(client, name, sizeof(name)));
+	ClientName(client, name, sizeof(name));
+
 	for (i = 0; name[i]; i++) name[i] &= 127;
 	//remove all spaces
 	for (ptr = strstr(name, " "); ptr; ptr = strstr(name, " ")) {
@@ -1795,8 +1791,8 @@ void BotCheckItemPickup(bot_state_t *bs, int *oldinventory) {
 							//BotAI_BotInitialChat(bs, "wantoffence", NULL);
 							//trap_BotEnterChat(bs->cs, leader, CHAT_TELL);
 						}
-					bs->teamtaskpreference |= TEAMTP_ATTACKER;
 				}
+				bs->teamtaskpreference |= TEAMTP_ATTACKER;
 			}
 			bs->teamtaskpreference &= ~TEAMTP_DEFENDER;
 		}
@@ -2390,7 +2386,7 @@ int BotWantsToRetreat(bot_state_t *bs) {
 	else if (gametype == GT_OBELISK) {
 		//the bots should be dedicated to attacking the enemy obelisk
 		if (bs->ltgtype == LTG_ATTACKENEMYBASE) {
-			if (bs->enemy != redobelisk.entitynum ||
+			if (bs->enemy != redobelisk.entitynum &&
 						bs->enemy != blueobelisk.entitynum) {
 				return qtrue;
 			}
@@ -2449,7 +2445,7 @@ int BotWantsToChase(bot_state_t *bs) {
 	else if (gametype == GT_OBELISK) {
 		//the bots should be dedicated to attacking the enemy obelisk
 		if (bs->ltgtype == LTG_ATTACKENEMYBASE) {
-			if (bs->enemy != redobelisk.entitynum ||
+			if (bs->enemy != redobelisk.entitynum &&
 						bs->enemy != blueobelisk.entitynum) {
 				return qfalse;
 			}
@@ -2876,11 +2872,9 @@ BotSameTeam
 */
 int BotSameTeam(bot_state_t *bs, int entnum) {
 	if (bs->client < 0 || bs->client >= MAX_CLIENTS) {
-		//BotAI_Print(PRT_ERROR, "BotSameTeam: client out of range\n");
 		return qfalse;
 	}
 	if (entnum < 0 || entnum >= MAX_CLIENTS) {
-		//BotAI_Print(PRT_ERROR, "BotSameTeam: client out of range\n");
 		return qfalse;
 	}
 	if ( gametype >= GT_TEAM && g_ffa_gt!=1) {
@@ -2936,8 +2930,12 @@ float BotEntityVisible(int viewer, vec3_t eye, vec3_t viewangles, float fov, int
 	aas_entityinfo_t entinfo;
 	vec3_t dir, entangles, start, end, middle;
 
-	//calculate middle of bounding box
 	BotEntityInfo(ent, &entinfo);
+	if (!entinfo.valid) {
+		return 0;
+	}
+
+	//calculate middle of bounding box
 	VectorAdd(entinfo.mins, entinfo.maxs, middle);
 	VectorScale(middle, 0.5, middle);
 	VectorAdd(entinfo.origin, middle, middle);
@@ -3087,6 +3085,10 @@ int BotFindEnemy(bot_state_t *bs, int curenemy) {
 		if (i == bs->client) continue;
 		//if it's the current enemy
 		if (i == curenemy) continue;
+		//if the enemy has targeting disabled
+		if (g_entities[i].flags & FL_NOTARGET) {
+			continue;
+		}
 		//
 		BotEntityInfo(i, &entinfo);
 		//
@@ -3740,7 +3742,7 @@ void BotCheckAttack(bot_state_t *bs) {
 	VectorMA(start, -12, forward, start);
 	BotAI_Trace(&trace, start, mins, maxs, end, bs->entitynum, MASK_SHOT);
 	//if the entity is a client
-	if (trace.ent > 0 && trace.ent <= MAX_CLIENTS) {
+	if (trace.ent >= 0 && trace.ent < MAX_CLIENTS) {
 		if (trace.ent != attackentity) {
 			//if a teammate is hit
 			if (BotSameTeam(bs, trace.ent))
@@ -5226,7 +5228,7 @@ void BotSetupAlternativeRouteGoals(void) {
 		return;
 	if (gametype == GT_CTF || gametype == GT_CTF_ELIMINATION) {
 		if (trap_BotGetLevelItemGoal(-1, "Neutral Flag", &ctf_neutralflag) < 0)
-			BotAI_Print(PRT_WARNING, "no alt routes without Neutral Flag\n");
+			BotAI_Print(PRT_WARNING, "No alt routes without Neutral Flag\n");
 		if (ctf_neutralflag.areanum) {
 			//
 			red_numaltroutegoals = trap_AAS_AlternativeRouteGoals(
@@ -5244,7 +5246,8 @@ void BotSetupAlternativeRouteGoals(void) {
 		}
 	}
 	else if (gametype == GT_1FCTF) {
-		//
+		if (trap_BotGetLevelItemGoal(-1, "Neutral Obelisk", &neutralobelisk) < 0)
+			BotAI_Print(PRT_WARNING, "One Flag CTF without Neutral Obelisk\n");
 		red_numaltroutegoals = trap_AAS_AlternativeRouteGoals(
 									ctf_neutralflag.origin, ctf_neutralflag.areanum,
 									ctf_redflag.origin, ctf_redflag.areanum, TFL_DEFAULT,
@@ -5260,7 +5263,7 @@ void BotSetupAlternativeRouteGoals(void) {
 	}
 	else if (gametype == GT_OBELISK) {
                 if (trap_BotGetLevelItemGoal(-1, "Neutral Obelisk", &neutralobelisk) < 0)
-			BotAI_Print(PRT_WARNING, "Obelisk without neutral obelisk\n");
+			BotAI_Print(PRT_WARNING, "No alt routes without Neutral Obelisk\n");
 		//
 		red_numaltroutegoals = trap_AAS_AlternativeRouteGoals(
 									neutralobelisk.origin, neutralobelisk.areanum,
@@ -5277,7 +5280,7 @@ void BotSetupAlternativeRouteGoals(void) {
 	}
 	else if (gametype == GT_HARVESTER) {
 		if (untrap_BotGetLevelItemGoal(-1, "Neutral Obelisk", &neutralobelisk) < 0)
-			BotAI_Print(PRT_WARNING, "Harvester without neutral obelisk\n");
+			BotAI_Print(PRT_WARNING, "Harvester without Neutral Obelisk\n");
 		//
 		red_numaltroutegoals = trap_AAS_AlternativeRouteGoals(
 									neutralobelisk.origin, neutralobelisk.areanum,
@@ -5532,27 +5535,27 @@ void BotSetupDeathmatchAI(void) {
 		if (untrap_BotGetLevelItemGoal(-1, "Neutral Flag", &ctf_neutralflag) < 0)
 			BotAI_Print(PRT_WARNING, "One Flag CTF without Neutral Flag\n");
 		if (untrap_BotGetLevelItemGoal(-1, "Red Flag", &ctf_redflag) < 0)
-			BotAI_Print(PRT_WARNING, "CTF without Red Flag\n");
+			BotAI_Print(PRT_WARNING, "One Flag CTF without Red Flag\n");
 		if (untrap_BotGetLevelItemGoal(-1, "Blue Flag", &ctf_blueflag) < 0)
-			BotAI_Print(PRT_WARNING, "CTF without Blue Flag\n");
+			BotAI_Print(PRT_WARNING, "One Flag CTF without Blue Flag\n");
 	}
 	else if (gametype == GT_OBELISK) {
 		if (untrap_BotGetLevelItemGoal(-1, "Red Obelisk", &redobelisk) < 0)
-			BotAI_Print(PRT_WARNING, "Obelisk without red obelisk\n");
+			BotAI_Print(PRT_WARNING, "Overload without Red Obelisk\n");
 		BotSetEntityNumForGoal(&redobelisk, "team_redobelisk");
 		if (untrap_BotGetLevelItemGoal(-1, "Blue Obelisk", &blueobelisk) < 0)
-			BotAI_Print(PRT_WARNING, "Obelisk without blue obelisk\n");
+			BotAI_Print(PRT_WARNING, "Overload without Blue Obelisk\n");
 		BotSetEntityNumForGoal(&blueobelisk, "team_blueobelisk");
 	}
 	else if (gametype == GT_HARVESTER) {
 		if (untrap_BotGetLevelItemGoal(-1, "Red Obelisk", &redobelisk) < 0)
-			BotAI_Print(PRT_WARNING, "Harvester without red obelisk\n");
+			BotAI_Print(PRT_WARNING, "Harvester without Red Obelisk\n");
 		BotSetEntityNumForGoal(&redobelisk, "team_redobelisk");
 		if (untrap_BotGetLevelItemGoal(-1, "Blue Obelisk", &blueobelisk) < 0)
-			BotAI_Print(PRT_WARNING, "Harvester without blue obelisk\n");
+			BotAI_Print(PRT_WARNING, "Harvester without Blue Obelisk\n");
 		BotSetEntityNumForGoal(&blueobelisk, "team_blueobelisk");
 		if (untrap_BotGetLevelItemGoal(-1, "Neutral Obelisk", &neutralobelisk) < 0)
-			BotAI_Print(PRT_WARNING, "Harvester without neutral obelisk\n");
+			BotAI_Print(PRT_WARNING, "Harvester without Neutral Obelisk\n");
 		BotSetEntityNumForGoal(&neutralobelisk, "team_neutralobelisk");
 	}
 

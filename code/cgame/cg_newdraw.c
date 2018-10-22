@@ -1223,8 +1223,6 @@ static void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4
 	vec4_t newColor;
 	glyphInfo_t *glyph;
   if (text) {
-// TTimo: FIXME
-//    const unsigned char *s = text; // bk001206 - unsigned
     const char *s = text;
 		float max = *maxX;
 		float useScale;
@@ -1236,13 +1234,13 @@ static void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4
 		}
 		useScale = scale * font->glyphScale;
 		trap_R_SetColor( color );
-    len = strlen(text);					 
+		len = strlen(text);					 
 		if (limit > 0 && len > limit) {
 			len = limit;
 		}
 		count = 0;
 		while (s && *s && count < len) {
-			glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
+			glyph = &font->glyphs[*s & 255];
 			if ( Q_IsColorString( s ) ) {
 				memcpy( newColor, g_color_table[ColorIndex(*(s+1))], sizeof( newColor ) );
 				newColor[3] = color[3];

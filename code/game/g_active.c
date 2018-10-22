@@ -126,15 +126,6 @@ void P_WorldEffects( gentity_t *ent ) {
 				if (ent->damage > 15)
 					ent->damage = 15;
 
-				// play a gurp sound instead of a normal pain sound
-				if (ent->health <= ent->damage) {
-					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*drown.wav"));
-				} else if (rand()&1) {
-					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp1.wav"));
-				} else {
-					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp2.wav"));
-				}
-
 				// don't play a normal pain sound
 				ent->pain_debounce_time = level.time + 200;
 
@@ -1245,7 +1236,7 @@ void ClientThink_real( gentity_t *ent ) {
 		if ( ( level.time > client->respawnTime ) && ( ( ( g_forcerespawn.integer > 0 ) && ( level.time - client->respawnTime  > g_forcerespawn.integer * 1000 ) ) ||
 			( ( ( g_gametype.integer == GT_LMS ) || ( g_gametype.integer == GT_ELIMINATION ) || ( g_gametype.integer == GT_CTF_ELIMINATION ) ) &&
 			( ( level.time - client->respawnTime > 0 ) ) ) || ( ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) || client->respawnCommission ) ) ) {
-			respawn( ent );
+			ClientRespawn( ent );
 		}
 		return;
 	}

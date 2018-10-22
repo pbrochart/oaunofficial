@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 void CPM_UpdateSettings(int num);
 
-extern float cpm_pm_jump_z;
+extern float	cpm_pm_jump_z;
 
 // Physics
 extern float	cpm_pm_airstopaccelerate;

@@ -450,8 +450,6 @@ void CopyToBodyQue( gentity_t *ent ) {
 	body = level.bodyQue[ level.bodyQueIndex ];
 	level.bodyQueIndex = (level.bodyQueIndex + 1) % BODY_QUEUE_SIZE;
 
-	trap_UnlinkEntity (body);
-
 	body->s = ent->s;
 	body->s.eFlags = EF_DEAD;		// clear EF_TALK, etc
 	if ( ent->s.eFlags & EF_KAMIKAZE ) {
@@ -556,11 +554,10 @@ void SetClientViewAngle( gentity_t *ent, vec3_t angle ) {
 
 /*
 ================
-respawn
+ClientRespawn
 ================
 */
-void respawn( gentity_t *ent ) {
-	gentity_t	*tent;
+void ClientRespawn( gentity_t *ent ) {
 
 	if((g_gametype.integer!=GT_ELIMINATION && g_gametype.integer!=GT_CTF_ELIMINATION && g_gametype.integer !=GT_LMS) && !ent->client->isEliminated)
 	{
@@ -600,12 +597,6 @@ void respawn( gentity_t *ent ) {
 		return;
 	
 	ClientSpawn(ent);
-
-	// add a teleportation effect at spawn
-	if(g_gametype.integer!=GT_ELIMINATION && g_gametype.integer!=GT_CTF_ELIMINATION && g_gametype.integer!=GT_LMS) {	
-		tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
-		tent->s.clientNum = ent->s.clientNum;
-	}
 }
 
 /*
@@ -614,26 +605,11 @@ respawnRound
 ================
 */
 void respawnRound( gentity_t *ent ) {
-	gentity_t	*tent;
 
-	//if(g_gametype.integer!=GT_ELIMINATION || !ent->client->isEliminated)
-	//{
-	//	ent->client->isEliminated  = qtrue;
-		//CopyToBodyQue (ent);
-	//}
-
-	//if(g_gametype.integer==GT_ELIMINATION && ent->client->ps.pm_type == PM_SPECTATOR && ent->client->ps.stats[STAT_HEALTH] > 0)
-	//	return;
         if(ent->client->hook)
                 Weapon_HookFree(ent->client->hook);
 		
 	ClientSpawn(ent);
-
-	// add a teleportation effect
-	if(g_gametype.integer!=GT_ELIMINATION && g_gametype.integer!=GT_CTF_ELIMINATION && g_gametype.integer!=GT_LMS) {	
-		tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
-		tent->s.clientNum = ent->s.clientNum;
-	}
 }
 
 /*
@@ -1965,7 +1941,6 @@ and on transition between teams, but doesn't happen on respawns
 void ClientBegin( int clientNum ) {
 	gentity_t	*ent;
 	gclient_t	*client;
-	gentity_t	*tent;
 	int			flags;
 	int		countRed, countBlue, countFree;
         char		userinfo[MAX_INFO_STRING];
@@ -2049,10 +2024,6 @@ void ClientBegin( int clientNum ) {
 		( ( g_gametype.integer != GT_ELIMINATION || level.intermissiontime) &&		//TODO: you dont need all the level.intermissiontime, just once
 		( g_gametype.integer != GT_CTF_ELIMINATION || level.intermissiontime) &&
 		( g_gametype.integer != GT_LMS || level.intermissiontime ) ) ) ) {
-	  
-		// send event
-		tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
-		tent->s.clientNum = ent->s.clientNum;
 
 		if ( g_gametype.integer != GT_TOURNAMENT  ) {
 			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname) );
@@ -2139,6 +2110,7 @@ void ClientSpawn(gentity_t *ent) {
 	int		persistant[MAX_PERSISTANT];
 	int		rewards[MAX_REWARDS];
 	gentity_t	*spawnPoint;
+	gentity_t	*tent;
 	int		flags;
 	int		savedPing;
 //	char	*savedAreaBits;
@@ -2608,23 +2580,6 @@ void ClientSpawn(gentity_t *ent) {
 	trap_GetUsercmd( client - level.clients, &ent->client->pers.cmd );
 	SetClientViewAngle( ent, spawn_angles );
 
-	if ( (ent->client->sess.sessionTeam == TEAM_SPECTATOR) || ((client->ps.pm_type == PM_SPECTATOR || client->isEliminated) && 
-		(g_gametype.integer == GT_ELIMINATION || g_gametype.integer == GT_CTF_ELIMINATION || g_gametype.integer == GT_LMS) ) ) {
-                //Sago: Lets see if this fixes the bots only bug - loose all point on dead bug. (It didn't)
-            /*if(g_gametype.integer == GT_ELIMINATION || g_gametype.integer == GT_CTF_ELIMINATION || g_gametype.integer == GT_LMS) {
-                G_KillBox( ent );
-		trap_LinkEntity (ent);
-            }*/
-	} else {
-		G_KillBox( ent );
-		trap_LinkEntity (ent);
-
-		// force the base weapon up
-		client->ps.weapon = WP_MACHINEGUN;
-		client->ps.weaponstate = WEAPON_READY;
-
-	}
-
 	// don't allow full run speed for a bit
 	client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 	client->ps.pm_time = 100;
@@ -2639,26 +2594,39 @@ void ClientSpawn(gentity_t *ent) {
 	
 	client->quadKills = 0;
 
-	if ( level.intermissiontime ) {
-		MoveClientToIntermission( ent );
-	} else {
-		// fire the targets of the spawn point
-		G_UseTargets( spawnPoint, ent );
+	if (!level.intermissiontime) {
+		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
+			G_KillBox(ent);
+			// force the base weapon up
+			client->ps.weapon = WP_MACHINEGUN;
+			client->ps.weaponstate = WEAPON_READY;
+			// fire the targets of the spawn point
+			G_UseTargets(spawnPoint, ent);
+			// select the highest weapon number available, after any spawn given items have fired
+			if(g_gametype.integer != GT_ELIMINATION && g_gametype.integer != GT_CTF_ELIMINATION && g_gametype.integer != GT_LMS && !g_elimination_allgametypes.integer) {
+				client->ps.weapon = 1;
 
-		// select the highest weapon number available, after any
-		// spawn given items have fired
-		//TODO: need to think about that, on some large open maps it sucks to spawn with sg out when you could use mg, maybe add client var
-		if(g_gametype.integer != GT_ELIMINATION && g_gametype.integer != GT_CTF_ELIMINATION && g_gametype.integer != GT_LMS && !g_elimination_allgametypes.integer){
-			client->ps.weapon = 1;
-			for ( i = WP_NUM_WEAPONS - 1 ; i > 0 ; i-- ) {
-				if ( client->ps.stats[STAT_WEAPONS] & ( 1 << i ) && i !=WP_GRAPPLING_HOOK ) {
-					client->ps.weapon = i;
-					break;
+				for (i = WP_NUM_WEAPONS - 1 ; i > 0 ; i--)
+					{ if (client->ps.stats[STAT_WEAPONS] & (1 << i)) {
+						client->ps.weapon = i; break;
+					}
 				}
 			}
+                	else
+                        	client->ps.weapon = WP_ROCKET_LAUNCHER;
+
+			// positively link the client, even if the command times are weird
+        		if ( (ent->client->sess.sessionTeam != TEAM_SPECTATOR) || ( (!client->isEliminated || client->ps.pm_type != PM_SPECTATOR)&& (g_gametype.integer == GT_ELIMINATION || g_gametype.integer == GT_CTF_ELIMINATION || g_gametype.integer == GT_LMS) ) ) {	
+				VectorCopy(ent->client->ps.origin, ent->r.currentOrigin);
+				trap_LinkEntity (ent);
+				// add a teleportation effect
+				tent = G_TempEntity(ent->client->ps.origin, EV_PLAYER_TELEPORT_IN);
+				tent->s.clientNum = ent->s.clientNum;
+			}
 		}
-		else
-			client->ps.weapon = WP_ROCKET_LAUNCHER;
+	} else {
+		// move players to intermission
+		MoveClientToIntermission(ent);
 	}
 
 	// run a client frame to drop exactly to the floor,
@@ -2666,17 +2634,11 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.commandTime = level.time - 100;
 	ent->client->pers.cmd.serverTime = level.time;
 	ClientThink( ent-g_entities );
-
-	// positively link the client, even if the command times are weird
-	if ( (ent->client->sess.sessionTeam != TEAM_SPECTATOR) || ( (!client->isEliminated || client->ps.pm_type != PM_SPECTATOR)&& 
-		(g_gametype.integer == GT_ELIMINATION || g_gametype.integer == GT_CTF_ELIMINATION || g_gametype.integer == GT_LMS) ) ) {
-		BG_PlayerStateToEntityState( &client->ps, &ent->s, qtrue );
-		VectorCopy( ent->client->ps.origin, ent->r.currentOrigin );
-		trap_LinkEntity( ent );
+	// run the presend to set anything else, follow spectators wait
+	// until all clients have been reconnected after map_restart
+	if ( ent->client->sess.spectatorState != SPECTATOR_FOLLOW ) {
+		ClientEndFrame( ent );
 	}
-
-	// run the presend to set anything else
-	ClientEndFrame( ent );
 
 	// clear entity state values
 	BG_PlayerStateToEntityState( &client->ps, &ent->s, qtrue );

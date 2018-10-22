@@ -1792,7 +1792,7 @@ char *CG_GetMenuBuffer(const char *filename) {
 		return NULL;
 	}
 	if ( len >= MAX_MENUFILE ) {
-		trap_Print( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", filename, len, MAX_MENUFILE ) );
+		trap_Print( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i\n", filename, len, MAX_MENUFILE ) );
 		trap_FS_FCloseFile( f );
 		return NULL;
 	}
@@ -2049,7 +2049,7 @@ void CG_LoadMenus(const char *menuFile) {
 	}
 
 	if ( len >= MAX_MENUDEFFILE ) {
-		trap_Error( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE ) );
+		trap_Error( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i\n", menuFile, len, MAX_MENUDEFFILE ) );
 		trap_FS_FCloseFile( f );
 		return;
 	}
@@ -2681,13 +2681,13 @@ into a wall.
 ======================
 */
 void SnapVectorTowards( vec3_t v, vec3_t to ) {
-	int		i;
+	int i;
 
 	for ( i = 0 ; i < 3 ; i++ ) {
 		if ( to[i] <= v[i] ) {
-			v[i] = (int)v[i];
+			v[i] = floor(v[i]);
 		} else {
-			v[i] = (int)v[i] + 1;
+			v[i] = ceil(v[i]);
 		}
 	}
 }

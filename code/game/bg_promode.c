@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "bg_local.h"
 #include "bg_promode.h"
 
-float cpm_pm_jump_z;
+float	cpm_pm_jump_z;
 
 // Physics
 float	cpm_pm_airstopaccelerate = 1;

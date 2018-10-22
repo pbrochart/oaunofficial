@@ -1389,6 +1389,10 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 		return WEAPONINDEX_CHAINGUN;
 	else if (bs->inventory[INVENTORY_NAILGUN] > 0 && bs->inventory[INVENTORY_NAILS] > 0)
 		return WEAPONINDEX_NAILGUN;
+	else if (bs->inventory[INVENTORY_PROXLAUNCHER] > 0 && bs->inventory[INVENTORY_MINES] > 0)
+		return WEAPONINDEX_PROXLAUNCHER;
+	else if (bs->inventory[INVENTORY_GRENADELAUNCHER] > 0 && bs->inventory[INVENTORY_GRENADES] > 0)
+		return WEAPONINDEX_GRENADE_LAUNCHER;
 	else if (bs->inventory[INVENTORY_RAILGUN] > 0 && bs->inventory[INVENTORY_SLUGS] > 0)
 		return WEAPONINDEX_RAILGUN;
 	else if (bs->inventory[INVENTORY_ROCKETLAUNCHER] > 0 && bs->inventory[INVENTORY_ROCKETS] > 0)

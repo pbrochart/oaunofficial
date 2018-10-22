@@ -852,27 +852,11 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		}
 	}
 
-	// if client is in a nodrop area, don't drop anything (but return CTF flags!)
-	contents = trap_PointContents( self->r.currentOrigin, -1 );
-	if ( !( contents & CONTENTS_NODROP )) {
-		TossClientItems( self );
-	}
-	else {
-		if ( self->client->ps.powerups[PW_NEUTRALFLAG] ) {		// only happens in One Flag CTF
-			Team_ReturnFlag( TEAM_FREE );
-		}
-		else if ( self->client->ps.powerups[PW_REDFLAG] ) {		// only happens in standard CTF
-			Team_ReturnFlag( TEAM_RED );
-		}
-		else if ( self->client->ps.powerups[PW_BLUEFLAG] ) {	// only happens in standard CTF
-			Team_ReturnFlag( TEAM_BLUE );
-		}
-	}
+	TossClientItems( self );
 	TossClientPersistantPowerups( self );
         if( g_gametype.integer == GT_HARVESTER ) {
 		TossClientCubes( self );
 	}
-//#endif
 
 	Cmd_Score_f( self );		// show scores
 	// send updated scores to any clients that are following this one,
@@ -926,6 +910,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	memset( self->client->ps.powerups, 0, sizeof(self->client->ps.powerups) );
 
 	// never gib in a nodrop
+	contents = trap_PointContents( self->r.currentOrigin, -1 );
+
 	if ( (self->health <= GIB_HEALTH && !(contents & CONTENTS_NODROP) && g_gibs.integer) || meansOfDeath == MOD_SUICIDE) {
 		// gib death
 		GibEntity( self, killer );
@@ -1670,47 +1656,93 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 	vec3_t	dest;
 	trace_t	tr;
 	vec3_t	midpoint;
+	vec3_t	offsetmins = {-15, -15, -15};
+	vec3_t	offsetmaxs = {15, 15, 15};
 
 	// use the midpoint of the bounds instead of the origin, because
 	// bmodels may have their origin is 0,0,0
 	VectorAdd (targ->r.absmin, targ->r.absmax, midpoint);
 	VectorScale (midpoint, 0.5, midpoint);
 
-	VectorCopy (midpoint, dest);
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+	VectorCopy(midpoint, dest);
+	trap_Trace(&tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+
 	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
 		return qtrue;
 
 	// this should probably check in the plane of projection, 
-	// rather than in world coordinate, and also include Z
-	VectorCopy (midpoint, dest);
-	dest[0] += 15.0;
-	dest[1] += 15.0;
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+	// rather than in world coordinate
+	VectorCopy(midpoint, dest);
+	dest[0] += offsetmaxs[0];
+	dest[1] += offsetmaxs[1];
+	dest[2] += offsetmaxs[2];
+	trap_Trace(&tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+
 	if (tr.fraction == 1.0)
 		return qtrue;
 
-	VectorCopy (midpoint, dest);
-	dest[0] += 15.0;
-	dest[1] -= 15.0;
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+	VectorCopy(midpoint, dest);
+	dest[0] += offsetmaxs[0];
+	dest[1] += offsetmins[1];
+	dest[2] += offsetmaxs[2];
+	trap_Trace(&tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+
 	if (tr.fraction == 1.0)
 		return qtrue;
 
-	VectorCopy (midpoint, dest);
-	dest[0] -= 15.0;
-	dest[1] += 15.0;
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+	VectorCopy(midpoint, dest);
+	dest[0] += offsetmins[0];
+	dest[1] += offsetmaxs[1];
+	dest[2] += offsetmaxs[2];
+	trap_Trace(&tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+
 	if (tr.fraction == 1.0)
 		return qtrue;
 
-	VectorCopy (midpoint, dest);
-	dest[0] -= 15.0;
-	dest[1] -= 15.0;
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+	VectorCopy(midpoint, dest);
+	dest[0] += offsetmins[0];
+	dest[1] += offsetmins[1];
+	dest[2] += offsetmaxs[2];
+	trap_Trace(&tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+
 	if (tr.fraction == 1.0)
 		return qtrue;
 
+	VectorCopy(midpoint, dest);
+	dest[0] += offsetmaxs[0];
+	dest[1] += offsetmaxs[1];
+	dest[2] += offsetmins[2];
+	trap_Trace(&tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+
+	if (tr.fraction == 1.0)
+		return qtrue;
+
+	VectorCopy(midpoint, dest);
+	dest[0] += offsetmaxs[0];
+	dest[1] += offsetmins[1];
+	dest[2] += offsetmins[2];
+	trap_Trace(&tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+
+	if (tr.fraction == 1.0)
+		return qtrue;
+
+	VectorCopy(midpoint, dest);
+	dest[0] += offsetmins[0];
+	dest[1] += offsetmaxs[1];
+	dest[2] += offsetmins[2];
+	trap_Trace(&tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+
+	if (tr.fraction == 1.0)
+		return qtrue;
+
+	VectorCopy(midpoint, dest);
+	dest[0] += offsetmins[0];
+	dest[1] += offsetmins[1];
+	dest[2] += offsetmins[2];
+	trap_Trace(&tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+
+	if (tr.fraction == 1.0)
+		return qtrue;
 
 	return qfalse;
 }
