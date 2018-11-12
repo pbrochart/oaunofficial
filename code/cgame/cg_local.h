@@ -1774,6 +1774,7 @@ extern vmCvar_t 		cg_drawSpawnpoints;
 extern vmCvar_t 		cg_mapoverview;
 extern vmCvar_t			cg_damagePlums;
 extern vmCvar_t			cg_damagePlum;
+extern vmCvar_t			cg_waterWarp;
 extern vmCvar_t   		g_crosshairNamesFog;
 
 //unlagged - cg_unlagged.c

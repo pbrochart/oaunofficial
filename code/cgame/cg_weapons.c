@@ -1874,7 +1874,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	gun.renderfx = parent->renderfx;
 
 	// set custom shading for railgun refire rate
-	if ( ps ) {
+	if ( ps || cent->currentState.clientNum == cg.predictedPlayerState.clientNum ) {
 		if ( cg.predictedPlayerState.weapon == WP_RAILGUN 
 			&& cg.predictedPlayerState.weaponstate == WEAPON_FIRING ) {
 			float	f;
@@ -1930,7 +1930,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		VectorMA(gun.origin, -lerped.origin[1], parent->axis[1], gun.origin);
 	else if(((!ps || cg_drawGun.integer != 3) && cg_drawGun.integer < DRAW_GUN_ELEMENTS+1) ||
 		((!ps || cg_drawGun.integer != 6) && cg_drawGun.integer > DRAW_GUN_ELEMENTS))
-       		VectorMA(gun.origin, lerped.origin[1], parent->axis[1], gun.origin);
+		VectorMA(gun.origin, lerped.origin[1], parent->axis[1], gun.origin);
 
 	if ((ps && cg_drawGun.integer > DRAW_GUN_ELEMENTS) && (cg_drawGun.integer < (DRAW_GUN_ELEMENTS*2)+1)) {
 		gun.customShader = cgs.media.ghostWeaponShader;
@@ -2970,6 +2970,10 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		if ( weapon == WP_RAILGUN ) {
 			// colorize with client color
 			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
+			le->refEntity.shaderRGBA[0] = le->color[0] * 0xff;
+			le->refEntity.shaderRGBA[1] = le->color[1] * 0xff;
+			le->refEntity.shaderRGBA[2] = le->color[2] * 0xff;
+			le->refEntity.shaderRGBA[3] = 0xff;
 		}
 	}
 
@@ -3008,6 +3012,8 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 	switch ( weapon ) {
 	case WP_GRENADE_LAUNCHER:
 	case WP_ROCKET_LAUNCHER:
+	case WP_PLASMAGUN:
+	case WP_BFG:
 #ifdef MISSIONPACK
 	case WP_NAILGUN:
 	case WP_CHAINGUN:

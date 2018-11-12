@@ -2439,10 +2439,10 @@ int QDECL SortPlayers( const void *a, const void *b ) {
     // then spectators
     if ( ca->sess.sessionTeam == TEAM_SPECTATOR && cb->sess.sessionTeam == TEAM_SPECTATOR ) {
         if ( ( ca->sess.specOnly && cb->sess.specOnly ) || ( !ca->sess.specOnly && !cb->sess.specOnly ) ) {
-            if ( ca->sess.spectatorTime < cb->sess.spectatorTime ) {
+            if ( ca->sess.spectatorNum < cb->sess.spectatorNum ) {
                 return -1;
             }
-            if ( ca->sess.spectatorTime > cb->sess.spectatorTime ) {
+            if ( ca->sess.spectatorNum > cb->sess.spectatorNum ) {
                 return 1;
             }
             return 0;

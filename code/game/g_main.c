@@ -998,6 +998,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// range are NEVER anything but clients
 	level.num_entities = MAX_CLIENTS;
 
+	for ( i=0 ; i<MAX_CLIENTS ; i++ ) {
+		g_entities[i].classname = "clientslot";
+	}
+
 	// let the server system know where the entites are
 	trap_LocateGameData( level.gentities, level.num_entities, sizeof( gentity_t ), 
 		&level.clients[0].ps, sizeof( level.clients[0] ) );
@@ -1223,7 +1227,7 @@ void AddTournamentPlayer( void ) {
 		if ( client->sess.specOnly )
 			continue;
 
-		if ( !nextInLine || client->sess.spectatorTime < nextInLine->sess.spectatorTime ) {
+		if ( !nextInLine || client->sess.spectatorNum < nextInLine->sess.spectatorNum ) {
 			nextInLine = client;
 		}
 	}
@@ -1236,6 +1240,33 @@ void AddTournamentPlayer( void ) {
 
 	// set them to free-for-all team
 	SetTeam( &g_entities[ nextInLine - level.clients ], "f" );
+}
+
+/*
+=======================
+AddTournamentQueue
+
+Add client to end of tournament queue
+=======================
+*/
+
+void AddTournamentQueue(gclient_t *client) {
+	int index;
+	gclient_t *curclient;
+
+	for(index = 0; index < level.maxclients; index++)
+	{
+		curclient = &level.clients[index];
+
+		if(curclient->pers.connected != CON_DISCONNECTED)
+		{
+
+		if(curclient == client)
+			curclient->sess.spectatorNum = 0;
+		else if(curclient->sess.sessionTeam == TEAM_SPECTATOR)
+			curclient->sess.spectatorNum++;
+		}
+	}
 }
 
 /*
@@ -1338,10 +1369,10 @@ int QDECL SortRanks( const void *a, const void *b ) {
 	// then spectators
 	if ( ca->sess.sessionTeam == TEAM_SPECTATOR && cb->sess.sessionTeam == TEAM_SPECTATOR ) {
 		if( ( ca->sess.specOnly && cb->sess.specOnly ) || ( !ca->sess.specOnly && !cb->sess.specOnly ) ) {
-			if ( ca->sess.spectatorTime < cb->sess.spectatorTime ) {
+			if ( ca->sess.spectatorNum < cb->sess.spectatorNum ) {
 				return -1;
 			}
-			if ( ca->sess.spectatorTime > cb->sess.spectatorTime ) {
+			if ( ca->sess.spectatorNum > cb->sess.spectatorNum ) {
 				return 1;
 			}
 			return 0;
@@ -1409,7 +1440,7 @@ void CalculateRanks( void ) {
 	level.numConnectedClients = 0;
 	level.numNonSpectatorClients = 0;
 	level.numPlayingClients = 0;
-        humanplayers = 0; // don't count bots
+	humanplayers = 0; // don't count bots
 	for ( i = 0; i < ARRAY_LEN(level.numteamVotingClients); i++ )
 		level.numteamVotingClients[i] = 0;
 	for ( i = 0 ; i < level.maxclients ; i++ ) {

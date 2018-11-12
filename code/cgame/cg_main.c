@@ -409,6 +409,7 @@ vmCvar_t 	cg_drawSpawnpoints;
 vmCvar_t 	cg_mapoverview;
 vmCvar_t 	cg_damagePlums;
 vmCvar_t 	cg_damagePlum;
+vmCvar_t 	cg_waterWarp;
 vmCvar_t 	g_crosshairNamesFog;
 
 
@@ -673,6 +674,7 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{&cg_mapoverview, "cg_mapoverview", "0", CVAR_ARCHIVE | CVAR_CHEAT },
 	{&cg_damagePlums, "cg_damagePlums", "1", CVAR_USERINFO | CVAR_ARCHIVE },
 	{&cg_damagePlum, "cg_damagePlum", "/g/mg/sg/gl/rl/lg/rg/pg/bfg/cg/ng/pl/", CVAR_USERINFO | CVAR_ARCHIVE },
+	{&cg_waterWarp, "cg_waterWarp", "1", CVAR_ARCHIVE },
 	{&g_crosshairNamesFog, "g_crosshairNamesFog", "0", CVAR_SYSTEMINFO }
 };
 

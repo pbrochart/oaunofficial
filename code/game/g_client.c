@@ -2083,11 +2083,6 @@ void ClientBegin( int clientNum ) {
 	
 	G_toSmallCaps(ent->client->aftershock_hash);
 	
-	//G_SendAllItems();
-	
-	
-	/*if( client->sess.sessionTeam == TEAM_SPECTATOR )
-		G_ReadSessionDataRestart( client );*/
 	G_SendSpawnpoints( ent );
 }
 
