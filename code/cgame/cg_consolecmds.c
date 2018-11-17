@@ -239,7 +239,7 @@ static void CG_Echo_f( void ) {
 	string = ConcatArgs(1);
 	
 	CG_AddToChat( string );
-	CG_Printf( string );
+	CG_Printf( "%s\n", string );
 }
 /*
 ==================

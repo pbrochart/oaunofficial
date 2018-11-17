@@ -1055,6 +1055,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	G_RemapTeamShaders();
 
+	trap_SetConfigstring( CS_INTERMISSION, "" );
+
 	//elimination:
 	level.roundNumber = 1;
 	level.roundNumberStarted = 0;

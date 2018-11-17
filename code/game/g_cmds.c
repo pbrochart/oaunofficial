@@ -38,6 +38,11 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 	gclient_t	*cl;
 	int			numSorted, scoreFlags, accuracy, perfect;
 
+	// don't send scores to bots, they don't parse it
+	if ( ent->r.svFlags & SVF_BOT ) {
+		return;
+	}
+
 	// send the latest information on all clients
 	string[0] = 0;
 	stringlength = 0;
@@ -1018,19 +1023,27 @@ hide the scoreboard, and take a special screenshot
 ==================
 */
 void Cmd_LevelShot_f( gentity_t *ent ) {
+    if(!ent->client->pers.localClient)
+    {
+        trap_SendServerCommand(ent-g_entities,
+            "print \"The levelshot command must be executed by a local client\n\"");
+        return;
+    }
+
     if ( !CheatsOk( ent ) ) {
         return;
     }
 
     // doesn't work in single player
-    if ( g_gametype.integer != 0 ) {
-        trap_SendServerCommand( ent-g_entities,
-                                "print \"Must be in g_gametype 0 for levelshot\n\"" );
+    if(g_gametype.integer == GT_SINGLE_PLAYER)
+    {
+        trap_SendServerCommand(ent-g_entities,
+            "print \"Must not be in singleplayer mode for levelshot\n\"" );
         return;
     }
 
     BeginIntermission();
-    trap_SendServerCommand( ent-g_entities, "clientLevelShot" );
+    trap_SendServerCommand(ent-g_entities, "clientLevelShot");
 }
 
 
@@ -2887,6 +2900,13 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 
     // if there is still a vote to be executed
     if ( level.voteExecuteTime ) {
+        // don't start a vote when map change or restart is in progress
+        if ( !Q_stricmpn( level.voteString, "map", 3 )
+            || !Q_stricmpn( level.voteString, "nextmap", 7 ) ) {
+            trap_SendServerCommand( ent-g_entities, "print \"Vote after map change.\n\"" );
+            return;
+        }
+
         level.voteExecuteTime = 0;
         trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", level.voteString ) );
     }
@@ -3176,6 +3196,7 @@ Cmd_CallTeamVote_f
 ==================
 */
 void Cmd_CallTeamVote_f( gentity_t *ent ) {
+    char*	c;
     int		i, team, cs_offset;
     char	arg1[MAX_STRING_TOKENS];
     char	arg2[MAX_STRING_TOKENS];
@@ -3215,9 +3236,17 @@ void Cmd_CallTeamVote_f( gentity_t *ent ) {
         trap_Argv( i, &arg2[strlen(arg2)], sizeof( arg2 ) - strlen(arg2) );
     }
 
-    if ( strchr( arg1, ';' ) || strchr( arg2, ';' ) ) {
-        trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
-        return;
+
+    // check for command separators in arg2
+    for( c = arg2; *c; ++c) {
+        switch(*c) {
+            case '\n':
+            case '\r':
+            case ';':
+                trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
+                return;
+            break;
+        }
     }
 
     if ( !Q_stricmp( arg1, "leader" ) ) {

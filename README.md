@@ -25,3 +25,4 @@ Revision 316: Add cg_waterWarp (enabled by default): Control the
 wavy undulating visual effect when the player is under water.
 A little improvement of the CTF scoreboard.
 Backport some bug fixes from ioquake3.
+Revision 317: Optimization of bot's parsing from ioquake3.
