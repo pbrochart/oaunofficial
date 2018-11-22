@@ -506,7 +506,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #else
 			};
 #endif
-		int weapCount = sizeof(weapList) / sizeof(int);
+		int weapCount = ARRAY_LEN( weapList );
 		//
 		for (i = 0; i < weapCount; i++) {
 			w = weapList[i];

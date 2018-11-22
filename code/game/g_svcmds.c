@@ -581,7 +581,7 @@ qboolean  ConsoleCommand( void )
 
   trap_Argv( 0, cmd, sizeof( cmd ) );
 
-  for( i = 0; i < sizeof( svcmds ) / sizeof( svcmds[ 0 ] ); i++ )
+  for( i = 0; i < ARRAY_LEN( svcmds ); i++ )
   {
     if( !Q_stricmp( cmd, svcmds[ i ].cmd ) )
     {

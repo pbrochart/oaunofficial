@@ -678,7 +678,7 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{&g_crosshairNamesFog, "g_crosshairNamesFog", "0", CVAR_SYSTEMINFO }
 };
 
-static int  cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
+static int  cvarTableSize = ARRAY_LEN( cvarTable );
 
 /*
 =================
@@ -2021,7 +2021,7 @@ qboolean CG_Load_Menu(char **p) {
 			return qtrue;
 		}
 
-		if ( !token || token[0] == 0 ) {
+		if ( !token[0] ) {
 			return qfalse;
 		}
 
@@ -2068,7 +2068,7 @@ void CG_LoadMenus(const char *menuFile) {
 
 	while ( 1 ) {
 		token = COM_ParseExt( &p, qtrue );
-		if( !token || token[0] == 0 || token[0] == '}') {
+		if ( !token[0] || token[0] == '}' ) {
 			break;
 		}
 

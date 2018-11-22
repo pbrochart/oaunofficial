@@ -26,3 +26,4 @@ wavy undulating visual effect when the player is under water.
 A little improvement of the CTF scoreboard.
 Backport some bug fixes from ioquake3.
 Revision 317: Optimization of bot's parsing from ioquake3.
+Revision 318: Some bug fixes from ioquake3.

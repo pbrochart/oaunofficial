@@ -214,7 +214,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
     
   };
 
-static int adminNumCmds = sizeof( g_admin_cmds ) / sizeof( g_admin_cmds[ 0 ] );
+static int adminNumCmds = ARRAY_LEN( g_admin_cmds );
 
 static int admin_level_maxname = 0;
 g_admin_level_t *g_admin_levels[ MAX_ADMIN_LEVELS ];
@@ -3064,7 +3064,7 @@ qboolean G_admin_disorient(gentity_t *ent, int skiparg)
 	gentity_t *vic;
 
 	if(G_SayArgc() < 2+skiparg) {
-		ADMP("^/disorient usage: ^7!disorient [name|slot#] [reason]");
+		ADMP("^/disorient usage: ^7!disorient [name|slot#] [reason]\n");
 		return qfalse;
 	}
 	G_SayArgv(1+skiparg, name, sizeof(name));
@@ -3072,23 +3072,23 @@ qboolean G_admin_disorient(gentity_t *ent, int skiparg)
 
 	if((found = G_ClientNumbersFromString(name, pids, MAX_CLIENTS)) != 1) {
 		G_MatchOnePlayer(pids, found, err, sizeof(err));
-		ADMP(va("^/disorient: ^7%s", err));
+		ADMP(va("^/disorient: ^7%s\n", err));
 		return qfalse;
 	}
 	vic = &g_entities[pids[0]];
 	if(!admin_higher(ent, vic)) {
-		ADMP("^/disorient: ^7sorry, but your intended victim has a higher admin level than you do");
+		ADMP("^/disorient: ^7sorry, but your intended victim has a higher admin level than you do\n");
 		return qfalse;
 	}
 
 	if(!(vic->client->sess.sessionTeam == TEAM_RED ||
 			vic->client->sess.sessionTeam == TEAM_BLUE ||
 			vic->client->sess.sessionTeam == TEAM_FREE )) {
-		ADMP("^/disorient: ^7player must be on a team");
+		ADMP("^/disorient: ^7player must be on a team\n");
 		return qfalse;
 	}
 	if(vic->client->pers.disoriented) {
-		ADMP(va("^/disorient: ^7%s^7 is already disoriented",
+		ADMP(va("^/disorient: ^7%s^7 is already disoriented\n",
 			vic->client->pers.netname));
 		return qfalse;
 	}
@@ -3109,20 +3109,20 @@ qboolean G_admin_orient(gentity_t *ent, int skiparg)
 	gentity_t *vic;
 
 	if(G_SayArgc() < 2+skiparg) {
-		ADMP("^/orient usage: ^7!orient [name|slot#]");
+		ADMP("^/orient usage: ^7!orient [name|slot#]\n");
 		return qfalse;
 	}
 	G_SayArgv(1+skiparg, name, sizeof(name));
     //Fix
 	if((found = G_ClientNumbersFromString(name, pids, MAX_CLIENTS)) != 1) {
 		G_MatchOnePlayer(pids, found, err, sizeof(err));
-		ADMP(va("^/orient: ^7%s", err));
+		ADMP(va("^/orient: ^7%s\n", err));
 		return qfalse;
 	}
 	vic = &g_entities[pids[0]];
 
 	if(!vic->client->pers.disoriented) {
-		ADMP(va("^/orient: ^7%s^7 is not currently disoriented",
+		ADMP(va("^/orient: ^7%s^7 is not currently disoriented\n",
 			vic->client->pers.netname));
 		return qfalse;
 	}
@@ -3148,7 +3148,7 @@ qboolean G_admin_slap( gentity_t *ent, int skiparg )
     
 	if(G_SayArgc() < 2+skiparg) 
 	{
-		ADMP("^/slap usage: ^7!slap [name|slot#] [reason] [damage]");
+		ADMP("^/slap usage: ^7!slap [name|slot#] [reason] [damage]\n");
 		return qfalse;
 	}
 	
@@ -3174,14 +3174,14 @@ qboolean G_admin_slap( gentity_t *ent, int skiparg )
 	
 	vic = &g_entities[pids[0]];
 	if(!admin_higher(ent, vic)) {
-		ADMP("^/slap: ^7sorry, but your intended victim has a higher admin level than you do");
+		ADMP("^/slap: ^7sorry, but your intended victim has a higher admin level than you do\n");
 		return qfalse;
 	}
 	
 	if(!(vic->client->sess.sessionTeam == TEAM_RED ||
 			vic->client->sess.sessionTeam == TEAM_BLUE ||
 			vic->client->sess.sessionTeam == TEAM_FREE )) {
-		ADMP("^/slap: ^7player must be in the game!");
+		ADMP("^/slap: ^7player must be in the game!\n");
 		return qfalse;
 	}
 	//Player Not Alive

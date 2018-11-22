@@ -709,7 +709,6 @@ int		Q_strncmp (const char *s1, const char *s2, int n);
 int		Q_stricmpn (const char *s1, const char *s2, int n);
 char	*Q_strlwr( char *s1 );
 char	*Q_strupr( char *s1 );
-char	*Q_strrchr( const char* string, int c );
 const char	*Q_stristr( const char *s, const char *find);
 
 // buffer size safe library replacements
@@ -1019,7 +1018,7 @@ typedef struct playerState_s {
 	int			delta_angles[3];	// add to command angles to get view direction
 									// changed by spawns, rotating objects, and teleporters
 
-	int			groundEntityNum;// ENTITYNUM_NONE = in air
+	int			groundEntityNum;	// ENTITYNUM_NONE = in air
 
 	int			legsTimer;		// don't change low priority animations until this runs out
 	int			legsAnim;		// mask off ANIM_TOGGLEBIT
@@ -1161,7 +1160,7 @@ typedef struct entityState_s {
 	int		otherEntityNum;	// shotgun sources, etc
 	int		otherEntityNum2;
 
-	int		groundEntityNum;	// -1 = in air
+	int		groundEntityNum;	// ENTITYNUM_NONE = in air
 
 	int		constantLight;	// r + (g<<8) + (b<<16) + (intensity<<24)
 	int		loopSound;		// constantly loop this sound

@@ -40,12 +40,12 @@ void CG_TargetCommand_f( void ) {
 	char	test[4];
 
 	targetNum = CG_CrosshairPlayer();
-	if (!targetNum ) {
+	if ( targetNum == -1 ) {
 		return;
 	}
 
 	trap_Argv( 1, test, 4 );
-	trap_SendConsoleCommand( va( "gc %i %i", targetNum, atoi( test ) ) );
+	trap_SendClientCommand( va( "gc %i %i", targetNum, atoi( test ) ) );
 }
 
 /*
@@ -713,7 +713,7 @@ qboolean CG_ConsoleCommand( void ) {
 
 	cmd = CG_Argv(0);
 
-	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) {
+	for ( i = 0 ; i < ARRAY_LEN( commands ) ; i++ ) {
 		if ( !Q_stricmp( cmd, commands[i].cmd ) ) {
 			commands[i].function();
 			return qtrue;
@@ -735,7 +735,7 @@ so it can perform tab completion
 void CG_InitConsoleCommands( void ) {
 	int		i;
 
-	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) {
+	for ( i = 0 ; i < ARRAY_LEN( commands ) ; i++ ) {
 		trap_AddCommand( commands[i].cmd );
 	}
 
@@ -758,8 +758,11 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("god");
 	trap_AddCommand ("notarget");
 	trap_AddCommand ("noclip");
+	trap_AddCommand ("where");
 	trap_AddCommand ("team");
 	trap_AddCommand ("follow");
+	trap_AddCommand ("follownext");
+	trap_AddCommand ("followprev");
 	trap_AddCommand ("levelshot");
 	trap_AddCommand ("addbot");
 	trap_AddCommand ("setviewpos");

@@ -1549,7 +1549,7 @@ static void CG_MapRestart ( void ) {
 #ifdef MISSIONPACK
     if ( cg_singlePlayerActive.integer ) {
         trap_Cvar_Set ( "ui_matchStartTime", va ( "%i", cg.time ) );
-        if ( cg_recordSPDemo.integer && cg_recordSPDemoName.string && *cg_recordSPDemoName.string ) {
+        if ( cg_recordSPDemo.integer && *cg_recordSPDemoName.string ) {
             trap_SendConsoleCommand ( va ( "set g_synchronousclients 1 ; record %s \n", cg_recordSPDemoName.string ) );
         }
     }
@@ -1646,7 +1646,7 @@ int CG_ParseVoiceChats ( const char *filename, voiceChatList_t *voiceChatList, i
         voiceChats[i].id[0] = 0;
     }
     token = COM_ParseExt ( p, qtrue );
-    if ( !token || token[0] == 0 ) {
+    if ( !token[0] ) {
         return qtrue;
     }
     if ( !Q_stricmp ( token, "female" ) ) {
@@ -1663,7 +1663,7 @@ int CG_ParseVoiceChats ( const char *filename, voiceChatList_t *voiceChatList, i
     voiceChatList->numVoiceChats = 0;
     while ( 1 ) {
         token = COM_ParseExt ( p, qtrue );
-        if ( !token || token[0] == 0 ) {
+        if ( !token[0] ) {
             return qtrue;
         }
         Com_sprintf ( voiceChats[voiceChatList->numVoiceChats].id, sizeof ( voiceChats[voiceChatList->numVoiceChats].id ), "%s", token );
@@ -1675,7 +1675,7 @@ int CG_ParseVoiceChats ( const char *filename, voiceChatList_t *voiceChatList, i
         voiceChats[voiceChatList->numVoiceChats].numSounds = 0;
         while ( 1 ) {
             token = COM_ParseExt ( p, qtrue );
-            if ( !token || token[0] == 0 ) {
+            if ( !token[0] ) {
                 return qtrue;
             }
             if ( !Q_stricmp ( token, "}" ) )
@@ -1683,7 +1683,7 @@ int CG_ParseVoiceChats ( const char *filename, voiceChatList_t *voiceChatList, i
             sound = trap_S_RegisterSound ( token, compress );
             voiceChats[voiceChatList->numVoiceChats].sounds[voiceChats[voiceChatList->numVoiceChats].numSounds] = sound;
             token = COM_ParseExt ( p, qtrue );
-            if ( !token || token[0] == 0 ) {
+            if ( !token[0] ) {
                 return qtrue;
             }
             Com_sprintf ( voiceChats[voiceChatList->numVoiceChats].chats[
@@ -1751,7 +1751,7 @@ int CG_HeadModelVoiceChats ( char *filename ) {
     p = &ptr;
 
     token = COM_ParseExt ( p, qtrue );
-    if ( !token || token[0] == 0 ) {
+    if ( !token[0] ) {
         return -1;
     }
 

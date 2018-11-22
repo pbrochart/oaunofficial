@@ -264,7 +264,7 @@ static void CG_DrawSpecs( void ){
 					
 				}
 				else
-					strcpy( string, ci->name );
+					strcpy( string, va( "^7%s", ci->name ) );
 				
 				y += SB_MEDCHAR_HEIGHT;
 				numLine++;
@@ -285,7 +285,7 @@ static void CG_DrawSpecs( void ){
 					}
 				}
 				else
-					strcat( string, ci->name );
+					strcat( string, va( "^7%s", ci->name ) );
 			}
 			
 		}

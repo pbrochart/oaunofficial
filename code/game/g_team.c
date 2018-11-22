@@ -407,6 +407,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
     }
 
     if (g_gametype.integer == GT_1FCTF) {
+        flag_pw = PW_NEUTRALFLAG;
         enemy_flag_pw = PW_NEUTRALFLAG;
     }
 
@@ -705,6 +706,10 @@ void Team_CheckHurtCarrier(gentity_t *targ, gentity_t *attacker)
         flag_pw = PW_BLUEFLAG;
     else
         flag_pw = PW_REDFLAG;
+
+    if (g_gametype.integer == GT_1FCTF) {
+        flag_pw = PW_NEUTRALFLAG;
+    }
 
     // flags
     if (targ->client->ps.powerups[flag_pw] &&
@@ -2191,8 +2196,8 @@ static void ObeliskTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
         return;
     }
 
-    PrintMsg(NULL, "%s" S_COLOR_WHITE " brought in %i skull%s.\n",
-             other->client->pers.netname, tokens, tokens ? "s" : "" );
+    PrintMsg(NULL, "%s" S_COLOR_WHITE " brought in %i %s.\n",
+             other->client->pers.netname, tokens, ( tokens == 1 ) ? "skull" : "skulls" );
 
     AddTeamScore(self->s.pos.trBase, other->client->sess.sessionTeam, tokens);
     Team_ForceGesture(other->client->sess.sessionTeam);

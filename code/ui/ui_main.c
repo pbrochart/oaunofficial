@@ -51,7 +51,7 @@ static const char *skillLevels[] = {
   "Nightmare"
 };
 
-static const int numSkillLevels = sizeof(skillLevels) / sizeof(const char*);
+static const int numSkillLevels = ARRAY_LEN( skillLevels );
 
 /*
  *These sources are currently hardcoded in the engine.
@@ -64,7 +64,7 @@ static const char *netSources[] = {
 	"Internet",
 	"Favorites"
 };
-static const int numNetSources = sizeof(netSources) / sizeof(const char*);
+static const int numNetSources = ARRAY_LEN( netSources );
 
 static const serverFilter_t serverFilters[] = {
 	{"All", "" },
@@ -92,7 +92,7 @@ static const char *teamArenaGameTypes[] = {
         "DOMINATION"
 };
 
-static int const numTeamArenaGameTypes = sizeof(teamArenaGameTypes) / sizeof(const char*);
+static int const numTeamArenaGameTypes = ARRAY_LEN( teamArenaGameTypes );
 
 
 static const char *teamArenaGameNames[] = {
@@ -111,10 +111,10 @@ static const char *teamArenaGameNames[] = {
         "Domination"
 };
 
-static int const numTeamArenaGameNames = sizeof(teamArenaGameNames) / sizeof(const char*);
+static int const numTeamArenaGameNames = ARRAY_LEN( teamArenaGameNames );
 
 
-static const int numServerFilters = sizeof(serverFilters) / sizeof(serverFilter_t);
+static const int numServerFilters = ARRAY_LEN( serverFilters );
 
 static const char *sortKeys[] = {
 	"Server Name",
@@ -123,7 +123,7 @@ static const char *sortKeys[] = {
 	"Game Type",
 	"Ping Time"
 };
-static const int numSortKeys = sizeof(sortKeys) / sizeof(const char*);
+static const int numSortKeys = ARRAY_LEN( sortKeys );
 
 static char* netnames[] = {
 	"???",
@@ -1019,7 +1019,7 @@ void UI_Load(void) {
 
 static const char *handicapValues[] = {"None","95","90","85","80","75","70","65","60","55","50","45","40","35","30","25","20","15","10","5",NULL};
 #ifndef MISSIONPACK // bk001206
-static int numHandicaps = sizeof(handicapValues) / sizeof(const char*);
+static int numHandicaps = ARRAY_LEN( handicapValues );
 #endif
 
 static void UI_DrawHandicap(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
@@ -4525,7 +4525,7 @@ static qboolean Team_Parse(char **p) {
       return qtrue;
     }
 
-    if ( !token || token[0] == 0 ) {
+    if ( !token[0] ) {
       return qfalse;
     }
 
@@ -4584,7 +4584,7 @@ static qboolean Character_Parse(char **p) {
       return qtrue;
     }
 
-    if ( !token || token[0] == 0 ) {
+    if ( !token[0] ) {
       return qfalse;
     }
 
@@ -4639,7 +4639,7 @@ static qboolean Alias_Parse(char **p) {
       return qtrue;
     }
 
-    if ( !token || token[0] == 0 ) {
+    if ( !token[0] ) {
       return qfalse;
     }
 
@@ -4687,7 +4687,7 @@ static void UI_ParseTeamInfo(const char *teamFile) {
 
 	while ( 1 ) {
 		token = COM_ParseExt( &p, qtrue );
-		if( !token || token[0] == 0 || token[0] == '}') {
+		if ( !token[0] || token[0] == '}') {
 			break;
 		}
 
@@ -4739,7 +4739,7 @@ static qboolean GameType_Parse(char **p, qboolean join) {
 			return qtrue;
 		}
 
-		if ( !token || token[0] == 0 ) {
+		if ( !token[0] ) {
 			return qfalse;
 		}
 
@@ -5832,7 +5832,7 @@ static cvarTable_t		cvarTable[] = {
 };
 
 // bk001129 - made static to avoid aliasing
-static int		cvarTableSize = sizeof(cvarTable) / sizeof(cvarTable[0]);
+static int		cvarTableSize = ARRAY_LEN ( cvarTable );
 
 
 /*
