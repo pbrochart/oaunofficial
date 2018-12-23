@@ -111,7 +111,7 @@ t_mappage getMappage(int page) {
 		for(i=0;i<MAPS_PER_PAGE*page;i++) {
 			token = COM_Parse(&pointer);
 		}
-		if(!token || token[0]==0) {
+		if(!token[0]) {
 			//Page empty, return to first page
                         trap_FS_FCloseFile(file);
 			return getMappage(0);
