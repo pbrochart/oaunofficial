@@ -724,7 +724,7 @@ void CG_AddScorePlum( localEntity_t *le ) {
 	refEntity_t	*re;
 	vec3_t		origin, delta, dir, vec, up = {0, 0, 1};
 	float		c, len;
-	int			i, score, digits[10], numdigits, negative;
+	int		i, score, digits[10], numdigits, negative;
 
 	re = &le->refEntity;
 
@@ -809,14 +809,13 @@ void CG_AddDamagePlum( localEntity_t *le ) {
 	refEntity_t	*re;
 	vec3_t		origin, delta, dir, vec, up = {0, 0, 1};
 	float		c, len;
-	int			i, damage, mod, digits[10], numdigits, negative;
+	int		i, damage, digits[10], numdigits, negative;
 
 	re = &le->refEntity;
 
 	c = ( le->endTime - cg.time ) * le->lifeRate;
 
 	damage = le->radius;
-	mod = le->light;
 	if (damage < 5) {
 		re->shaderRGBA[0] = 0xff;
 		re->shaderRGBA[1] = 0xff;

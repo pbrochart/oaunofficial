@@ -1300,7 +1300,7 @@ void SetTeam( gentity_t *ent, char *s ) {
             team = PickTeam( clientNum );
         }
         if ( !force ) {
-            if ( g_teamForceBalance.integer  ) {
+            if ( g_teamForceBalance.integer ) {
                 int		counts[TEAM_NUM_TEAMS];
 
                 counts[TEAM_BLUE] = TeamCount( clientNum, TEAM_BLUE );
@@ -1366,8 +1366,8 @@ void SetTeam( gentity_t *ent, char *s ) {
     // execute the team change
     //
 
-    // if the player was dead leave the body
-    if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
+    // if the player was dead leave the body, but only if they're actually in game
+    if ( client->ps.stats[STAT_HEALTH] <= 0 && client->pers.connected == CON_CONNECTED ) {
         CopyToBodyQue(ent);
     }
 
@@ -1411,9 +1411,10 @@ void SetTeam( gentity_t *ent, char *s ) {
     // get and distribute relevent paramters
     ClientUserinfoChanged( clientNum );
 
-    // log team changes to demo
-    /*Info_SetValueForKey( buf, "team", va( "%d", ent->client->sess.sessionTeam ) );
-    G_DemoCommand( DC_CLIENT_SET, va( "%d %s", (int)(ent - g_entities), buf ) );*/
+    // client hasn't spawned yet, they sent an early team command
+    if ( client->pers.connected != CON_CONNECTED ) {
+        return;
+    }
 
     ClientBegin( clientNum );
     
@@ -2571,26 +2572,10 @@ void Cmd_Ref_f( gentity_t *ent ) {
         if ( trap_Argc() >= 3 )
             trap_Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
 
-        /*if(!allowedMap(arg3)){
-                    trap_SendServerCommand( ent-g_entities, "print \"Map is not available.\n\"" );
-                    return;
-                }*/
-
-
         if (*s) {
-            /*if( trap_Argc() >= 3 ){
-            	Com_sprintf( command, sizeof( command ), "%s %d; map %s; set nextmap \"%s\"", arg1, i,arg3,s );
-            }
-            else{*/
             Com_sprintf( command, sizeof( command ), "%s %d; map_restart; set nextmap \"%s\"", arg1, i,s );
-            //}
         } else {
-            /*if( trap_Argc() >= 3 ){
-            	Com_sprintf( command, sizeof( command ), "%s %d; map", arg1, i, arg3);
-            }
-            else{*/
             Com_sprintf( command, sizeof( command ), "%s %d; map_restart", arg1, i );
-            //}
         }
     } else if ( !Q_stricmp( arg1, "map" ) ) {
         // special case for map changes, we want to reset the nextmap setting
@@ -2761,7 +2746,6 @@ void Cmd_CallVote_f( gentity_t *ent ) {
     char	arg2[MAX_STRING_TOKENS];
     char	arg3[MAX_STRING_TOKENS];
     char    buffer[256];
-    qboolean mapAllowed = qtrue;
 
     if ( !g_allowVote.integer ) {
         trap_SendServerCommand( ent-g_entities, "print \"Voting not allowed here.\n\"" );
@@ -2933,39 +2917,12 @@ void Cmd_CallVote_f( gentity_t *ent ) {
         if ( trap_Argc() >= 3 )
             trap_Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
 
-        if ( g_useMapcycle.integer ) {
-            if ( !G_mapIsVoteable( arg2 ) ) {
-                trap_SendServerCommand( ent-g_entities, "print \"Map is not allowed.\n\"" );
-                G_drawAllowedMaps( ent );
-                mapAllowed = qfalse;
-            }
-        }
-        else {
-            if (!allowedMap(arg3)) {
-                trap_SendServerCommand( ent-g_entities, "print \"Map is not available.\n\"" );
-                mapAllowed = qfalse;
-            }
-        }
-
-
         if (*s) {
-            if ( trap_Argc() >= 3 && mapAllowed ) {
-                Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d; map %s; set nextmap \"%s\"", arg1, i,arg3,s );
-                Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "Change gametype to: %s   Map: %s?", gameNames[i], arg3 );
-            }
-            else {
-                Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d; map_restart; set nextmap \"%s\"", arg1, i,s );
-                Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "Change gametype to: %s?", gameNames[i] );
-            }
+            Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d; map_restart; set nextmap \"%s\"", arg1, i,s );
+            Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "Change gametype to: %s?", gameNames[i] );
         } else {
-            if ( trap_Argc() >= 3  && mapAllowed) {
-                Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d; map", arg1, i);
-                Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "Change gametype to: %s   Map: %s?", gameNames[i], arg3 );
-            }
-            else {
-                Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d; map_restart", arg1, i );
-                Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "Change gametype to: %s?", gameNames[i] );
-            }
+            Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d; map_restart", arg1, i );
+            Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "Change gametype to: %s?", gameNames[i] );
         }
     } else if ( !Q_stricmp( arg1, "map" ) ) {
         // special case for map changes, we want to reset the nextmap setting
@@ -3305,7 +3262,7 @@ void Cmd_CallTeamVote_f( gentity_t *ent ) {
         if ( level.clients[i].pers.connected == CON_DISCONNECTED )
             continue;
         if (level.clients[i].sess.sessionTeam == team)
-            trap_SendServerCommand( i, va("print \"%s called a team vote.\n\"", ent->client->pers.netname ) );
+            trap_SendServerCommand( i, va("print \"%s" S_COLOR_WHITE " called a team vote.\n\"", ent->client->pers.netname ) );
     }
 
     // start the voting, the caller autoamtically votes yes
@@ -3842,8 +3799,17 @@ void ClientCommand( int clientNum )
     int       i;
 
     ent = g_entities + clientNum;
-    if ( !ent->client )
+    if (!ent->client || ent->client->pers.connected != CON_CONNECTED) {
+        if (ent->client && ent->client->pers.localClient) {
+            // Handle early team command sent by UI when starting a local
+            // team play game.
+            trap_Argv( 0, cmd, sizeof( cmd ) );
+            if (Q_stricmp (cmd, "team") == 0) {
+                Cmd_Team_f (ent);
+            }
+        }
         return;   // not fully in game yet
+    }
 
     trap_Argv( 0, cmd, sizeof( cmd ) );
 

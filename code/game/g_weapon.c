@@ -356,6 +356,7 @@ qboolean ShotgunPellet( vec3_t start, vec3_t end, gentity_t *ent ) {
 	gentity_t	*traceEnt;
 	vec3_t		impactpoint, bouncedir;
 	vec3_t		tr_start, tr_end;
+	qboolean	hitClient = qfalse;
 
 	passent = ent->s.number;
 	oldAttacker = ent;
@@ -396,13 +397,11 @@ qboolean ShotgunPellet( vec3_t start, vec3_t end, gentity_t *ent ) {
 				}
 				continue;
 			}
-			else {
-				G_Damage( traceEnt, ent, ent, forward, tr.endpos,
-					damage, 0, MOD_SHOTGUN);
-				if( LogAccuracyHit( traceEnt, ent ) ) {
-					return qtrue;
-				}
+			if( LogAccuracyHit( traceEnt, ent ) ) {
+				hitClient = qtrue;
 			}
+			G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, 0, MOD_SHOTGUN);
+			return hitClient;
 		}
 		return qfalse;
 	}
@@ -882,10 +881,14 @@ void Weapon_LightningFire( gentity_t *ent ) {
 				}
 				continue;
 			}
-			else {
-				G_Damage( traceEnt, ent, ent, forward, tr.endpos,
-					damage, 0, MOD_LIGHTNING);
+			if( LogAccuracyHit( traceEnt, ent ) ) {
+				if( level.time - traceEnt->client->lastActive < 500 )
+					G_AddHitHistory( ent->client, qtrue );
+
+				ent->client->accuracy_hits++;
+				ent->client->accuracy[WP_LIGHTNING][1]++;
 			}
+			G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, 0, MOD_LIGHTNING);
 		}
 
 		if ( traceEnt->takedamage && traceEnt->client ) {
@@ -893,14 +896,6 @@ void Weapon_LightningFire( gentity_t *ent ) {
 			tent->s.otherEntityNum = traceEnt->s.number;
 			tent->s.eventParm = DirToByte( tr.plane.normal );
 			tent->s.weapon = ent->s.weapon;
-			
-			if( LogAccuracyHit( traceEnt, ent ) ) {
-				if( level.time - traceEnt->client->lastActive < 500 )
-					G_AddHitHistory( ent->client, qtrue );
-			  
-				ent->client->accuracy_hits++;
-				ent->client->accuracy[WP_LIGHTNING][1]++;
-			}
 		} else if ( !( tr.surfaceFlags & SURF_NOIMPACT ) ) {
 			tent = G_TempEntity( tr.endpos, EV_MISSILE_MISS );
 			tent->s.eventParm = DirToByte( tr.plane.normal );

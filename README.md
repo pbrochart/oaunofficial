@@ -28,3 +28,5 @@ Backport some bug fixes from ioquake3.
 Revision 317: Optimization of bot's parsing from ioquake3.
 Revision 318: Some bug fixes from ioquake3.
 Revision 319: Add missing commit and some bug fixes from ioquake3.
+Revision 320: Fix hit accuracy stats for lg/sg and predicting entity
+origin on rotating mover from ioquake3.

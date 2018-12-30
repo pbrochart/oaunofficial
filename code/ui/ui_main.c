@@ -1758,16 +1758,10 @@ static int UI_OwnerDrawWidth(int ownerDraw, float scale) {
 static void UI_DrawBotName(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
 	int value = uiInfo.botIndex;
 	int game = trap_Cvar_VariableValue("g_gametype");
-	const char *text = "";
+	const char *text;
 	if (game >= GT_TEAM && !GT_LMS ) {
-		if (value >= uiInfo.characterCount) {
-			value = 0;
-		}
 		text = uiInfo.characterList[value].name;
 	} else {
-		if (value >= UI_GetNumBots()) {
-			value = 0;
-		}
 		text = UI_GetBotNameByNumber(value);
 	}
   Text_Paint(rect->x, rect->y, scale, color, text, 0, 0, textStyle);
@@ -2575,16 +2569,16 @@ static qboolean UI_BotName_HandleKey(int flags, float *special, int key) {
 		}
 
 		if (game >= GT_TEAM && !GT_LMS) {
-			if (value >= uiInfo.characterCount + 2) {
+			if (value >= uiInfo.characterCount) {
 				value = 0;
 			} else if (value < 0) {
-				value = uiInfo.characterCount + 2 - 1;
+				value = uiInfo.characterCount - 1;
 			}
 		} else {
-			if (value >= UI_GetNumBots() + 2) {
+			if (value >= UI_GetNumBots()) {
 				value = 0;
 			} else if (value < 0) {
-				value = UI_GetNumBots() + 2 - 1;
+				value = UI_GetNumBots() - 1;
 			}
 		}
 		uiInfo.botIndex = value;
@@ -5961,7 +5955,7 @@ static void UI_StartServerRefresh(qboolean full)
 
 	qtime_t q;
 	trap_RealTime(&q);
- 	trap_Cvar_Set( va("ui_lastServerRefresh_%i", ui_netSource.integer), va("%s-%i, %i at %i:%i", MonthAbbrev[q.tm_mon],q.tm_mday, 1900+q.tm_year,q.tm_hour,q.tm_min));
+ 	trap_Cvar_Set( va("ui_lastServerRefresh_%i", ui_netSource.integer), va("%s-%i, %i at %i:%02i", MonthAbbrev[q.tm_mon],q.tm_mday, 1900+q.tm_year,q.tm_hour,q.tm_min));
 
 	if (!full) {
 		UI_UpdatePendingPings();
