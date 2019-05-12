@@ -185,7 +185,8 @@ vmCvar_t 	cg_scorePlum;
 vmCvar_t	pmove_fixed;
 //vmCvar_t	cg_pmove_fixed;
 vmCvar_t	pmove_msec;
-vmCvar_t        pmove_float;
+vmCvar_t	pmove_float;
+vmCvar_t	pmove_accurate;
 vmCvar_t	cg_pmove_msec;
 vmCvar_t	cg_cameraMode;
 vmCvar_t	cg_cameraOrbit;
@@ -500,38 +501,39 @@ static cvarTable_t cvarTable[] = { // bk001129
 #ifdef MISSIONPACK
 	{ &cg_redTeamName, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
 	{ &cg_blueTeamName, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
-	{ &cg_currentSelectedPlayer, "cg_currentSelectedPlayer", "0", CVAR_ARCHIVE},
-	{ &cg_currentSelectedPlayerName, "cg_currentSelectedPlayerName", "", CVAR_ARCHIVE},
-	{ &cg_singlePlayer, "ui_singlePlayerActive", "0", CVAR_USERINFO},
-	{ &cg_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_USERINFO},
-	{ &cg_recordSPDemo, "ui_recordSPDemo", "0", CVAR_ARCHIVE},
-	{ &cg_recordSPDemoName, "ui_recordSPDemoName", "", CVAR_ARCHIVE},
-	{ &cg_hudFiles, "cg_hudFiles", "ui/hud.txt", CVAR_ARCHIVE},
+	{ &cg_currentSelectedPlayer, "cg_currentSelectedPlayer", "0", CVAR_ARCHIVE },
+	{ &cg_currentSelectedPlayerName, "cg_currentSelectedPlayerName", "", CVAR_ARCHIVE },
+	{ &cg_singlePlayer, "ui_singlePlayerActive", "0", CVAR_USERINFO },
+	{ &cg_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_USERINFO },
+	{ &cg_recordSPDemo, "ui_recordSPDemo", "0", CVAR_ARCHIVE },
+	{ &cg_recordSPDemoName, "ui_recordSPDemoName", "", CVAR_ARCHIVE },
+	{ &cg_hudFiles, "cg_hudFiles", "ui/hud.txt", CVAR_ARCHIVE },
 #endif
-	{ &cg_enableDust, "g_enableDust", "0", CVAR_SERVERINFO},
-	{ &cg_enableBreath, "g_enableBreath", "0", CVAR_SERVERINFO},
-	{ &cg_obeliskRespawnDelay, "g_obeliskRespawnDelay", "10", CVAR_SERVERINFO},
-	{ &cg_cameraOrbit, "cg_cameraOrbit", "0", CVAR_CHEAT},
-	{ &cg_cameraOrbitDelay, "cg_cameraOrbitDelay", "50", CVAR_ARCHIVE},
-	{ &cg_timescaleFadeEnd, "cg_timescaleFadeEnd", "1", 0},
-	{ &cg_timescaleFadeSpeed, "cg_timescaleFadeSpeed", "0", 0},
-	{ &cg_timescale, "timescale", "1", 0},
-	{ &cg_scorePlum, "cg_scorePlums", "1", CVAR_USERINFO | CVAR_ARCHIVE},
+	{ &cg_enableDust, "g_enableDust", "0", CVAR_SERVERINFO },
+	{ &cg_enableBreath, "g_enableBreath", "0", CVAR_SERVERINFO },
+	{ &cg_obeliskRespawnDelay, "g_obeliskRespawnDelay", "10", CVAR_SERVERINFO },
+	{ &cg_cameraOrbit, "cg_cameraOrbit", "0", CVAR_CHEAT },
+	{ &cg_cameraOrbitDelay, "cg_cameraOrbitDelay", "50", CVAR_ARCHIVE },
+	{ &cg_timescaleFadeEnd, "cg_timescaleFadeEnd", "1", 0 },
+	{ &cg_timescaleFadeSpeed, "cg_timescaleFadeSpeed", "0", 0 },
+	{ &cg_timescale, "timescale", "1", 0 },
+	{ &cg_scorePlum, "cg_scorePlums", "1", CVAR_USERINFO | CVAR_ARCHIVE },
 //unlagged - smooth clients #2
 // this is done server-side now
-//	{ &cg_smoothClients, "cg_smoothClients", "0", CVAR_USERINFO | CVAR_ARCHIVE},
+//	{ &cg_smoothClients, "cg_smoothClients", "0", CVAR_USERINFO | CVAR_ARCHIVE },
 //unlagged - smooth clients #2
-	{ &cg_cameraMode, "com_cameraMode", "0", CVAR_CHEAT},
-	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO},
-	{ &pmove_msec, "pmove_msec", "8", CVAR_SYSTEMINFO},
-        { &pmove_float, "pmove_float", "0", CVAR_SYSTEMINFO},
-	{ &cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE},
-	{ &cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE},
-	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
-	{ &cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
-	{ &cg_oldRail, "cg_railStyle", "0", CVAR_ARCHIVE},
-	{ &cg_oldRocket, "cg_rocketStyle", "1", CVAR_ARCHIVE},
-	{ &cg_plasmaTrail, "cg_plasmaStyle", "0", CVAR_ARCHIVE},
+	{ &cg_cameraMode, "com_cameraMode", "0", CVAR_CHEAT },
+	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO },
+	{ &pmove_msec, "pmove_msec", "8", CVAR_SYSTEMINFO },
+	{ &pmove_float, "pmove_float", "0", CVAR_SYSTEMINFO },
+	{ &pmove_accurate, "pmove_accurate", "0", CVAR_SYSTEMINFO },
+	{ &cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
+	{ &cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE },
+	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE },
+	{ &cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE },
+	{ &cg_oldRail, "cg_railStyle", "0", CVAR_ARCHIVE },
+	{ &cg_oldRocket, "cg_rocketStyle", "1", CVAR_ARCHIVE },
+	{ &cg_plasmaTrail, "cg_plasmaStyle", "0", CVAR_ARCHIVE },
 //unlagged - client options
 	{ &cg_delag, "cg_delag", "0", CVAR_ARCHIVE | CVAR_USERINFO },
 //	{ &cg_debugDelag, "cg_debugDelag", "0", CVAR_USERINFO | CVAR_CHEAT },

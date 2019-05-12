@@ -503,7 +503,11 @@ qboolean CG_DrawOldScoreboard( void ){
 		picBar[ infoCount ].val = score->spawnkillCount;
 		picBar[ infoCount ].percent = qfalse;
 		infoCount++;
-		CG_DrawPicBar( picBar, infoCount, SB_INFO_X, SB_INFO_Y, SB_INFO_WIDTH, SB_INFO_HEIGHT );
+		if( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cgs.gametype == GT_CTF_ELIMINATION ){
+			CG_DrawPicBar( picBar, infoCount, SB_INFO_X, SB_INFO_Y, SB_WIDTH, SB_INFO_HEIGHT );
+		}else{
+			CG_DrawPicBar( picBar, infoCount, SB_INFO_X, SB_INFO_Y, SB_INFO_WIDTH, SB_INFO_HEIGHT );
+		}
 	}
 	
 	// spectators

@@ -959,22 +959,26 @@ static void ServerOptions_Start( void ) {
                 trap_Cvar_SetValue( "pmove_fixed", 1);
                 trap_Cvar_SetValue( "pmove_msec", 8);
                 trap_Cvar_SetValue( "pmove_float", 0);
+                trap_Cvar_SetValue( "pmove_accurate", 0);
                 break;
             case 2:
                 //Fixed framerate 91 Hz
                 trap_Cvar_SetValue( "pmove_fixed", 1);
                 trap_Cvar_SetValue( "pmove_msec", 11);
                 trap_Cvar_SetValue( "pmove_float", 0);
+                trap_Cvar_SetValue( "pmove_accurate", 0);
                 break;
             case 3:
                 //Accurate physics
                 trap_Cvar_SetValue( "pmove_fixed", 0);
                 trap_Cvar_SetValue( "pmove_float", 1);
+                trap_Cvar_SetValue( "pmove_accurate", 0);
                 break;
             default:
                 //Framerate dependent
                 trap_Cvar_SetValue( "pmove_fixed", 0);
                 trap_Cvar_SetValue( "pmove_float", 0);
+                trap_Cvar_SetValue( "pmove_accurate", 0);
                 break;
         };
 	trap_Cvar_Set("sv_hostname", s_serveroptions.hostname.field.buffer );

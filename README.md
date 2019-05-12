@@ -30,3 +30,10 @@ Revision 318: Some bug fixes from ioquake3.
 Revision 319: Add missing commit and some bug fixes from ioquake3.
 Revision 320: Fix hit accuracy stats for lg/sg and predicting entity
 origin on rotating mover from ioquake3.
+Revision 321: Add pmove_accurate (disabled by default):
+It's an alternative to pmove_fixed which had drawbacks
+(choppy movement). Setting this to 125 will make all players jump
+as high and far as if they had 125 fps even when their
+actual fps is lower or unstable (but require more bandwidth).
+It's frame-rate independent physics and be fair for everyone.
+BoxOnPlaneSide rewrite from ioquake3 (by Diego de Estrada).

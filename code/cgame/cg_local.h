@@ -1552,6 +1552,7 @@ extern  vmCvar_t		cg_scorePlum;
 extern	vmCvar_t		pmove_fixed;
 extern	vmCvar_t		pmove_msec;
 extern	vmCvar_t		pmove_float;
+extern	vmCvar_t		pmove_accurate;
 //extern	vmCvar_t		cg_pmove_fixed;
 extern	vmCvar_t		cg_cameraOrbit;
 extern	vmCvar_t		cg_cameraOrbitDelay;

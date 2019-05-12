@@ -1160,7 +1160,7 @@ void Cmd_Timeout_f( gentity_t *player ) {
         for ( i = 0; i < level.numConnectedClients ;i++) {
             for ( j = 0; j < MAX_POWERUPS; j++ ) {
                 if ( level.clients[i].ps.powerups[j] > 0 )
-                    level.clients->ps.powerups[j] += level.timeoutAdd;
+                    level.clients[i].ps.powerups[j] += level.timeoutAdd;
             }
         }
 
