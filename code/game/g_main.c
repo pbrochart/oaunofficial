@@ -1936,7 +1936,7 @@ void QDECL G_LogPrintf( const char *fmt, ... ) {
 	char		string[1024];
 	int			min, tens, sec;
 
-	sec = level.time / 1000;
+	sec = ( level.time - level.startTime ) / 1000;
 
 	min = sec / 60;
 	sec -= min * 60;
@@ -2060,7 +2060,7 @@ void CheckIntermissionExit( void ) {
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-		if ( g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT ) {
+		if ( g_entities[i].r.svFlags & SVF_BOT ) {
 			continue;
 		}
 
@@ -2959,7 +2959,7 @@ void CheckTournament( void ) {
 		qboolean	notEnough = qfalse;
 		int i, clientsReady = 0;
 
-		if ( g_gametype.integer > GT_TEAM && !g_ffa_gt ) {
+		if ( g_gametype.integer >= GT_TEAM && !g_ffa_gt ) {
 			counts[TEAM_BLUE] = TeamCount( -1, TEAM_BLUE );
 			counts[TEAM_RED] = TeamCount( -1, TEAM_RED );
 

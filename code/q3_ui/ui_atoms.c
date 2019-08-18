@@ -514,6 +514,10 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 	int		width;
 	float	sizeScale;
 
+	if( !str ) {
+		return;
+	}
+
 	sizeScale = UI_ProportionalSizeScale( style );
 
 	switch( style & UI_FORMATMASK ) {
@@ -875,17 +879,21 @@ UI_MouseEvent
 void UI_MouseEvent( int dx, int dy )
 {
 	int				i;
+	int				bias;
 	menucommon_s*	m;
 
 	if (!uis.activemenu)
 		return;
 
+	// convert X bias to 640 coords
+	bias = uis.bias / uis.xscale;
+
 	// update mouse screen position
 	uis.cursorx += dx;
-	if (uis.cursorx < 0)
-		uis.cursorx = 0;
-	else if (uis.cursorx > SCREEN_WIDTH)
-		uis.cursorx = SCREEN_WIDTH;
+	if (uis.cursorx < -bias)
+		uis.cursorx = -bias;
+	else if (uis.cursorx > SCREEN_WIDTH+bias)
+		uis.cursorx = SCREEN_WIDTH+bias;
 
 	uis.cursory += dy;
 	if (uis.cursory < 0)

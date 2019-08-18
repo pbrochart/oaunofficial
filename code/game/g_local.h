@@ -1628,6 +1628,7 @@ void Svcmd_DumpUser_f( void );
 void Svcmd_Chat_f( void );
 void Svcmd_ListIP_f( void );
 void Svcmd_MessageWrapper( void );
+void Svcmd_CenterPrintSizeTen_f( void );
 
 #include "g_killspree.h"
 #include "g_admin.h"

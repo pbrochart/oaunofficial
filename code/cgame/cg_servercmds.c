@@ -1995,6 +1995,11 @@ static void CG_ServerCommand ( void ) {
         return;
     }
 
+    if ( !strcmp ( cmd, "cpst" ) ) {
+        CG_CenterPrint ( CG_Argv ( 1 ), SCREEN_HEIGHT * 0.30, MEDIUMCHAR_WIDTH - 2 );
+        return;
+    }
+
     if ( !strcmp ( cmd, "cs" ) ) {
         CG_ConfigStringModified();
         return;

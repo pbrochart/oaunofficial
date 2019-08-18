@@ -1644,7 +1644,7 @@ Sago: I am not happy with this exception
 	}
 */
 
-	if (g_gametype.integer >= GT_TEAM && g_ffa_gt!=1) {
+	if (g_gametype.integer >= GT_TEAM && !(ent->r.svFlags & SVF_BOT) && g_ffa_gt!=1) {
 		client->pers.teamInfo = qtrue;
 	} else {
 		s = Info_ValueForKey( userinfo, "teamoverlay" );

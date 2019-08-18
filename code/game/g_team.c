@@ -96,16 +96,6 @@ const char *TeamName(int team)  {
     return "FREE";
 }
 
-const char *OtherTeamName(int team) {
-    if (team==TEAM_RED)
-        return "BLUE";
-    else if (team==TEAM_BLUE)
-        return "RED";
-    else if (team==TEAM_SPECTATOR)
-        return "SPECTATOR";
-    return "FREE";
-}
-
 const char *TeamColorString(int team) {
     if (team==TEAM_RED)
         return S_COLOR_RED;
@@ -1306,6 +1296,8 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 
 			PrintMsg( NULL, "Flag held for %i:%02i:%03i\n", mins, secs, msecs );
 			trap_SendServerCommand( -1, va("screenPrint \"^3Red captured the flag in %i:%02i:%03i\"", mins, secs, msecs) );
+			trap_SendServerCommand( -1, va("cpst \"%s ^1(^3%i %s^1) scores!\"", cl->pers.netname,
+				cl->ps.persistant[PERS_CAPTURES] + 1, (!cl->ps.persistant[PERS_CAPTURES]) ? "flag" : "flags") ); 
 			level.blueFlagTaken = -1;
         }
         else if ( team == TEAM_BLUE ) {
@@ -1338,6 +1330,8 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 
 			PrintMsg( NULL, "Flag held for %i:%03i:%03i\n", mins, secs, msecs );
 			trap_SendServerCommand( -1, va("screenPrint \"^3Blue captured the flag in %i:%02i:%03i\"", mins, secs, msecs) );
+			trap_SendServerCommand( -1, va("cpst \"%s ^4(^3%i %s^4) scores!\"", cl->pers.netname,
+				cl->ps.persistant[PERS_CAPTURES] + 1, (!cl->ps.persistant[PERS_CAPTURES]) ? "flag" : "flags") ); 
 			level.redFlagTaken = -1;
         }
 
@@ -1380,12 +1374,13 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
             continue;
 
         if (player->client->sess.sessionTeam !=
-                cl->sess.sessionTeam) {
+            cl->sess.sessionTeam) {
             player->client->pers.teamState.lasthurtcarrier = -5;
         } else if (player->client->sess.sessionTeam ==
-                   cl->sess.sessionTeam) {
-            if (player != other)
-                AddScore(player, ent->r.currentOrigin, CTF_TEAM_BONUS);
+            cl->sess.sessionTeam) {
+#ifdef MISSIONPACK
+            AddScore(player, ent->r.currentOrigin, CTF_TEAM_BONUS);
+#endif
             // award extra points for capture assists
             if (player->client->pers.teamState.lastreturnedflag +
                     CTF_RETURN_FLAG_ASSIST_TIMEOUT > level.time) {
@@ -1484,7 +1479,9 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
         }
     }
 
+#ifdef MISSIONPACK
     AddScore(other, ent->r.currentOrigin, CTF_FLAG_BONUS);
+#endif
     cl->pers.teamState.flagsince = level.time;
     Team_TakeFlagSound( ent, team );
 
@@ -1988,17 +1985,32 @@ void TeamplayInfoMessage( gentity_t *ent ) {
     int			cnt;
     int			h, a, w;
     int			clients[TEAM_MAXOVERLAY];
+    int			team;
 
     if ( ! ent->client->pers.teamInfo )
         return;
+
+    // send team info to spectator for team of followed client
+    if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
+        if ( ent->client->sess.spectatorState != SPECTATOR_FOLLOW
+            || ent->client->sess.spectatorClient < 0 ) {
+            return;
+        }
+        team = g_entities[ ent->client->sess.spectatorClient ].client->sess.sessionTeam;
+    } else {
+        team = ent->client->sess.sessionTeam;
+    }
+
+    if (team != TEAM_RED && team != TEAM_BLUE) {
+        return;
+    }
 
     // figure out what client should be on the display
     // we are limited to 8, but we want to use the top eight players
     // but in client order (so they don't keep changing position on the overlay)
     for (i = 0, cnt = 0; i < g_maxclients.integer && cnt < TEAM_MAXOVERLAY; i++) {
         player = g_entities + level.sortedClients[i];
-        if (player->inuse && player->client->sess.sessionTeam ==
-                ent->client->sess.sessionTeam ) {
+        if (player->inuse && player->client->sess.sessionTeam == team ) {
             clients[cnt++] = level.sortedClients[i];
         }
     }
@@ -2012,8 +2024,7 @@ void TeamplayInfoMessage( gentity_t *ent ) {
 
     for (i = 0, cnt = 0; i < g_maxclients.integer && cnt < TEAM_MAXOVERLAY; i++) {
         player = g_entities + i;
-        if (player->inuse && player->client->sess.sessionTeam ==
-                ent->client->sess.sessionTeam ) {
+        if (player->inuse && player->client->sess.sessionTeam == team ) {
 
             h = player->client->ps.stats[STAT_HEALTH];
             a = player->client->ps.stats[STAT_ARMOR];
@@ -2059,7 +2070,7 @@ void CheckTeamStatus(void) {
                 continue;
             }
 
-            if (ent->inuse && (ent->client->sess.sessionTeam == TEAM_RED ||	ent->client->sess.sessionTeam == TEAM_BLUE)) {
+            if (ent->inuse && (ent->client->sess.sessionTeam == TEAM_RED || ent->client->sess.sessionTeam == TEAM_BLUE)) {
                 loc = Team_GetLocation( ent );
                 if (loc)
                     ent->client->pers.teamState.location = loc->health;
@@ -2075,7 +2086,7 @@ void CheckTeamStatus(void) {
                 continue;
             }
 
-            if (ent->inuse && (ent->client->sess.sessionTeam == TEAM_RED ||	ent->client->sess.sessionTeam == TEAM_BLUE)) {
+            if (ent->inuse) {
                 TeamplayInfoMessage( ent );
             }
         }
@@ -2512,7 +2523,6 @@ void ShuffleTeams(void) {
         if ( level.clients[sortPlayers[i]].sess.sessionTeam==TEAM_RED || level.clients[sortPlayers[i]].sess.sessionTeam==TEAM_BLUE ) {
             level.clients[sortPlayers[i]].sess.sessionTeam = nextTeam;
             count++;
-            G_Printf("%i\n", nextTeam);
             if ( nextTeam == TEAM_RED )
                 nextTeam = TEAM_BLUE;
             else if ( nextTeam == TEAM_BLUE)

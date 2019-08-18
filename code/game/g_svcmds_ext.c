@@ -108,6 +108,24 @@ void Svcmd_CenterPrint_f( void )
 
   trap_SendServerCommand( -1, va( "cp \"%s\"", ConcatArgs( 1 ) ) );
 }
+
+/*
+============
+Svcmd_CenterPrintSizeTen_f
+Does a CenterPrintSizeTen from the Console
+============
+*/
+void Svcmd_CenterPrintSizeTen_f( void )
+{
+  if( trap_Argc( ) < 2 )
+  {
+    G_Printf( "usage: cpst <message>\n" );
+    return;
+  }
+
+  trap_SendServerCommand( -1, va( "cpst \"%s\"", ConcatArgs( 1 ) ) );
+}
+
 /*
 ============
 Svcmd_BannerPrint_f
@@ -125,6 +143,7 @@ void Svcmd_BannerPrint_f( void )
 
   trap_SendServerCommand( -1, va( "bp \"%s\"", ConcatArgs( 1 ) ) );
 }
+
 /*
 ============
 Svcmd_EjectClient_f

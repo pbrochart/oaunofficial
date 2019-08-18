@@ -155,7 +155,7 @@ static void UpdateIPBans (void)
 				Q_strcat(ip, sizeof(ip), va("%i", b[j]));
 			Q_strcat(ip, sizeof(ip), (j<3) ? "." : " ");
 		}		
-		if (strlen(iplist_final)+strlen(ip) < MAX_CVAR_VALUE_STRING - 1)
+		if (strlen(iplist_final)+strlen(ip) < MAX_CVAR_VALUE_STRING)
 		{
 			Q_strcat( iplist_final, sizeof(iplist_final), ip);
 		}
@@ -565,7 +565,8 @@ struct
   { "matchinfo", qfalse, Matchinfo_f },
   { "getmapcycle", qfalse, G_sendMapcycle },
   { "writeMapfile", qfalse, G_WriteMapfile_f },
-  { "loadMapfile", qfalse, G_LoadMapfile_f }
+  { "loadMapfile", qfalse, G_LoadMapfile_f },
+  { "cpst", qtrue, Svcmd_CenterPrintSizeTen_f }
 };
 
 /*

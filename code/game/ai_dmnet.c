@@ -659,7 +659,6 @@ int BotGetLongTermGoal(bot_state_t *bs, int tfl, int retreat, bot_goal_t *goal) 
 			EasyClientName(bs->teamgoal.entitynum, buf, sizeof(buf));
 			BotAI_BotInitialChat(bs, "kill_done", buf, NULL);
 			trap_BotEnterChat(bs->cs, bs->decisionmaker, CHAT_TELL);
-			bs->lastkilledplayer = -1;
 			bs->ltgtype = 0;
 		}
 		//
@@ -2047,11 +2046,12 @@ void AIEnter_Battle_Fight(bot_state_t *bs, char *s) {
 	BotRecordNodeSwitch(bs, "battle fight", "", s);
 	trap_BotResetLastAvoidReach(bs->ms);
 	bs->ainode = AINode_Battle_Fight;
+	bs->flags &= ~BFL_FIGHTSUICIDAL;
 }
 
 /*
 ==================
-AIEnter_Battle_Fight
+AIEnter_Battle_SuicidalFight
 ==================
 */
 void AIEnter_Battle_SuicidalFight(bot_state_t *bs, char *s) {

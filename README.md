@@ -37,3 +37,4 @@ as high and far as if they had 125 fps even when their
 actual fps is lower or unstable (but require more bandwidth).
 It's frame-rate independent physics and be fair for everyone.
 BoxOnPlaneSide rewrite from ioquake3 (by Diego de Estrada).
+Revision 322: Minor enhancements on CTF and small bug fixes from ioquake3.

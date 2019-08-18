@@ -795,6 +795,7 @@ static const char *pmove_list[] = {
 	"Fixed framerate 125Hz",
         "Fixed framerate 91Hz",
 	"Accurate",
+	"Accurate 125Hz",
 	NULL
 };
 
@@ -889,13 +890,13 @@ static void ServerOptions_Start( void ) {
 	case GT_TEAM:
 		trap_Cvar_SetValue( "ui_team_fraglimit", fraglimit );
 		trap_Cvar_SetValue( "ui_team_timelimit", timelimit );
-		trap_Cvar_SetValue( "ui_team_friendlt", friendlyfire );
+		trap_Cvar_SetValue( "ui_team_friendly", friendlyfire );
 		break;
 
 	case GT_CTF:
-		trap_Cvar_SetValue( "ui_ctf_fraglimit", fraglimit );
+		trap_Cvar_SetValue( "ui_ctf_capturelimit", flaglimit );
 		trap_Cvar_SetValue( "ui_ctf_timelimit", timelimit );
-		trap_Cvar_SetValue( "ui_ctf_friendlt", friendlyfire );
+		trap_Cvar_SetValue( "ui_ctf_friendly", friendlyfire );
 		break;
 #ifdef MISSIONPACK                
         case GT_1FCTF:
@@ -973,6 +974,12 @@ static void ServerOptions_Start( void ) {
                 trap_Cvar_SetValue( "pmove_fixed", 0);
                 trap_Cvar_SetValue( "pmove_float", 1);
                 trap_Cvar_SetValue( "pmove_accurate", 0);
+                break;
+            case 4:
+                //Accurate physics 125 Hz
+                trap_Cvar_SetValue( "pmove_fixed", 0);
+                trap_Cvar_SetValue( "pmove_float", 0);
+                trap_Cvar_SetValue( "pmove_accurate", 125);
                 break;
             default:
                 //Framerate dependent
@@ -1238,6 +1245,7 @@ static void ServerOptions_StatusBar_Pmove( void* ptr ) {
             UI_DrawString( 320, 460, "All players are equal", UI_CENTER|UI_SMALLFONT, colorWhite );
             break;
         case 3:
+        case 4:
             UI_DrawString( 320, 440, "Physics are calculated exactly", UI_CENTER|UI_SMALLFONT, colorWhite );
             UI_DrawString( 320, 460, "All players are equal", UI_CENTER|UI_SMALLFONT, colorWhite );
             break;
@@ -1484,6 +1492,8 @@ static void ServerOptions_SetMenuItems( void ) {
             s_serveroptions.pmove.curvalue = 2;
         if(trap_Cvar_VariableValue( "pmove_float" ))
             s_serveroptions.pmove.curvalue = 3;
+        if(trap_Cvar_VariableValue( "pmove_accurate" ))
+            s_serveroptions.pmove.curvalue = 4;
 
 	// set the map pic
         info = UI_GetArenaInfoByNumber(s_startserver.maplist[s_startserver.currentmap]);
