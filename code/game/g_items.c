@@ -306,7 +306,7 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 		other->client->stats[STATS_MH]++;
 
 	// small and mega healths will go over the max
-	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD ) {
+	if( bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD ) {
 		max = other->client->ps.stats[STAT_MAX_HEALTH];
 	}
 	else

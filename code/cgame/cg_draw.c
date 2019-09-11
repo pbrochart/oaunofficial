@@ -1448,9 +1448,9 @@ static void CG_DrawTeamOverlay ( qboolean right, qboolean upper ) {
             	p = CG_ConfigString(CS_LOCATIONS + ci->location);
             	if (!p || !*p)
             		p = "unknown";
-            	len = CG_DrawStrlen(p);
-            	if (len > lwidth)
-            		len = lwidth;
+            //	len = CG_DrawStrlen(p);
+            // 	if (len > lwidth)
+            //		len = lwidth;
 
             // 			xx = x + TINYCHAR_WIDTH * 2 + TINYCHAR_WIDTH * pwidth +
             // 				((lwidth/2 - len/2) * TINYCHAR_WIDTH);
@@ -3576,7 +3576,7 @@ CG_DrawCrosshair3D
 =================
 */
 static void CG_DrawCrosshair3D ( void ) {
-    float		w, h;
+    float		w;
     qhandle_t	hShader;
     float		f;
     int			ca;
@@ -3599,14 +3599,13 @@ static void CG_DrawCrosshair3D ( void ) {
         return;
     }
 
-    w = h = cg_crosshairSize.value;
+    w = cg_crosshairSize.value;
 
     // pulse the size of the crosshair when picking up items
     f = cg.time - cg.itemPickupBlendTime;
     if ( f > 0 && f < ITEM_BLOB_TIME ) {
         f /= ITEM_BLOB_TIME;
         w *= ( 1 + f );
-        h *= ( 1 + f );
     }
 
     ca = cg_drawCrosshair.integer;
@@ -3840,7 +3839,6 @@ static void CG_DrawTeamVote ( void ) {
 static qboolean CG_DrawScoreboard ( void ) {
 #ifdef MISSIONPACK
     static qboolean firstTime = qtrue;
-    float fade, *fadeColor;
 
     if ( menuScoreboard ) {
         menuScoreboard->window.flags &= ~WINDOW_FORCED;
@@ -3864,18 +3862,14 @@ static qboolean CG_DrawScoreboard ( void ) {
     }
 
     if ( cg.showScores || cg.predictedPlayerState.pm_type == PM_DEAD || cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
-        fade = 1.0;
-        fadeColor = colorWhite;
     } else {
-        fadeColor = CG_FadeColor ( cg.scoreFadeTime, FADE_TIME );
-        if ( !fadeColor ) {
+	if ( !CG_FadeColor( cg.scoreFadeTime, FADE_TIME ) ) {
             // next time scoreboard comes up, don't print killer
             cg.deferredPlayerLoading = 0;
             cg.killerName[0] = 0;
             firstTime = qtrue;
             return qfalse;
         }
-        fade = *fadeColor;
     }
 
 

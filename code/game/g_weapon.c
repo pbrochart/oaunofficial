@@ -414,7 +414,6 @@ void ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 	float		r, u;
 	vec3_t		end;
 	vec3_t		forward, right, up;
-	int			oldScore;
 	qboolean	hitClient = qfalse;
 	int 		hits=0;
 	
@@ -430,9 +429,7 @@ void ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 	VectorNormalize2( origin2, forward );
 	PerpendicularVector( right, forward );
 	CrossProduct( forward, right, up );
-
 	countTarg = 0;
-	oldScore = ent->client->ps.persistant[PERS_SCORE];
 
 //unlagged - backward reconciliation #2
 	// backward-reconcile the other clients

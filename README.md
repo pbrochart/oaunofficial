@@ -38,3 +38,5 @@ actual fps is lower or unstable (but require more bandwidth).
 It's frame-rate independent physics and be fair for everyone.
 BoxOnPlaneSide rewrite from ioquake3 (by Diego de Estrada).
 Revision 322: Minor enhancements on CTF and small bug fixes from ioquake3.
+Revision 323: Fix broken AI by moving green armour at the end of list
+and remove unused-but-set gcc warnings.

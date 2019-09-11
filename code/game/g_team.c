@@ -466,7 +466,6 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
         G_LogPrintf( "Award: %i %i: %s gained the %s award!\n", attacker->client->ps.clientNum, 3, attacker->client->pers.netname, "DEFENCE" );
         if (!level.hadBots)
             ChallengeMessage(attacker,AWARD_DEFENCE);
-        team = attacker->client->sess.sessionTeam;
         // add the sprite over the player's head
         attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP | EF_AWARD_AIRROCKET | EF_AWARD_AIRGRENADE );
         attacker->client->ps.eFlags |= EF_AWARD_DEFEND;
@@ -487,7 +486,6 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
         if (!level.hadBots)
             ChallengeMessage(attacker,AWARD_DEFENCE);
         G_LogPrintf( "Award: %i %i: %s gained the %s award!\n", attacker->client->ps.clientNum, 3, attacker->client->pers.netname, "DEFENCE" );
-        team = attacker->client->sess.sessionTeam;
         // add the sprite over the player's head
         attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP | EF_AWARD_AIRROCKET | EF_AWARD_AIRGRENADE );
         attacker->client->ps.eFlags |= EF_AWARD_DEFEND;
