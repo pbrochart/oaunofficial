@@ -3408,10 +3408,10 @@ void G_admin_print( gentity_t *ent, char *m )
     if( !trap_Cvar_VariableIntegerValue( "com_ansiColor" ) )
     {
       G_DecolorString( m, m2, sizeof( m2 ) );
-      trap_Printf( m2 );
+      trap_Print( m2 );
     }
     else
-      trap_Printf( m );
+      trap_Print( m );
   }
 }
 

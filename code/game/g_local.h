@@ -125,7 +125,6 @@ struct gentity_s {
 
 	int			timestamp;		// body queue sinking, etc
 
-	float		angle;			// set in editor, -1 = up, -2 = down
 	char		*target;
 	char		*targetname;
 	char		*team;
@@ -229,11 +228,6 @@ typedef struct {
 	float		flagsince;
 	float		lastfraggedcarrier;
 } playerTeamState_t;
-
-// the auto following clients don't follow a specific client
-// number, but instead follow the first two active players
-#define	FOLLOW_ACTIVE1	-1
-#define	FOLLOW_ACTIVE2	-2
 
 // client data that stays across multiple levels or tournament restarts
 // this is achieved by writing all the data to cvar strings at game shutdown
@@ -800,7 +794,6 @@ void	    G_FreeEntity( gentity_t *e );
 qboolean	G_EntitiesFree( void );
 
 void	G_TouchTriggers (gentity_t *ent);
-void	G_TouchSolids (gentity_t *ent);
 
 float	*tv (float x, float y, float z);
 char	*vtos( const vec3_t v );
@@ -918,8 +911,6 @@ gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, q
 void CopyToBodyQue( gentity_t *ent );
 void ClientRespawn (gentity_t *ent);
 void BeginIntermission (void);
-void InitClientPersistant (gclient_t *client);
-void InitClientResp (gclient_t *client);
 void InitBodyQue (void);
 void ClientSpawn( gentity_t *ent );
 void player_die (gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
@@ -944,12 +935,6 @@ void FireWeapon( gentity_t *ent );
 void G_StartKamikaze( gentity_t *ent );
 
 //
-// p_hud.c
-//
-void MoveClientToIntermission (gentity_t *client);
-void G_SetStats (gentity_t *ent);
-
-//
 // g_cmds.c
 // Also another place /Sago
 
@@ -971,19 +956,20 @@ void SendCustomVoteCommands(int clientNum);
 //
 // g_main.c
 //
+void MoveClientToIntermission( gentity_t *ent );
 void FindIntermissionPoint( void );
 void SetLeader(int team, int client);
 void CheckTeamLeader( int team );
 void G_RunThink (gentity_t *ent);
 void AddTournamentQueue(gclient_t *client);
-void QDECL G_LogPrintf( const char *fmt, ... );
+void QDECL G_LogPrintf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
 void SendScoreboardMessageToAllClients( void );
 void SendEliminationMessageToAllClients( void );
 void SendDDtimetakenMessageToAllClients( void );
 void SendDominationPointsStatusMessageToAllClients( void );
 void SendYourTeamMessageToTeam( team_t team );
-void QDECL G_Printf( const char *fmt, ... );
-void QDECL G_Error( const char *fmt, ... );
+void QDECL G_Printf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
+void QDECL G_Error( const char *fmt, ... ) __attribute__ ((noreturn, format (printf, 1, 2)));
 //KK-OAX Made Accessible for g_admin.c
 void LogExit( const char *string ); 
 void CheckTeamVote( int team );
@@ -1389,8 +1375,8 @@ extern vmCvar_t   g_writePlayerCoords;
 extern vmCvar_t   g_crosshairNamesFog;
 extern vmCvar_t   g_damagePlums;
 
-void	trap_Printf( const char *fmt );
-void	trap_Error( const char *fmt );
+void	trap_Print( const char *text );
+void	trap_Error( const char *text ) __attribute__((noreturn));
 int		trap_Milliseconds( void );
 int     trap_RealTime( qtime_t *qtime );
 int		trap_Argc( void );

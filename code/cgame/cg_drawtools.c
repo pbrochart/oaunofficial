@@ -35,15 +35,18 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	float yscale = ((float)cg.refdef.height)/480.0f;
   
 	// scale for screen sizes
-	/**x *= cgs.screenXScale;
-	*y *= cgs.screenYScale;
-	*w *= cgs.screenXScale;
-	*h *= cgs.screenYScale;*/
-	
-	*x = cg.refdef.x + *x*xscale;
-	*y = cg.refdef.y + *y*yscale;
-	*w *= xscale;
-	*h *= yscale;
+	if ( !cg_hudFullScreen.integer ) {
+		*x = cg.refdef.x + *x*xscale;
+		*y = cg.refdef.y + *y*yscale;
+		*w *= xscale;
+		*h *= yscale;
+	}
+	else {
+		*x *= cgs.screenXScale;
+		*y *= cgs.screenYScale;
+		*w *= cgs.screenXScale;
+		*h *= cgs.screenYScale;
+	}
 }
 
 /*

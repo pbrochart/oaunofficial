@@ -182,7 +182,7 @@ static void CG_EndOfGame ( void ) {
     if ( cg_autoaction.integer & 2 ) {
         cmd = va ( "screenshotJPEG %s;",gameString );
         trap_SendConsoleCommand ( cmd );
-        CG_Printf ( cmd );
+        CG_Printf ( "%s", cmd );
     }
     if ( cg_autoaction.integer & 4 )
         trap_SendConsoleCommand ( "stats;" );

@@ -219,6 +219,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifdef __i386__
 #define ARCH_STRING "i386"
+#elif defined __x86_64__
+#define ARCH_STRING "x86_64"
 #elif defined __axp__
 #define ARCH_STRING "alpha"
 #endif
@@ -297,9 +299,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #error "Operating system not supported"
 #endif
 
-/*#if !defined( ARCH_STRING )
+#if !defined( ARCH_STRING )
 #error "Architecture not supported"
-#endif*/
+#endif
 
 #ifndef ID_INLINE
 #error "ID_INLINE not defined"

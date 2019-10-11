@@ -1197,7 +1197,7 @@ int BotAISetupClient(int client, struct bot_settings_s *settings, qboolean resta
 	if (!botstates[client]) {
             if(!BG_CanAlloc(sizeof(bot_state_t))) {
                 //We cannot run BG_Alloc, fail nicely
-                BotAI_Print(PRT_FATAL, "BotAISetupClient: Not enough heap memory\n", client);
+                BotAI_Print(PRT_FATAL, "BotAISetupClient: Not enough heap memory\n");
 		return qfalse;
             }
             botstates[client] = BG_Alloc(sizeof(bot_state_t));

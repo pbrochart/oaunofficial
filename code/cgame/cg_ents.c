@@ -369,7 +369,7 @@ static void CG_Item( centity_t *cent ) {
 	// add to refresh list
 	trap_R_AddRefEntityToScene(&ent);
 
-	if ( item->giType == IT_WEAPON && wi->barrelModel ) {
+	if ( item->giType == IT_WEAPON && wi && wi->barrelModel ) {
 		refEntity_t	barrel;
 
 		memset( &barrel, 0, sizeof( barrel ) );

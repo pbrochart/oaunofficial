@@ -411,6 +411,7 @@ vmCvar_t 	cg_mapoverview;
 vmCvar_t 	cg_damagePlums;
 vmCvar_t 	cg_damagePlum;
 vmCvar_t 	cg_waterWarp;
+vmCvar_t	cg_hudFullScreen;
 vmCvar_t 	g_crosshairNamesFog;
 
 
@@ -677,6 +678,7 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{&cg_damagePlums, "cg_damagePlums", "1", CVAR_USERINFO | CVAR_ARCHIVE },
 	{&cg_damagePlum, "cg_damagePlum", "/g/mg/sg/gl/rl/lg/rg/pg/bfg/cg/ng/pl/", CVAR_USERINFO | CVAR_ARCHIVE },
 	{&cg_waterWarp, "cg_waterWarp", "1", CVAR_ARCHIVE },
+	{&cg_hudFullScreen, "cg_hudFullScreen", "0", CVAR_ARCHIVE},
 	{&g_crosshairNamesFog, "g_crosshairNamesFog", "0", CVAR_SYSTEMINFO }
 };
 
@@ -926,7 +928,7 @@ void QDECL Com_Error( int level, const char *error, ... ) {
 	Q_vsnprintf (text, sizeof(text), error, argptr);
 	va_end (argptr);
 
-	CG_Error( "%s", text);
+	trap_Error( text );
 }
 
 void QDECL Com_Printf( const char *msg, ... ) {
@@ -937,7 +939,7 @@ void QDECL Com_Printf( const char *msg, ... ) {
 	Q_vsnprintf (text, sizeof(text), msg, argptr);
 	va_end (argptr);
 
-	CG_Printf ("%s", text);
+	trap_Print( text );
 }
 
 /*
@@ -2701,8 +2703,8 @@ void CG_oaUnofficialCvars( void ) {
 	char rendererinfos[128];
 
 	trap_Cvar_VariableStringBuffer("com_maxfps",rendererinfos,sizeof(rendererinfos) );
-	if(atoi( rendererinfos ) > 125 )
-            	trap_Cvar_Set("com_maxfps","125");
+	if(atoi( rendererinfos ) > 250 )
+            	trap_Cvar_Set("com_maxfps","250");
 
 	trap_Cvar_VariableStringBuffer("cg_shadows",rendererinfos,sizeof(rendererinfos) );
 	if(atoi( rendererinfos ) > 1 )

@@ -424,7 +424,7 @@ static void CG_setHudElement( int hudnumber, token_t *in, int min, int max ){
 }
 
 void CG_WriteHudFile_f( void ){
-	int i;
+/*	int i;
 	fileHandle_t f;
 	char *string;
 	int len;
@@ -510,7 +510,7 @@ void CG_WriteHudFile_f( void ){
 	}
 	trap_FS_FCloseFile(f);
 	
-	trap_Cvar_Set("cg_hud", filename);
+	trap_Cvar_Set("cg_hud", filename);*/
 }
 
 void CG_LoadHudFile( const char* hudFile ){
@@ -706,9 +706,9 @@ void CG_HudEdit_f( void ){
 		if( strcmp( CG_Argv(2), "rect" ) == 0 )
 			CG_Printf("rect %i %i %i %i\n", cgs.hud[hudnumber].xpos, cgs.hud[hudnumber].ypos, cgs.hud[hudnumber].width, cgs.hud[hudnumber].height );
 		else if( strcmp( CG_Argv(2), "bgcolor" ) == 0 )
-			CG_Printf("bgcolor %i %i %i %i\n", cgs.hud[hudnumber].bgcolor[0], cgs.hud[hudnumber].bgcolor[1], cgs.hud[hudnumber].bgcolor[2], cgs.hud[hudnumber].bgcolor[3] );
+			CG_Printf("bgcolor %f %f %f %f\n", cgs.hud[hudnumber].bgcolor[0], cgs.hud[hudnumber].bgcolor[1], cgs.hud[hudnumber].bgcolor[2], cgs.hud[hudnumber].bgcolor[3] );
 		else if( strcmp( CG_Argv(2), "color" ) == 0 )
-			CG_Printf("color %i %i %i %i\n", cgs.hud[hudnumber].color[0], cgs.hud[hudnumber].color[1], cgs.hud[hudnumber].color[2], cgs.hud[hudnumber].color[3] );
+			CG_Printf("color %f %f %f %f\n", cgs.hud[hudnumber].color[0], cgs.hud[hudnumber].color[1], cgs.hud[hudnumber].color[2], cgs.hud[hudnumber].color[3] );
 		else if( strcmp( CG_Argv(2), "fontsize" ) == 0 )
 			CG_Printf("fontsize %i %i\n", cgs.hud[hudnumber].fontWidth, cgs.hud[hudnumber].fontHeight );
 		else if( strcmp( CG_Argv(2), "image" ) == 0 )

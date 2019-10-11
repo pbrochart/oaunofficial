@@ -40,3 +40,8 @@ BoxOnPlaneSide rewrite from ioquake3 (by Diego de Estrada).
 Revision 322: Minor enhancements on CTF and small bug fixes from ioquake3.
 Revision 323: Fix broken AI by moving green armour at the end of list
 and remove unused-but-set gcc warnings.
+Revision 324: Add cg_hudFullScreen (disabled by default): Make the hud
+independent from cg_viewsize and fix the crosshair position.
+Increase com_maxfps and pmove_accurate limit from 125 to 250.
+Rename trap_Printf() to trap_Print() and add missing traps from ioquake3.
+Add gcc __attribute__ annotations for printf, non-returning functions...

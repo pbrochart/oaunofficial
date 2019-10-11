@@ -796,6 +796,7 @@ static const char *pmove_list[] = {
         "Fixed framerate 91Hz",
 	"Accurate",
 	"Accurate 125Hz",
+	"Accurate 250Hz",
 	NULL
 };
 
@@ -980,6 +981,12 @@ static void ServerOptions_Start( void ) {
                 trap_Cvar_SetValue( "pmove_fixed", 0);
                 trap_Cvar_SetValue( "pmove_float", 0);
                 trap_Cvar_SetValue( "pmove_accurate", 125);
+                break;
+            case 5:
+                //Accurate physics 250 Hz
+                trap_Cvar_SetValue( "pmove_fixed", 0);
+                trap_Cvar_SetValue( "pmove_float", 0);
+                trap_Cvar_SetValue( "pmove_accurate", 250);
                 break;
             default:
                 //Framerate dependent
@@ -1246,6 +1253,7 @@ static void ServerOptions_StatusBar_Pmove( void* ptr ) {
             break;
         case 3:
         case 4:
+        case 5:
             UI_DrawString( 320, 440, "Physics are calculated exactly", UI_CENTER|UI_SMALLFONT, colorWhite );
             UI_DrawString( 320, 460, "All players are equal", UI_CENTER|UI_SMALLFONT, colorWhite );
             break;
@@ -1492,8 +1500,10 @@ static void ServerOptions_SetMenuItems( void ) {
             s_serveroptions.pmove.curvalue = 2;
         if(trap_Cvar_VariableValue( "pmove_float" ))
             s_serveroptions.pmove.curvalue = 3;
-        if(trap_Cvar_VariableValue( "pmove_accurate" ))
+        if(trap_Cvar_VariableValue( "pmove_accurate" )==125)
             s_serveroptions.pmove.curvalue = 4;
+        if(trap_Cvar_VariableValue( "pmove_accurate" )==250)
+            s_serveroptions.pmove.curvalue = 5;
 
 	// set the map pic
         info = UI_GetArenaInfoByNumber(s_startserver.maplist[s_startserver.currentmap]);

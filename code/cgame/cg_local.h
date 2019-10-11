@@ -1768,7 +1768,8 @@ extern vmCvar_t 		cg_mapoverview;
 extern vmCvar_t			cg_damagePlums;
 extern vmCvar_t			cg_damagePlum;
 extern vmCvar_t			cg_waterWarp;
-extern vmCvar_t   		g_crosshairNamesFog;
+extern vmCvar_t			cg_hudFullScreen;
+extern vmCvar_t			g_crosshairNamesFog;
 
 //unlagged - cg_unlagged.c
 void CG_PredictWeaponEffects( centity_t *cent );
@@ -1783,8 +1784,8 @@ qboolean CG_Cvar_ClampFloat( const char *name, vmCvar_t *vmCvar, float min, floa
 const char *CG_ConfigString( int index );
 const char *CG_Argv( int arg );
 
-void QDECL CG_Printf( const char *msg, ... );
-void QDECL CG_Error( const char *msg, ... );
+void QDECL CG_Printf( const char *msg, ... ) __attribute__ ((format (printf, 1, 2)));
+void QDECL CG_Error( const char *msg, ... ) __attribute__ ((noreturn, format (printf, 1, 2)));
 
 void CG_StartMusic( void );
 
@@ -2121,7 +2122,7 @@ void CG_WriteHudFile_f( void );
 void		trap_Print( const char *fmt );
 
 // abort the game
-void		trap_Error( const char *fmt );
+void		trap_Error( const char *fmt ) __attribute__((noreturn));
 
 // milliseconds should only be used for performance tuning, never
 // for anything game related.  Get time from the CG_DrawActiveFrame parameter
@@ -2155,6 +2156,7 @@ void		trap_SendConsoleCommand( const char *text );
 // register a command name so the console can perform command completion.
 // FIXME: replace this with a normal console command "defineCommand"?
 void		trap_AddCommand( const char *cmdName );
+void		trap_RemoveCommand( const char *cmdName );
 
 // send a string to the server over the network
 void		trap_SendClientCommand( const char *s );
@@ -2172,7 +2174,14 @@ int			trap_CM_TransformedPointContents( const vec3_t p, clipHandle_t model, cons
 void		trap_CM_BoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
 					  const vec3_t mins, const vec3_t maxs,
 					  clipHandle_t model, int brushmask );
+void		trap_CM_CapsuleTrace( trace_t *results, const vec3_t start, const vec3_t end,
+					  const vec3_t mins, const vec3_t maxs,
+					  clipHandle_t model, int brushmask );
 void		trap_CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
+					  const vec3_t mins, const vec3_t maxs,
+					  clipHandle_t model, int brushmask,
+					  const vec3_t origin, const vec3_t angles );
+void		trap_CM_TransformedCapsuleTrace( trace_t *results, const vec3_t start, const vec3_t end,
 					  const vec3_t mins, const vec3_t maxs,
 					  clipHandle_t model, int brushmask,
 					  const vec3_t origin, const vec3_t angles );
@@ -2222,6 +2231,7 @@ void		trap_R_AddRefEntityToScene( const refEntity_t *re );
 void		trap_R_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts );
 void		trap_R_AddPolysToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int numPolys );
 void		trap_R_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
+void		trap_R_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 int			trap_R_LightForPoint( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );
 void		trap_R_RenderScene( const refdef_t *fd );
 void		trap_R_SetColor( const float *rgba );	// NULL = 1,1,1,1
@@ -2231,6 +2241,7 @@ void		trap_R_ModelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs );
 int			trap_R_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame, 
 					   float frac, const char *tagName );
 void		trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset );
+qboolean	trap_R_inPVS( const vec3_t p1, const vec3_t p2 );
 
 // The glconfig_t will not change during the life of a cgame.
 // If it needs to change, the entire cgame will be restarted, because

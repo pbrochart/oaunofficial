@@ -1294,7 +1294,6 @@ void CG_ParticleExplosion (char *animStr, vec3_t origin, vec3_t vel, int duratio
 // Rafael Shrapnel
 void CG_AddParticleShrapnel (localEntity_t *le)
 {
-	return;
 }
 // done.
 
@@ -1676,7 +1675,7 @@ qboolean ValidBloodPool (vec3_t start)
 			CG_Trace (&trace, this_pos, NULL, NULL, end_pos, -1, CONTENTS_SOLID);
 
 			
-			if (trace.entityNum < (MAX_ENTITIES - 1)) // may only land on world
+			if (trace.entityNum < ENTITYNUM_WORLD) // may only land on world
 				return qfalse;
 
 			if (!(!trace.startsolid && trace.fraction < 1))

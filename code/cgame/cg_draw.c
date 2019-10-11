@@ -1033,7 +1033,7 @@ void CG_DrawTimer ( void ) {
     if ( !cgs.timeout )
         msec = cg.time - cgs.timeoutDelay - cgs.levelStartTime;
     else
-        msec = cgs.timeoutTime - cgs.levelStartTime;
+        msec = cgs.timeoutTime - cgs.timeoutDelay + cgs.timeoutAdd - cgs.levelStartTime;
 
     seconds = msec / 1000;
     if ( cg_inverseTimer.integer && cgs.timelimit ) {
@@ -1449,7 +1449,7 @@ static void CG_DrawTeamOverlay ( qboolean right, qboolean upper ) {
             	if (!p || !*p)
             		p = "unknown";
             //	len = CG_DrawStrlen(p);
-            // 	if (len > lwidth)
+            //	if (len > lwidth)
             //		len = lwidth;
 
             // 			xx = x + TINYCHAR_WIDTH * 2 + TINYCHAR_WIDTH * pwidth +
@@ -3431,6 +3431,8 @@ static void CG_DrawCrosshair ( void ) {
     int			ca = 0; //only to get rid of the warning(not useful)
     int 		currentWeapon;
     vec4_t		color;
+    float		xscale = ((float)cg.refdef.width)/640.0f;
+    float		yscale = ((float)cg.refdef.height)/480.0f;
 
     currentWeapon = cg.predictedPlayerState.weapon;
 
@@ -3477,50 +3479,6 @@ static void CG_DrawCrosshair ( void ) {
 	color[2] = (g_color_table[ColorIndex(*(cg_crosshairColor.string))][2]);
 	color[3] = 1.0f;
     }
-    //TODO: there must be a better solution, maybe only two cvars with 9 numbers? DONE
-    /*if ( cg_differentCrosshairs.integer == 1 ) {
-    	switch ( currentWeapon ) {
-    	case 1:
-    		w = h = cg_ch1size.value;
-    		ca = cg_ch1.integer;
-    		break;
-    	case 2:
-    		w = h = cg_ch2size.value;
-    		ca = cg_ch2.integer;
-    		break;
-    	case 3:
-    		w = h = cg_ch3size.value;
-    		ca = cg_ch3.integer;
-    		break;
-    	case 4:
-    		w = h = cg_ch4size.value;
-    		ca = cg_ch4.integer;
-    		break;
-    	case 5:
-    		w = h = cg_ch5size.value;
-    		ca = cg_ch5.integer;
-    		break;
-    	case 6:
-    		w = h = cg_ch6size.value;
-    		ca = cg_ch6.integer;
-    		break;
-    	case 7:
-    		w = h = cg_ch7size.value;
-    		ca = cg_ch7.integer;
-    		break;
-    	case 8:
-    		w = h = cg_ch8size.value;
-    		ca = cg_ch8.integer;
-    		break;
-    	case 9:
-    		w = h = cg_ch9size.value;
-    		ca = cg_ch9.integer;
-    		break;
-    	}
-    } else {
-    	w = h = cg_crosshairSize.value;
-    	ca = cg_drawCrosshair.integer;
-    }*/
 
     ca = cgs.crosshair[currentWeapon];
     w = h =cgs.crosshairSize[currentWeapon];
@@ -3551,7 +3509,11 @@ static void CG_DrawCrosshair ( void ) {
 
     x = cg_crosshairX.integer;
     y = cg_crosshairY.integer;
-    CG_AdjustFrom640 ( &x, &y, &w, &h );
+    //CG_AdjustFrom640 ( &x, &y, &w, &h );
+    x = cg.refdef.x + x*xscale;
+    y = cg.refdef.y + y*yscale;
+    w *= xscale;
+    h *= yscale;
 
     if ( ca < 0 ) {
         ca = 0;
@@ -3563,8 +3525,8 @@ static void CG_DrawCrosshair ( void ) {
 
     trap_R_SetColor ( color );
 
-    trap_R_DrawStretchPic ( x + cg.refdef.x + 0.5 * ( cg.refdef.width - w ),
-                            y + cg.refdef.y + 0.5 * ( cg.refdef.height - h ),
+    trap_R_DrawStretchPic ( x + 0.5 * ( cg.refdef.width - w ),
+                            y + 0.5 * ( cg.refdef.height - h ),
                             w, h, 0, 0, 1, 1, hShader );
 
     trap_R_SetColor ( NULL );
@@ -3985,8 +3947,7 @@ static void CG_DrawProxWarning ( void ) {
     char s [32];
     int			w;
     static int proxTime;
-    static int proxCounter;
-    static int proxTick;
+    int proxTick;
 
     if ( ! ( cg.snap->ps.eFlags & EF_TICKING ) ) {
         proxTime = 0;
@@ -3994,17 +3955,12 @@ static void CG_DrawProxWarning ( void ) {
     }
 
     if ( proxTime == 0 ) {
-        proxTime = cg.time + 5000;
-        proxCounter = 5;
-        proxTick = 0;
+        proxTime = cg.time;
     }
 
-    if ( cg.time > proxTime ) {
-        proxTick = proxCounter--;
-        proxTime = cg.time + 1000;
-    }
+    proxTick = 10 - ((cg.time - proxTime) / 1000);
 
-    if ( proxTick != 0 ) {
+    if ( proxTick > 0 && proxTick <= 5 ) {
         Com_sprintf ( s, sizeof ( s ), "INTERNAL COMBUSTION IN: %i", proxTick );
     } else {
         Com_sprintf ( s, sizeof ( s ), "YOU HAVE BEEN MINED" );

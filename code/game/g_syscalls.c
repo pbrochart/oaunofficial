@@ -41,12 +41,14 @@ int PASSFLOAT( float x ) {
 	return fi.i;
 }
 
-void	trap_Printf( const char *fmt ) {
-	syscall( G_PRINT, fmt );
+void	trap_Print( const char *text ) {
+	syscall( G_PRINT, text );
 }
 
-void	trap_Error( const char *fmt ) {
-	syscall( G_ERROR, fmt );
+void	trap_Error( const char *text ) {
+	syscall( G_ERROR, text );
+	// shut up GCC warning about returning functions, because we know better
+	exit(1);
 }
 
 int		trap_Milliseconds( void ) {

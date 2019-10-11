@@ -2106,8 +2106,8 @@ void PmoveSingle (pmove_t *pmove) {
 			float fac;
 			float fps = pm->pmove_accurate;
 
-			if (fps > 125) {
-				fps = 125;
+			if (fps > 250) {
+				fps = 250;
 			}
 			else if (fps < 30) {
 				fps = 30;
