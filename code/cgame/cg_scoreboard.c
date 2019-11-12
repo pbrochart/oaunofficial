@@ -97,7 +97,7 @@ static void CG_DrawClientScore( int x, int y, int w, int h, score_t *score, floa
 
 	if ( score->ping >= 0 && score->ping < 50 ) Vector4Copy(colorGreen, colorPing);  
 	if ( score->ping >= 50 && score->ping < 100 ) Vector4Copy(colorYellow, colorPing);  
-	if ( score->ping >= 100 ) Vector4Copy(colorRed, colorPing);  
+	if ( score->ping >= 100 || score->ping < 0 ) Vector4Copy(colorRed, colorPing);  
 	CG_DrawStringExt( x, y - SB_MEDCHAR_HEIGHT/2, ci->name, colorWhite, qfalse, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 31 );
 	CG_DrawStringExt( x + w*0.7, y - SB_MEDCHAR_HEIGHT/2, va( "%i", score->score ), colorWhite, qtrue, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
 	CG_DrawStringExt( x + w*0.8, y - SB_MEDCHAR_HEIGHT/2, va( "%i", score->ping ), colorPing, qtrue, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 3 );
@@ -623,7 +623,9 @@ qboolean CG_DrawOldTourneyScoreboard( void ){
 	
 		CG_DrawStringExt( x + side*w/2 - SMALLCHAR_WIDTH*CG_DrawStrlen( va("^7(^2%i^7/^1%i^7) %s",p->wins, p->losses, p->name ) )/2, y + 15, va("^7(^2%i^7/^1%i^7) %s",p->wins, p->losses, p->name ), colorWhite, qfalse, qtrue, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 		CG_DrawPic( x + side*w*0.8 - offset*SB_INFOICON_SIZE, y + 30, SB_INFOICON_SIZE, SB_INFOICON_SIZE, cgs.media.sbPing );
-		strcpy( string, va( "%i", score->ping ) );
+		if ( score->ping >= 0 && score->ping < 50 ) strcpy( string, va( "^2%i", score->ping ) );
+		if ( score->ping >= 50 && score->ping < 100 ) strcpy( string, va( "^3%i", score->ping ) );
+		if ( score->ping >= 100 || score->ping < 0 ) strcpy( string, va( "^1%i", score->ping ) );
 		CG_DrawStringExt( x + side*w*0.8 - side*SB_INFOICON_SIZE*2 - offset*SB_MEDCHAR_WIDTH*CG_DrawStrlen( string ), y + 30, string, colorWhite, qfalse, qtrue, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
 		
 		if( cg.warmup < 0 && cgs.startWhenReady ){

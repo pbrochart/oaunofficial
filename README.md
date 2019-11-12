@@ -42,6 +42,8 @@ Revision 323: Fix broken AI by moving green armour at the end of list
 and remove unused-but-set gcc warnings.
 Revision 324: Add cg_hudFullScreen (disabled by default): Make the hud
 independent from cg_viewsize and fix the crosshair position.
-Increase com_maxfps and pmove_accurate limit from 125 to 250.
+Increase com_maxfps and pmove_accurate limit to 250.
 Rename trap_Printf() to trap_Print() and add missing traps from ioquake3.
-Add gcc __attribute__ annotations for printf, non-returning functions...
+Add gcc attribute annotations for printf, non-returning functions...
+Revision 325: Safer and more secure handling of disconnected clients
+and clients with malformed or illegal info strings and fix some bugs.

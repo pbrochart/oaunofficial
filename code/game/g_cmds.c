@@ -187,7 +187,7 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 	}
 	
         j = strlen(entry);
-        if (stringlength + j > 1000 ) {
+        if (stringlength + j >= 1000 ) {
 		G_Printf("Too many clients connected for scoreboard info!\n");
 		break;
         }
@@ -1138,25 +1138,25 @@ void Cmd_Timeout_f( gentity_t *player ) {
     gentity_t *ent;
 
     if ( !g_timeoutAllowed.integer ) {
-        trap_SendServerCommand(player-g_entities,va("screenPrint \"" S_COLOR_CYAN "timeout not allowed\"" ) );
+        trap_SendServerCommand(player-g_entities,va("screenPrint \"" S_COLOR_CYAN "Timeout not allowed\"" ) );
         return;
     }
     if ( level.warmupTime ) {
-        trap_SendServerCommand(player-g_entities,va("screenPrint \"" S_COLOR_CYAN "timeout not allowed in warmup\"" ) );
+        trap_SendServerCommand(player-g_entities,va("screenPrint \"" S_COLOR_CYAN "Timeout not allowed in warmup\"" ) );
         return;
     }
 
     if ( player->client->sess.sessionTeam == TEAM_SPECTATOR && !player->client->referee) {
-        trap_SendServerCommand(player-g_entities,va("screenPrint \"" S_COLOR_CYAN "timeout not allowed as spectator\"" ) );
+        trap_SendServerCommand(player-g_entities,va("screenPrint \"" S_COLOR_CYAN "Timeout not allowed as spectator\"" ) );
         return;
     }
     if ( !(player->client->timeouts < g_timeoutAllowed.integer) ) {
-        trap_SendServerCommand(player-g_entities,va("screenPrint \"" S_COLOR_CYAN "timeout limit reached\"" ) );
+        trap_SendServerCommand(player-g_entities,va("screenPrint \"" S_COLOR_CYAN "Timeout limit reached\"" ) );
         return;
     }
 
     if ( level.timeout )
-        trap_SendServerCommand( player-g_entities, va("timeout %i %i", level.timeoutTime, level.timeoutAdd ) );
+        trap_SendServerCommand( player-g_entities, va("print \"A timeout is already in progress\n\"" ) );
     else {
         level.timeout = qtrue;
         level.timeoutTime = level.time;
@@ -1179,7 +1179,9 @@ void Cmd_Timeout_f( gentity_t *player ) {
         //TODO: POWERUPS
 
         for ( i = 0; i < level.numConnectedClients ;i++) {
-            for ( j = 0; j < MAX_POWERUPS; j++ ) {
+            level.clients[i].airOutTime += level.timeoutAdd;
+            for ( j = 0; (j < MAX_POWERUPS && j != PW_REDFLAG &&
+                          j != PW_BLUEFLAG && j != PW_NEUTRALFLAG); j++ ) {
                 if ( level.clients[i].ps.powerups[j] > 0 )
                     level.clients[i].ps.powerups[j] += level.timeoutAdd;
             }
@@ -1206,8 +1208,8 @@ void Cmd_Ready_f( gentity_t *ent ) {
         return;
 
     if ( g_startWhenReady.integer == 3 ) {
-        trap_SendServerCommand(ent-g_entities,va("screenPrint \"only a referee can start the game\"" ) );
-        trap_SendServerCommand(ent-g_entities,va("print \"only a referee can start the game\"" ) );
+        trap_SendServerCommand(ent-g_entities,va("screenPrint \"Only a referee can start the game\"" ) );
+        trap_SendServerCommand(ent-g_entities,va("print \"Only a referee can start the game\n\"" ) );
         return;
     }
 
@@ -1772,7 +1774,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
         //G_DemoCommand( DC_SERVER_COMMAND, va( "tchat \"%s^5%s\"", name, chatText ) );
         break;
     case SAY_TELL:
-        if (target && g_gametype.integer >= GT_TEAM && g_ffa_gt != 1 &&
+        if (target && target->inuse && target->client && g_gametype.integer >= GT_TEAM && g_ffa_gt != 1 &&
                 target->client->sess.sessionTeam == ent->client->sess.sessionTeam &&
                 Team_GetLocationMsg(ent, location, sizeof(location)))
             Com_sprintf (name, sizeof(name), EC"[%s%c%c"EC"] (%s)"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE, location );
@@ -2095,6 +2097,15 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
     }
 }
 
+static void SanitizeChatText( char *text ) {
+    int i;
+
+    for ( i = 0; text[i]; i++ ) {
+        if ( text[i] == '\n' || text[i] == '\r' ) {
+            text[i] = ' ';
+        }
+    }
+}
 
 /*
 ==================
@@ -2135,6 +2146,8 @@ static void Cmd_Say_f( gentity_t *ent ) {
 
     p = ConcatArgs( 1 );
 
+    SanitizeChatText( p );
+
     G_Say( ent, NULL, mode, p );
 }
 
@@ -2165,6 +2178,8 @@ static void Cmd_Tell_f( gentity_t *ent ) {
     }
 
     p = ConcatArgs( 2 );
+
+    SanitizeChatText( p );
 
     G_LogPrintf( "tell: %s to %s: %s\n", ent->client->pers.netname, target->client->pers.netname, p );
     G_Say( ent, target, SAY_TELL, p );
@@ -2278,6 +2293,8 @@ static void Cmd_Voice_f( gentity_t *ent ) {
     p = ConcatArgs( 1 );
     //}
 
+    SanitizeChatText( p );
+
     G_Voice( ent, NULL, mode, p, voiceonly );
 }
 
@@ -2314,6 +2331,8 @@ static void Cmd_VoiceTell_f( gentity_t *ent ) {
     }
 
     id = ConcatArgs( 2 );
+
+    SanitizeChatText( id );
 
     G_LogPrintf( "vtell: %s to %s: %s\n", ent->client->pers.netname, target->client->pers.netname, id );
     G_Voice( ent, target, SAY_TELL, id, voiceonly );

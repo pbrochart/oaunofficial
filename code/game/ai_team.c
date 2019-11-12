@@ -1915,7 +1915,7 @@ BotHarvesterOrders
 */
 void BotHarvesterOrders(bot_state_t *bs) {
 	int numteammates, defenders, attackers, i;
-	int teammates[MAX_CLIENTS];
+	int teammates[MAX_CLIENTS] = {0};
 	char name[MAX_NETNAME];
 
         if (bot_nochat.integer>2) return;

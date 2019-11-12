@@ -234,7 +234,7 @@ static void UI_SPLevelMenu_SetMenuArena( int n, int level, const char *arenaInfo
 		levelMenuInfo.levelScores[n] = 8;
 	}
 
-	strcpy( levelMenuInfo.levelPicNames[n], va( "levelshots/%s.tga", map ) );
+	Com_sprintf( levelMenuInfo.levelPicNames[n], sizeof(levelMenuInfo.levelPicNames[n]), "levelshots/%s.tga", map );
 	if( !trap_R_RegisterShaderNoMip( levelMenuInfo.levelPicNames[n] ) ) {
 		strcpy( levelMenuInfo.levelPicNames[n], ART_MAP_UNKNOWN );
 	}
@@ -723,7 +723,6 @@ static void UI_SPLevelMenu_Init( void ) {
 	skill = (int)trap_Cvar_VariableValue( "g_spSkill" );
 	if( skill < 1 || skill > 5 ) {
 		trap_Cvar_Set( "g_spSkill", "2" );
-		skill = 2;
 	}
 
 	memset( &levelMenuInfo, 0, sizeof(levelMenuInfo) );

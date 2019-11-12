@@ -766,7 +766,6 @@ static void CG_PlasmaTrail( centity_t *cent, const weaponInfo_t *wi ) {
 	vec3_t			velocity, xvelocity, origin;
 	vec3_t			offset, xoffset;
 	vec3_t			v[3];
-	//int				t, startTime, step;
 
 	float	waterScale = 1.0f;
 
@@ -774,11 +773,7 @@ static void CG_PlasmaTrail( centity_t *cent, const weaponInfo_t *wi ) {
 		return;
 	}
 
-	//step = 50;
-
 	es = &cent->currentState;
-	//startTime = cent->trailTime;
-	//t = step * ( (startTime + step) / step );
 
 	BG_EvaluateTrajectory( &es->pos, cg.time, origin );
 
@@ -1967,7 +1962,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	}
 
 	// make sure we aren't looking at cg.predictedPlayerEntity for LG
-	nonPredictedCent = &cg_entities[cent->currentState.clientNum];
+	nonPredictedCent = &cg_entities[cent->currentState.number];
 
 	// if the index of the nonPredictedCent is not the same as the clientNum
 	// then this is a fake player (like on teh single player podiums), so
@@ -2742,8 +2737,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	qboolean		isSprite;
 	int				duration;
 
-	mark = 0;
-	radius = 32;
 	sfx = 0;
 	mod = 0;
 	shader = 0;

@@ -5025,7 +5025,6 @@ UI_Init
 */
 void _UI_Init( qboolean inGameLoad ) {
 	const char *menuSet;
-	int start;
 
 	//uiInfo.inGameLoad = inGameLoad;
 
@@ -5063,7 +5062,6 @@ void _UI_Init( qboolean inGameLoad ) {
 	uiInfo.uiDC.drawSides = &_UI_DrawSides;
 	uiInfo.uiDC.drawTopBottom = &_UI_DrawTopBottom;
 	uiInfo.uiDC.clearScene = &trap_R_ClearScene;
-	uiInfo.uiDC.drawSides = &_UI_DrawSides;
 	uiInfo.uiDC.addRefEntityToScene = &trap_R_AddRefEntityToScene;
 	uiInfo.uiDC.renderScene = &trap_R_RenderScene;
 	uiInfo.uiDC.registerFont = &trap_R_RegisterFont;
@@ -5108,8 +5106,6 @@ void _UI_Init( qboolean inGameLoad ) {
 	uiInfo.uiDC.whiteShader = trap_R_RegisterShaderNoMip( "white" );
 
 	AssetCache();
-
-	start = trap_Milliseconds();
 
   uiInfo.teamCount = 0;
   uiInfo.characterCount = 0;
@@ -5500,9 +5496,6 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 		yStart = 130;
 		scale = 0.5f;
 	} else {
-		centerPoint = 320;
-		yStart = 32;
-		scale = 0.6f;
 		return;
 	}
 

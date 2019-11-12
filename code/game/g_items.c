@@ -372,9 +372,13 @@ RespawnItem
 ===============
 */
 void RespawnItem( gentity_t *ent ) {
-        //Don't spawn quad if quadfactor are 1.0 or less
-        if(ent->item->giType == IT_POWERUP && ent->item->giTag == PW_QUAD && g_quadfactor.value <= 1.0)
-            return;
+	if (!ent) {
+		return;
+	}
+
+	//Don't spawn quad if quadfactor are 1.0 or less
+	if(ent->item->giType == IT_POWERUP && ent->item->giTag == PW_QUAD && g_quadfactor.value <= 1.0)
+		return;
 
 	// randomly select from teamed entities
 	if (ent->team) {
@@ -392,7 +396,7 @@ void RespawnItem( gentity_t *ent ) {
 
 		choice = rand() % count;
 
-		for (count = 0, ent = master; count < choice; ent = ent->teamchain, count++)
+		for (count = 0, ent = master; ent && count < choice; ent = ent->teamchain, count++)
 			;
 	}
 

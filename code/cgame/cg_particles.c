@@ -1648,8 +1648,8 @@ qboolean ValidBloodPool (vec3_t start)
 	vec3_t	angles;
 	vec3_t	right, up;
 	vec3_t	this_pos, x_pos, center_pos, end_pos;
-	float	x, y;
-	float	fwidth, fheight;
+	int	x, y;
+	int	fwidth, fheight;
 	trace_t	trace;
 	vec3_t	normal;
 

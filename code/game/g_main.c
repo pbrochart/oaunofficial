@@ -2252,10 +2252,6 @@ void CheckExitRules( void ) {
 		}
 	}
 
-	if ( level.numPlayingClients < 2 ) {
-		return;
-	}
-
 	if ( g_fraglimit.integer < 0 ) {
 		G_Printf( "fraglimit %i is out of range, defaulting to 0\n", g_fraglimit.integer );
 		trap_Cvar_Set( "fraglimit", "0" );

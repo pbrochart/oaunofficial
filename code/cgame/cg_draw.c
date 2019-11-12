@@ -1782,7 +1782,12 @@ static void CG_DrawPowerups ( void ) {
             continue;
         }
 
-        t = ps->powerups[ i ] - cg.time;
+        if ( cgs.timeout ) {
+            t = ps->powerups[ i ] - cg.time - ( cgs.timeoutTime + cgs.timeoutAdd - cg.time );
+        }
+        else {
+            t = ps->powerups[ i ] - cg.time;
+        }
         if ( t <= 0 ) {
             continue;
         }
@@ -4111,6 +4116,10 @@ static void CG_DrawPickupItem ( void ) {
         return;
     }
 
+    if ( cgs.timeout ) {
+        return;
+    }
+
     value = cg.itemPickup;
     if ( value ) {
         if ( ( cg.time - cg.itemPickupBlendTime ) < 3000 ) {
@@ -4123,7 +4132,7 @@ static void CG_DrawPickupItem ( void ) {
             }
             if ( cg_drawItemPickups.integer & 4 ) {
 
-                msecs = cg.itemPickupBlendTime - cgs.levelStartTime;
+                msecs = cg.itemPickupBlendTime - cgs.timeoutDelay - cgs.levelStartTime;
                 second = msecs/1000;
                 min = second / 60;
                 second -= min * 60;

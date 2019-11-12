@@ -778,4 +778,16 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("listplayers");
 	trap_AddCommand ("mapcycle");
 	trap_AddCommand ("forfeit");
+	trap_AddCommand ("freespectator");
+	trap_AddCommand ("timeout");
+	trap_AddCommand ("ready");
+	trap_AddCommand ("lock");
+	trap_AddCommand ("unlock");
+	trap_AddCommand ("ref");
+	trap_AddCommand ("drop");
+	trap_AddCommand ("dropammo");
+	trap_AddCommand ("droparmor");
+	trap_AddCommand ("dropflag");
+	trap_AddCommand ("drophealth");
+	trap_AddCommand ("dropweapon");
 }

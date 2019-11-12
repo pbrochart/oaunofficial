@@ -350,7 +350,7 @@ static void CG_DrawSelectedPlayerArmor( rectDef_t *rect, float scale, vec4_t col
 }
 
 qhandle_t CG_StatusHandle(int task) {
-	qhandle_t h = cgs.media.assaultShader;
+	qhandle_t h;
 	switch (task) {
 		case TEAMTASK_OFFENSE :
 			h = cgs.media.assaultShader;
