@@ -822,7 +822,7 @@ static void CG_DrawAttacker ( void ) {
     hudElements_t	attacker = cgs.hud[HUD_ATTACKERICON];
 
 
-    if ( !attacker.inuse )
+    if ( !attacker.inuse || !cg_drawAttacker.integer )
         return;
 
     if ( cg.predictedPlayerState.stats[STAT_HEALTH] <= 0 ) {
@@ -3635,7 +3635,7 @@ static void CG_ScanForCrosshairEntity ( void ) {
         return;
     }
 
-    if ( !g_crosshairNamesFog.integer ) {
+    if ( !cgs.crosshairNamesFog ) {
         // if the player is in fog, don't show it
         content = CG_PointContents( trace.endpos, 0 );
         if ( content & CONTENTS_FOG ) {

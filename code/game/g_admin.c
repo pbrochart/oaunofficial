@@ -2309,8 +2309,8 @@ qboolean G_admin_listplayers( gentity_t *ent, int skiparg )
     }
 
     for( j = 0; j < 8; j++ )
-        guid_stub[ j ] = p->pers.guid[ j + 24 ];
-        guid_stub[ j ] = '\0';
+      guid_stub[ j ] = p->pers.guid[ j + 24 ];
+    guid_stub[ j ] = '\0';
 
     muted[ 0 ] = '\0';
     if( p->pers.muted )

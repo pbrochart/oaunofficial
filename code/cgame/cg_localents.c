@@ -805,7 +805,7 @@ CG_AddDamagePlum
 void CG_AddDamagePlum( localEntity_t *le ) {
 	refEntity_t	*re;
 	vec3_t		origin, delta, dir, vec, up = {0, 0, 1};
-	float		c, len;
+	float		c, len, scale;
 	int		i, damage, digits[10], numdigits, negative;
 
 	re = &le->refEntity;
@@ -835,17 +835,12 @@ void CG_AddDamagePlum( localEntity_t *le ) {
 	else
 		re->shaderRGBA[3] = 0xff;
 
-	re->radius = NUMBER_SIZE / 2;
-
 	VectorCopy(le->pos.trBase, origin);
-	//origin[2] += 110 - c * 100;
-	origin[2] += 49 - cos (c * 4.8) * 34;
 
 	VectorSubtract(cg.refdef.vieworg, origin, dir);
 	CrossProduct(dir, up, vec);
 	VectorNormalize(vec);
 
-	//VectorMA(origin, -10 + 20 * sin(c * 2 * M_PI), vec, origin);
 	VectorMA(origin, -8 + 6 * sin(c * 2 * M_PI), vec, origin);
 
 	// if the view would be "inside" the sprite, kill the sprite
@@ -856,6 +851,19 @@ void CG_AddDamagePlum( localEntity_t *le ) {
 		CG_FreeLocalEntity( le );
 		return;
 	}
+
+	if ( len > 350 && !cg.zoomed && ( !cg_zoomScaling.value ||
+		( ( cg.time - cg.zoomTime ) / (float)( cg_zoomScaling.value * ZOOM_TIME ) > 1 ) ) )
+		scale = (float)len / 350;
+	else
+		scale = 1.0f;
+
+	if ( len > 1750 && cg.zoomed && ( !cg_zoomScaling.value ||
+		( ( cg.time - cg.zoomTime ) / (float)( cg_zoomScaling.value * ZOOM_TIME ) > 1 ) ) )
+		scale *= (float)len / 1750;
+
+	origin[2] += 49 - cos (c * 4.8) * 34 * scale;
+	re->radius = NUMBER_SIZE / 2 * scale;
 
 	negative = qfalse;
 	if (damage < 0) {
@@ -874,7 +882,7 @@ void CG_AddDamagePlum( localEntity_t *le ) {
 	}
 
 	for (i = 0; i < numdigits; i++) {
-		VectorMA(origin, (float) (((float) numdigits / 2) - i) * NUMBER_SIZE, vec, re->origin);
+		VectorMA(origin, (float) (((float) numdigits / 2) - i) * NUMBER_SIZE * scale, vec, re->origin);
 		re->customShader = cgs.media.numberShaders[digits[numdigits-1-i]];
 		re->renderfx = RF_DEPTHHACK;
 		trap_R_AddRefEntityToScene( re );
@@ -944,6 +952,7 @@ void CG_AddLocalEntities( void ) {
 		case LE_SCOREPLUM:
 			CG_AddScorePlum( le );
 			break;
+
                 case LE_DAMAGEPLUM:
                         CG_AddDamagePlum( le );
                         break;

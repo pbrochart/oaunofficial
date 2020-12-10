@@ -47,3 +47,4 @@ Rename trap_Printf() to trap_Print() and add missing traps from ioquake3.
 Add gcc attribute annotations for printf, non-returning functions...
 Revision 325: Safer and more secure handling of disconnected clients
 and clients with malformed or illegal info strings and fix some bugs.
+Revision 326: Make the damage plumes more readable and add cg_fovAdjust.

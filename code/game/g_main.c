@@ -280,7 +280,6 @@ static cvarTable_t		gameCvarTable[] = {
 	{ NULL, "gamename", GAMEVERSION , CVAR_SERVERINFO | CVAR_ROM, 0, qfalse  },
 	{ NULL, "gamedate", __DATE__ , CVAR_ROM, 0, qfalse  },
 	{ &g_restarted, "g_restarted", "0", CVAR_ROM, 0, qfalse  },
-	{ NULL, "sv_mapname", "", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse  },
 
 	// latched vars
 	{ &g_gametype, "g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH, 0, qfalse  },
@@ -516,13 +515,13 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_promode, "g_promode", "0", CVAR_SERVERINFO, 0, qfalse },
 	{ &g_friendsThroughWalls, "g_friendsThroughWalls", "0", CVAR_SERVERINFO, 0, qfalse },
 	
-	{ &g_allowKill, "g_allowKill", "1", CVAR_SERVERINFO, 0, qfalse },
+	{ &g_allowKill, "g_allowKill", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_fadeToBlack, "g_fadeToBlack", "0", CVAR_SERVERINFO, 0, qfalse },
 	{ &g_spawnProtection, "g_spawnProtection", "0", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_disableVotingTime, "g_disableVotingTime", "0", CVAR_ARCHIVE, 0 ,qfalse },
 	{ &g_maxWarp, "g_maxWarp", "0", CVAR_CHEAT, 0, qfalse  },
 	{ &g_skipCorrection, "g_skipCorrection", "0", CVAR_CHEAT, 0, qfalse  },
-	{ &g_selfdamage, "g_selfdamage", "1", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse  },
+	{ &g_selfdamage, "g_selfdamage", "1", CVAR_ARCHIVE , 0, qfalse  },
 	{ &g_overtime, "g_overtime", "120", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse  },
 	{ &g_overtime_ctf_respawnDelay, "g_overtime_ctf_respawnDelay", "5", CVAR_ARCHIVE, 0, qfalse  },
 	{ &g_thrufloors, "g_thrufloors", "0", CVAR_ARCHIVE, 0, qfalse  },
@@ -532,8 +531,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_autoServerDemos, "g_autoServerDemos", "0", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_autoRestart, "g_autoRestart", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_writePlayerCoords, "g_writePlayerCoords", "0", CVAR_CHEAT, 0, qfalse },
-	{ &g_crosshairNamesFog, "g_crosshairNamesFog", "0", CVAR_SYSTEMINFO | CVAR_ARCHIVE, 0, qfalse },
-	{ &g_damagePlums, "g_damagePlums", "0", CVAR_SYSTEMINFO | CVAR_ARCHIVE, 0, qfalse }
+	{ &g_crosshairNamesFog, "g_crosshairNamesFog", "0", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qfalse },
+	{ &g_damagePlums, "g_damagePlums", "0", CVAR_ARCHIVE, 0, qfalse }
 };
 
 // bk001129 - made static to avoid aliasing

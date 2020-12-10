@@ -329,7 +329,11 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
         }
 
 	if ( client->sess.spectatorState != SPECTATOR_FOLLOW ) {
-		client->ps.pm_type = PM_SPECTATOR;
+		if ( client->noclip ) {
+			client->ps.pm_type = PM_NOCLIP;
+		} else {
+			client->ps.pm_type = PM_SPECTATOR;
+		}
 		//TODO: client cvar to change specspeed
 		client->ps.speed = 2.5*g_speed.integer;	// faster than normal
 
@@ -1306,7 +1310,7 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 	int i, preservedScore[MAX_PERSISTANT]; //for keeping in elimination
 	
 	//TODO: check here why playing clients get all entityinfo during multiview if someone specs them
-	if( ent->client->pers.multiview >= 2 && g_allowMultiview.integer && ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) ){
+	if( ent->client->pers.multiview > 1 && g_allowMultiview.integer && ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) ){
 		for( i = 0 ; i < MAX_GENTITIES; i++ ){
 			if( g_entities[i].inuse ){
 				g_entities[i].r.svFlags |= SVF_CLIENTMASKVISIBLE;
@@ -1356,8 +1360,8 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 				}
 				else
 					ent->client->ps = cl->ps;
-					ent->client->ps.pm_flags |= PMF_FOLLOW;
-					ent->client->ps.eFlags = flags;
+				ent->client->ps.pm_flags |= PMF_FOLLOW;
+				ent->client->ps.eFlags = flags;
 				return;
 			} else {
 				// drop them to free spectators unless they are dedicated camera followers

@@ -1262,22 +1262,22 @@ Only in Domination games
 
 /*QUAKED item_armor_jacket (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
-        {
-                "item_armor_jacket",
-                "sound/misc/ar2_pkup.wav",
-        { "models/powerups/armor/armor_gre.md3",
-                NULL, NULL, NULL},
-/* icon */              "icons/iconr_green",
-/* pickup */    "Green Armor",
-                25,
-                IT_ARMOR,
-                0,
+	{
+		"item_armor_jacket",
+		"sound/misc/ar2_pkup.wav",
+	{ "models/powerups/armor/armor_gre.md3",
+		NULL, NULL, NULL},
+/* icon */		"icons/iconr_green",
+/* pickup */	"Green Armor",
+		25,
+		IT_ARMOR,
+		0,
 /* precache */ "",
 /* sounds */ "",
-                "",
-        "^2GA",
-                0
-        },
+		"",
+	"^2GA",
+		0
+	},
 
 	// end of list marker
 	{NULL}

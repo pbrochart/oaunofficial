@@ -1,4 +1,4 @@
-ghostWeaponShader
+ghostWeapon
 {
 	nopicmip
 	{

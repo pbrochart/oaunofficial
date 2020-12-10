@@ -412,7 +412,8 @@ vmCvar_t 	cg_damagePlums;
 vmCvar_t 	cg_damagePlum;
 vmCvar_t 	cg_waterWarp;
 vmCvar_t	cg_hudFullScreen;
-vmCvar_t 	g_crosshairNamesFog;
+vmCvar_t	cg_fovAdjust;
+vmCvar_t	cg_drawAttacker;
 
 
 typedef struct {
@@ -679,7 +680,8 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{&cg_damagePlum, "cg_damagePlum", "/g/mg/sg/gl/rl/lg/rg/pg/bfg/cg/ng/pl/", CVAR_USERINFO | CVAR_ARCHIVE },
 	{&cg_waterWarp, "cg_waterWarp", "1", CVAR_ARCHIVE },
 	{&cg_hudFullScreen, "cg_hudFullScreen", "0", CVAR_ARCHIVE},
-	{&g_crosshairNamesFog, "g_crosshairNamesFog", "0", CVAR_SYSTEMINFO }
+	{&cg_fovAdjust, "cg_fovAdjust", "0", CVAR_ARCHIVE},
+	{&cg_drawAttacker, "cg_drawAttacker", "1", CVAR_ARCHIVE},
 };
 
 static int  cvarTableSize = ARRAY_LEN( cvarTable );
@@ -1669,7 +1671,7 @@ static void CG_RegisterGraphics( void ) {
 #endif
 	cgs.media.particleSpark = trap_R_RegisterShader("spark");
 	cgs.media.particlePlasma = trap_R_RegisterShader("plasmaSparkAs");
-	cgs.media.ghostWeaponShader = trap_R_RegisterShader("ghostWeaponShader");
+	cgs.media.ghostWeapon = trap_R_RegisterShader("ghostWeapon");
 	
 	CG_ClearParticles ();
 	
@@ -2292,18 +2294,14 @@ static void CG_FeederSelection(float feederID, int index) {
 		cg.selectedScore = index;
 	}
 }
-#endif
 
-#ifdef MISSIONPACK // bk001204 - only needed there
 static float CG_Cvar_Get(const char *cvar) {
 	char buff[128];
 	memset(buff, 0, sizeof(buff));
 	trap_Cvar_VariableStringBuffer(cvar, buff, sizeof(buff));
 	return atof(buff);
 }
-#endif
 
-#ifdef MISSIONPACK
 void CG_Text_PaintWithCursor(float x, float y, float scale, vec4_t color, const char *text, int cursorPos, char cursor, int limit, int style) {
 	CG_Text_Paint(x, y, scale, color, text, 0, limit, style);
 }

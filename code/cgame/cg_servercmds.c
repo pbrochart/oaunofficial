@@ -1084,6 +1084,8 @@ void CG_ParseServerinfo ( void ) {
     cgs.fadeToBlack = atoi ( Info_ValueForKey ( info, "g_fadeToBlack" ) );
     trap_Cvar_Set ( "g_fadeToBlack", va ( "%i", cgs.fadeToBlack ) );
     
+    cgs.crosshairNamesFog = atoi ( Info_ValueForKey ( info, "g_crosshairNamesFog" ) );
+    trap_Cvar_Set ( "g_crosshairNamesFog", va ( "%i", cgs.crosshairNamesFog ) );
 }
 
 /*

@@ -4,6 +4,7 @@ g_main
 bg_misc
 bg_lib
 bg_pmove
+bg_promode
 bg_slidemove
 q_math
 q_shared
@@ -30,6 +31,7 @@ g_misc
 g_missile
 g_mover
 g_mapcycle
+g_mapfiles
 g_playerstore
 g_serverstats
 g_session

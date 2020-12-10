@@ -783,7 +783,6 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("ready");
 	trap_AddCommand ("lock");
 	trap_AddCommand ("unlock");
-	trap_AddCommand ("ref");
 	trap_AddCommand ("drop");
 	trap_AddCommand ("dropammo");
 	trap_AddCommand ("droparmor");

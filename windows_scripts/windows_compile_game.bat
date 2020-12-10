@@ -27,6 +27,7 @@ cd windows\build\game
 %cc%  ../../../code/game/bg_lib.c
 %cc%  ../../../code/game/bg_misc.c
 %cc%  ../../../code/game/bg_pmove.c
+%cc%  ../../../code/game/bg_promode.c
 %cc%  ../../../code/game/bg_slidemove.c
 %cc%  ../../../code/game/g_active.c
 %cc%  ../../../code/game/g_admin.c
@@ -44,6 +45,7 @@ cd windows\build\game
 %cc%  ../../../code/game/g_misc.c
 %cc%  ../../../code/game/g_missile.c
 %cc%  ../../../code/game/g_mapcycle.c
+%cc%  ../../../code/game/g_mapfiles.c
 %cc%  ../../../code/game/g_mover.c
 %cc%  ../../../code/game/g_playerstore.c
 rem %cc%  ../../../code/game/g_rankings.c

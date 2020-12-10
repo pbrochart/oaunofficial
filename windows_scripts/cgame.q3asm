@@ -15,6 +15,7 @@ cg_players
 cg_playerstate
 cg_predict
 cg_scoreboard
+cg_oldScoreboard
 cg_servercmds
 cg_snapshot
 cg_unlagged
@@ -23,6 +24,7 @@ cg_weapons
 cg_superHud
 bg_slidemove
 bg_pmove
+bg_promode
 bg_lib
 bg_misc
 q_math

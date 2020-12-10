@@ -1254,7 +1254,7 @@ typedef struct {
 	
 	qhandle_t	particleSpark;
 	qhandle_t	particlePlasma;
-	qhandle_t	ghostWeaponShader;
+	qhandle_t	ghostWeapon;
 	
 	qhandle_t	blueMarker;
 	qhandle_t	redMarker;
@@ -1463,6 +1463,7 @@ typedef struct {
 	int 		csStatus;
 	int 		hitBeep[ WP_NUM_WEAPONS ];
 	int 		overtime;
+	int 		crosshairNamesFog;
 } cgs_t;
 
 //==============================================================================
@@ -1769,7 +1770,8 @@ extern vmCvar_t			cg_damagePlums;
 extern vmCvar_t			cg_damagePlum;
 extern vmCvar_t			cg_waterWarp;
 extern vmCvar_t			cg_hudFullScreen;
-extern vmCvar_t			g_crosshairNamesFog;
+extern vmCvar_t			cg_fovAdjust;
+extern vmCvar_t			cg_drawAttacker;
 
 //unlagged - cg_unlagged.c
 void CG_PredictWeaponEffects( centity_t *cent );

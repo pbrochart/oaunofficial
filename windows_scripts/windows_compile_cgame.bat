@@ -34,6 +34,7 @@ cd windows\build\cgame
 %cc%  ../../../code/cgame/cg_playerstate.c
 %cc%  ../../../code/cgame/cg_predict.c
 %cc%  ../../../code/cgame/cg_scoreboard.c
+%cc%  ../../../code/cgame/cg_oldScoreboard.c
 %cc%  ../../../code/cgame/cg_servercmds.c
 %cc%  ../../../code/cgame/cg_snapshot.c
 %cc%  ../../../code/cgame/cg_unlagged.c
@@ -44,6 +45,7 @@ cd windows\build\cgame
 %cc%  ../../../code/game/bg_lib.c
 %cc%  ../../../code/game/bg_misc.c
 %cc%  ../../../code/game/bg_pmove.c
+%cc%  ../../../code/game/bg_promode.c
 %cc%  ../../../code/game/bg_slidemove.c
 
 copy  ..\..\..\code\cgame\cg_syscalls.asm ..

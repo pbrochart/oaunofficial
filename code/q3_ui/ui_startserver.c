@@ -244,7 +244,7 @@ static void StartServer_Update( void ) {
 	int				i;
 	int				top;
 	static	char	picname[MAX_MAPSPERPAGE][64];
-        const char		*info;
+	const char		*info;
 	char			mapname[MAX_NAMELENGTH];
 
 	top = s_startserver.page*MAX_MAPSPERPAGE;
@@ -412,7 +412,8 @@ static void StartServer_LevelshotDraw( void *self ) {
 	int				w;
 	int				h;
 	int				n;
-        const char		*info;
+	const char		*info;
+	char			mapname[ MAX_NAMELENGTH ];
 
 	b = (menubitmap_s *)self;
 
@@ -448,7 +449,9 @@ static void StartServer_LevelshotDraw( void *self ) {
 	n = s_startserver.page * MAX_MAPSPERPAGE + b->generic.id - ID_PICTURES;
         
 	info = UI_GetArenaInfoByNumber( s_startserver.maplist[ n ]);
-	UI_DrawString( x, y, Info_ValueForKey( info, "map" ), UI_CENTER|UI_SMALLFONT, color_orange );
+	Q_strncpyz( mapname, Info_ValueForKey( info, "map"), MAX_NAMELENGTH );
+	Q_strupr( mapname );
+	UI_DrawString( x, y, mapname, UI_CENTER|UI_SMALLFONT, color_orange );
 
 	x = b->generic.x;
 	y = b->generic.y;
@@ -903,31 +906,31 @@ static void ServerOptions_Start( void ) {
         case GT_1FCTF:
 		trap_Cvar_SetValue( "ui_1fctf_capturelimit", fraglimit );
 		trap_Cvar_SetValue( "ui_1fctf_timelimit", timelimit );
-		trap_Cvar_SetValue( "ui_1fctf_friendlt", friendlyfire );
+		trap_Cvar_SetValue( "ui_1fctf_friendly", friendlyfire );
 		break;
                 
         case GT_OBELISK:
 		trap_Cvar_SetValue( "ui_overload_capturelimit", fraglimit );
 		trap_Cvar_SetValue( "ui_overload_timelimit", timelimit );
-		trap_Cvar_SetValue( "ui_overload_friendlt", friendlyfire );
+		trap_Cvar_SetValue( "ui_overload_friendly", friendlyfire );
 		break;
                 
         case GT_HARVESTER:
 		trap_Cvar_SetValue( "ui_harvester_capturelimit", fraglimit );
 		trap_Cvar_SetValue( "ui_harvester_timelimit", timelimit );
-		trap_Cvar_SetValue( "ui_harvester_friendlt", friendlyfire );
+		trap_Cvar_SetValue( "ui_harvester_friendly", friendlyfire );
 		break;
 #endif
 	case GT_ELIMINATION:
 		trap_Cvar_SetValue( "ui_elimination_capturelimit", fraglimit );
 		trap_Cvar_SetValue( "ui_elimination_timelimit", timelimit );
-		//trap_Cvar_SetValue( "ui_elimination_friendlt", friendlyfire );
+		//trap_Cvar_SetValue( "ui_elimination_friendly", friendlyfire );
 		break;
 
 	case GT_CTF_ELIMINATION:
 		trap_Cvar_SetValue( "ui_ctf_elimination_capturelimit", fraglimit );
 		trap_Cvar_SetValue( "ui_ctf_elimination_timelimit", timelimit );
-		//trap_Cvar_SetValue( "ui_ctf_elimination_friendlt", friendlyfire );
+		//trap_Cvar_SetValue( "ui_ctf_elimination_friendly", friendlyfire );
 		break;
 
 	case GT_LMS:
@@ -938,7 +941,7 @@ static void ServerOptions_Start( void ) {
 	case GT_DOUBLE_D:
 		trap_Cvar_SetValue( "ui_dd_capturelimit", fraglimit );
 		trap_Cvar_SetValue( "ui_dd_timelimit", timelimit );
-		trap_Cvar_SetValue( "ui_dd_friendlt", friendlyfire );
+		trap_Cvar_SetValue( "ui_dd_friendly", friendlyfire );
 		break;
 #endif
 	}
