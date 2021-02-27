@@ -243,26 +243,6 @@ vmCvar_t        cg_vote_custom_commands;
 vmCvar_t                cg_autovertex;
 
 vmCvar_t	cg_crosshairPulse;
-//TODO: merge that to less cvars DONE
-/*vmCvar_t	cg_differentCrosshairs;
-vmCvar_t	cg_ch1;
-vmCvar_t	cg_ch1size;
-vmCvar_t	cg_ch2;
-vmCvar_t	cg_ch2size;
-vmCvar_t	cg_ch3;
-vmCvar_t	cg_ch3size;
-vmCvar_t	cg_ch4;
-vmCvar_t	cg_ch4size;
-vmCvar_t	cg_ch5;
-vmCvar_t	cg_ch5size;
-vmCvar_t	cg_ch6;
-vmCvar_t	cg_ch6size;
-vmCvar_t	cg_ch7;
-vmCvar_t	cg_ch7size;
-vmCvar_t	cg_ch8;
-vmCvar_t	cg_ch8size;
-vmCvar_t	cg_ch9;
-vmCvar_t	cg_ch9size;*/
 
 vmCvar_t	cg_crosshairColor;
 
@@ -430,14 +410,14 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },
 	{ &cg_fov, "cg_fov", "115", CVAR_ARCHIVE | CVAR_USERINFO },
 	{ &cg_viewsize, "cg_viewsize", "100", CVAR_ARCHIVE },
-	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE  },
-	{ &cg_gibs, "cg_gibs", "1", CVAR_ARCHIVE  },
-	{ &cg_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE  },
-	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
-	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE  },
-	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE  },
-	{ &cg_ammoWarningSound, "cg_ammoWarningSound", "1", CVAR_ARCHIVE  },
-	{ &cg_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE  },
+	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE },
+	{ &cg_gibs, "cg_gibs", "1", CVAR_ARCHIVE },
+	{ &cg_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE },
+	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE },
+	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE },
+	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE },
+	{ &cg_ammoWarningSound, "cg_ammoWarningSound", "1", CVAR_ARCHIVE },
+	{ &cg_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	{ &cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
 	{ &cg_drawRewards, "cg_drawRewards", "1", CVAR_ARCHIVE },
 	{ &cg_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
@@ -447,12 +427,12 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
 	{ &cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE },
 	{ &cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE },
-	{ &cg_railTrailTime, "cg_railTrailTime", "600", CVAR_ARCHIVE  },
+	{ &cg_railTrailTime, "cg_railTrailTime", "600", CVAR_ARCHIVE },
 	{ &cg_gun_x, "cg_gunX", "0", CVAR_ARCHIVE },
 	{ &cg_gun_y, "cg_gunY", "0", CVAR_ARCHIVE },
 	{ &cg_gun_z, "cg_gunZ", "0", CVAR_ARCHIVE },
 	{ &cg_centertime, "cg_centertime", "3", CVAR_CHEAT },
-	{ &cg_runpitch, "cg_runpitch", "0.002", CVAR_ARCHIVE},
+	{ &cg_runpitch, "cg_runpitch", "0.002", CVAR_ARCHIVE },
 	{ &cg_runroll, "cg_runroll", "0.005", CVAR_ARCHIVE },
 	{ &cg_bobup , "cg_bobup", "0.005", CVAR_CHEAT },
 	{ &cg_bobpitch, "cg_bobpitch", "0.002", CVAR_ARCHIVE },
@@ -473,9 +453,9 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
 	{ &cg_thirdPerson, "cg_thirdPerson", "0", CVAR_CHEAT },
-	{ &cg_teamChatTime, "cg_teamChatTime", "5000", CVAR_ARCHIVE  },
-	{ &cg_chatTime, "cg_chatTime", "5000", CVAR_ARCHIVE},
-	{ &cg_forceModel, "cg_forceModel", "1", CVAR_ARCHIVE  },
+	{ &cg_teamChatTime, "cg_teamChatTime", "5000", CVAR_ARCHIVE },
+	{ &cg_chatTime, "cg_chatTime", "5000", CVAR_ARCHIVE },
+	{ &cg_forceModel, "cg_forceModel", "1", CVAR_ARCHIVE },
 	{ &cg_predictItems, "cg_predictItems", "0", CVAR_ARCHIVE },
 #ifdef MISSIONPACK
 	{ &cg_deferPlayers, "cg_deferPlayers", "0", CVAR_ARCHIVE },
@@ -493,13 +473,13 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_buildScript, "com_buildScript", "0", 0 },	// force loading of all possible data amd error on failures
 	{ &cg_paused, "cl_paused", "0", CVAR_ROM },
 	{ &cg_blood, "cg_blood", "0", CVAR_ARCHIVE },
-        { &cg_hitBeep, "cg_hitBeep", "2", CVAR_ARCHIVE},
-        { &cg_voip_teamonly, "cg_voipTeamOnly", "1", CVAR_ARCHIVE},
-        { &cg_voteflags, "cg_voteflags", "*", CVAR_ROM},
-        { &cg_cyclegrapple, "cg_cyclegrapple", "1", CVAR_ARCHIVE},
-        { &cg_vote_custom_commands, "cg_vote_custom_commands", "", CVAR_ROM },
+	{ &cg_hitBeep, "cg_hitBeep", "2", CVAR_ARCHIVE },
+	{ &cg_voip_teamonly, "cg_voipTeamOnly", "1", CVAR_ARCHIVE },
+	{ &cg_voteflags, "cg_voteflags", "*", CVAR_ROM },
+	{ &cg_cyclegrapple, "cg_cyclegrapple", "1", CVAR_ARCHIVE },
+	{ &cg_vote_custom_commands, "cg_vote_custom_commands", "", CVAR_ROM },
 	{ &cg_synchronousClients, "g_synchronousClients", "0", CVAR_SYSTEMINFO },	// communicated by systeminfo
-        { &cg_autovertex, "cg_autovertex", "0", CVAR_ARCHIVE },
+	{ &cg_autovertex, "cg_autovertex", "0", CVAR_ARCHIVE },
 #ifdef MISSIONPACK
 	{ &cg_redTeamName, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
 	{ &cg_blueTeamName, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
@@ -554,25 +534,6 @@ static cvarTable_t cvarTable[] = { // bk001129
         { &cg_music, "cg_music", "", CVAR_ARCHIVE},
 //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE }
 	{ &cg_crosshairPulse, "cg_crosshairPulse", "1", CVAR_ARCHIVE},
-	/*{ &cg_differentCrosshairs, "cg_differentCrosshairs", "0", CVAR_ARCHIVE},
-	{ &cg_ch1, "cg_ch1", "1", CVAR_ARCHIVE},
-	{ &cg_ch1size, "cg_ch1size", "24", CVAR_ARCHIVE},
-	{ &cg_ch2, "cg_ch2", "1", CVAR_ARCHIVE},
-	{ &cg_ch2size, "cg_ch2size", "24", CVAR_ARCHIVE},
-	{ &cg_ch3, "cg_ch3", "1", CVAR_ARCHIVE},
-	{ &cg_ch3size, "cg_ch3size", "24", CVAR_ARCHIVE},
-	{ &cg_ch4, "cg_ch4", "1", CVAR_ARCHIVE},
-	{ &cg_ch4size, "cg_ch4size", "24", CVAR_ARCHIVE},
-	{ &cg_ch5, "cg_ch5", "1", CVAR_ARCHIVE},
-	{ &cg_ch5size, "cg_ch5size", "24", CVAR_ARCHIVE},
-	{ &cg_ch6, "cg_ch6", "1", CVAR_ARCHIVE},
-	{ &cg_ch6size, "cg_ch6size", "24", CVAR_ARCHIVE},
-	{ &cg_ch7, "cg_ch7", "1", CVAR_ARCHIVE},
-	{ &cg_ch7size, "cg_ch7size", "24", CVAR_ARCHIVE},
-	{ &cg_ch8, "cg_ch8", "1", CVAR_ARCHIVE},
-	{ &cg_ch8size, "cg_ch8size", "24", CVAR_ARCHIVE},
-	{ &cg_ch9, "cg_ch9", "1", CVAR_ARCHIVE},
-	{ &cg_ch9size, "cg_ch9size", "24", CVAR_ARCHIVE},*/
 	{ &cg_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE},
 	{&cg_deathNoticeTime, "cg_deathNoticeTime", "3000", CVAR_ARCHIVE},
 	{&s_ambient, "s_ambient", "1", CVAR_ARCHIVE},
@@ -629,30 +590,25 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{&cg_hud, "cg_hud", "hud/default.txt", CVAR_ARCHIVE },
 	{&cg_consoleTime, "cg_consoleTime", "3000", CVAR_ARCHIVE },
 	{&cg_multiview, "cg_multiview", "4", CVAR_ARCHIVE | CVAR_USERINFO },
-	
 	{&cg_multiview1_xpos, "cg_multiview1_xpos", "0", CVAR_CHEAT },
 	{&cg_multiview1_ypos, "cg_multiview1_ypos", "0", CVAR_CHEAT },
 	{&cg_multiview1_width, "cg_multiview1_width", "640", CVAR_CHEAT },
 	{&cg_multiview1_height, "cg_multiview1_height", "480", CVAR_CHEAT },
-	
 	{&cg_multiview2_xpos, "cg_multiview2_xpos", "440", CVAR_ARCHIVE },
 	{&cg_multiview2_ypos, "cg_multiview2_ypos", "160", CVAR_ARCHIVE },
 	{&cg_multiview2_width, "cg_multiview2_width", "200", CVAR_ARCHIVE },
 	{&cg_multiview2_height, "cg_multiview2_height", "160", CVAR_ARCHIVE },
 	{&cg_multiview2_client, "cg_multiview2_client", "-1", CVAR_TEMP },
-	
-	
 	{&cg_multiview3_xpos, "cg_multiview3_xpos", "440", CVAR_ARCHIVE },
 	{&cg_multiview3_ypos, "cg_multiview3_ypos", "0", CVAR_ARCHIVE },
 	{&cg_multiview3_width, "cg_multiview3_width", "200", CVAR_ARCHIVE },
 	{&cg_multiview3_height, "cg_multiview3_height", "160", CVAR_ARCHIVE },
-	{&cg_multiview3_client, "cg_multiview2_client", "-1", CVAR_TEMP },
-	
+	{&cg_multiview3_client, "cg_multiview3_client", "-1", CVAR_TEMP },
 	{&cg_multiview4_xpos, "cg_multiview4_xpos", "440", CVAR_ARCHIVE },
 	{&cg_multiview4_ypos, "cg_multiview4_ypos", "320", CVAR_ARCHIVE },
 	{&cg_multiview4_width, "cg_multiview4_width", "200", CVAR_ARCHIVE },
 	{&cg_multiview4_height, "cg_multiview4_height", "160", CVAR_ARCHIVE },
-	{&cg_multiview4_client, "cg_multiview2_client", "-1", CVAR_TEMP },
+	{&cg_multiview4_client, "cg_multiview4_client", "-1", CVAR_TEMP },
 	{&g_promode, "g_promode", "0", CVAR_SYSTEMINFO },
 	{&cg_inverseTimer, "cg_inverseTimer", "0", CVAR_ARCHIVE },
 	{&cg_grenadeTrail, "cg_grenadeTrail", "1", CVAR_ARCHIVE },

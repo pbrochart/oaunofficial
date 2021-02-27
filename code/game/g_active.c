@@ -1227,8 +1227,10 @@ void ClientThink_real( gentity_t *ent ) {
 	// check for respawning
 	if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
 		//Dead clients can issue the respawncomand even before they can respawn
-		if( ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) && ( ( ( level.time > client->respawnTime - 1500) && ( g_gametype.integer != GT_CTF ) ) || 
-										     ( ( level.time > client->respawnTime - 1500 - g_overtime_ctf_respawnDelay.integer * 1000 * level.overtimeCount ) && ( g_gametype.integer == GT_CTF ) ) ) )
+		if( ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) &&
+			( ( ( level.time > client->respawnTime - 1500) && ( g_gametype.integer != GT_CTF ) ) || 
+			( ( level.time > client->respawnTime - 1500 - g_overtime_ctf_respawnDelay.integer * 1000 * level.overtimeCount ) &&
+			( g_gametype.integer == GT_CTF ) ) ) )
 			client->respawnCommission = qtrue;
 		
 		// wait for the attack button to be pressed
@@ -1238,9 +1240,11 @@ void ClientThink_real( gentity_t *ent ) {
 		// pressing attack or use is the normal respawn method
 			
 		//TODO: this is a mess! Redo this section
-		if ( ( level.time > client->respawnTime ) && ( ( ( g_forcerespawn.integer > 0 ) && ( level.time - client->respawnTime  > g_forcerespawn.integer * 1000 ) ) ||
-			( ( ( g_gametype.integer == GT_LMS ) || ( g_gametype.integer == GT_ELIMINATION ) || ( g_gametype.integer == GT_CTF_ELIMINATION ) ) &&
-			( ( level.time - client->respawnTime > 0 ) ) ) || ( ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) || client->respawnCommission ) ) ) {
+		if ( ( level.time > client->respawnTime ) && ( ( ( g_forcerespawn.integer > 0 ) &&
+			( level.time - client->respawnTime  > g_forcerespawn.integer * 1000 ) ) ||
+			( ( ( g_gametype.integer == GT_LMS ) || ( g_gametype.integer == GT_ELIMINATION ) ||
+			( g_gametype.integer == GT_CTF_ELIMINATION ) ) && ( ( level.time - client->respawnTime > 0 ) ) ) ||
+			( ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) || client->respawnCommission ) ) ) {
 			ClientRespawn( ent );
 		}
 		return;
@@ -1289,7 +1293,12 @@ void ClientThink( int clientNum ) {
 	}
 }
 
+/*
+==================
+G_RunClient
 
+==================
+*/
 void G_RunClient( gentity_t *ent ) {
 	if ( !(ent->r.svFlags & SVF_BOT) && !g_synchronousClients.integer ) {
 		return;
@@ -1298,6 +1307,177 @@ void G_RunClient( gentity_t *ent ) {
 	ClientThink_real( ent );
 }
 
+/*
+==================
+G_GenerateClientInMVList
+
+==================
+*/
+unsigned int G_GenerateClientInMVList( gentity_t *ent )
+{
+	unsigned int i, mClients = 0;
+
+	for ( i = 0; i < MAX_MVCLIENTS; i++ ) {
+		if ( ent->client->pers.mv[i].fActive ) {
+			mClients |= 1 << ent->client->pers.mv[i].entID;
+		}
+	}
+	return mClients;
+}
+
+/*
+==================
+G_RemoveEntityInMVList
+
+==================
+*/
+void G_RemoveEntityInMVList( gentity_t *ent, mview_t *ref )
+{
+	ref->entID = -1;
+	ref->fActive = qfalse;
+	G_FreeEntity( ref->camera );
+	ref->camera = NULL;
+	ent->client->pers.mvCount--;
+
+	G_GenerateClientInMVList( ent );
+}
+
+/*
+==================
+G_LocateEntityInMVList
+
+==================
+*/
+qboolean G_LocateEntityInMVList( gentity_t *ent, int pID, qboolean fRemove )
+{
+	if ( ent->client->pers.mvCount > 0 ) {
+		int i;
+
+		for ( i = 0; i < MAX_MVCLIENTS; i++ ) {
+			if ( ent->client->pers.mv[i].fActive && ent->client->pers.mv[i].entID == pID ) {
+				if ( fRemove ) {
+					G_RemoveEntityInMVList( ent, &ent->client->pers.mv[i] );
+				}
+				return qtrue;
+			}
+		}
+	}
+	return qfalse;
+}
+
+/*
+==================
+G_AddViewInMV
+
+==================
+*/
+void G_AddViewInMV( gentity_t *ent, int pID )
+{
+	mview_t *mv = NULL;
+	gentity_t *v;
+
+	if ( pID >= MAX_MVCLIENTS || G_LocateEntityInMVList( ent, pID, qfalse ) ) {
+		return;
+	}
+
+	if ( !ent->client->pers.mv[pID].fActive ) {
+		mv = &ent->client->pers.mv[pID];
+	}
+
+	if ( mv == NULL ) {
+		CP( va( "print \"No more MV slots available (all %d in use)\n\"", MAX_MVCLIENTS ) );
+		return;
+	}
+
+	mv->camera = G_Spawn();
+	if ( mv->camera == NULL ) {
+		return;
+	}
+
+	ent->client->pers.mvCount++;
+	mv->fActive = qtrue;
+	mv->entID = pID;
+
+	v = mv->camera;
+	v->classname = "misc_portal_surface";
+	v->r.svFlags = SVF_PORTAL | SVF_SINGLECLIENT; // Only merge snapshots for the target client
+	v->r.singleClient = ent->client->ps.clientNum;
+	v->s.eType = ET_PORTAL;
+
+	VectorClear( v->r.mins );
+	VectorClear( v->r.maxs );
+	trap_LinkEntity( v );
+
+	v->target_ent = &g_entities[pID];
+	v->targetFlag = pID;
+	v->tagParent = ent;
+
+	G_GenerateClientInMVList( ent );
+}
+
+/*
+==================
+G_AllRemoveSingleClientInMV
+
+==================
+*/
+void G_AllRemoveSingleClientInMV( int pID )
+{
+	int i;
+	gentity_t *ent;
+
+	for ( i = 0; i < level.numConnectedClients; i++ ) {
+		ent = g_entities + level.sortedClients[i];
+
+		if ( ent->client->pers.mvCount < 1 ) {
+			continue;
+		}
+		G_LocateEntityInMVList( ent, pID, qtrue );
+	}
+}
+
+/*
+==================
+G_RunCameraInMV
+
+==================
+*/
+qboolean G_RunCameraInMV( gentity_t *ent )
+{
+	playerState_t *ps;
+
+	// Opt out if not a real MV portal
+	if ( ent->tagParent == NULL || ent->tagParent->client == NULL ) {
+		return qfalse;
+	}
+
+	if ( ( ps = &ent->tagParent->client->ps ) == NULL ) {
+		return qfalse;
+	}
+
+	// If viewing client is no longer connected or spectator, delete this camera
+	if ( ent->tagParent->client->pers.connected != CON_CONNECTED ||
+		ent->tagParent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		G_RemoveEntityInMVList( ent->tagParent, &ent->tagParent->client->pers.mv[ent->targetFlag] );
+		return qtrue;
+	}
+
+	// Also remove if the target player is no longer in the game playing
+	if ( ent->target_ent->client->pers.connected != CON_CONNECTED ||
+		ent->target_ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+		G_LocateEntityInMVList( ent->tagParent, ent->target_ent - g_entities, qtrue );
+		return qtrue;
+	}
+
+	ent->classname = "misc_portal_surface";
+	ent->r.singleClient = ent->tagParent->client->ps.clientNum;
+	VectorCopy( ent->tagParent->s.origin, ent->s.origin );
+	G_SetOrigin( ent, ent->tagParent->client->ps.origin );
+	VectorCopy( ent->target_ent->r.currentOrigin, ent->s.origin2 );
+	trap_LinkEntity( ent );
+
+	return qtrue;
+}
 
 /*
 ==================
@@ -1306,20 +1486,21 @@ SpectatorClientEndFrame
 ==================
 */
 void SpectatorClientEndFrame( gentity_t *ent ) {
-	gclient_t	*cl;
+	gclient_t *cl;
+
 	int i, preservedScore[MAX_PERSISTANT]; //for keeping in elimination
 	
-	//TODO: check here why playing clients get all entityinfo during multiview if someone specs them
-	if( ent->client->pers.multiview > 1 && g_allowMultiview.integer && ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) ){
-		for( i = 0 ; i < MAX_GENTITIES; i++ ){
-			if( g_entities[i].inuse ){
-				g_entities[i].r.svFlags |= SVF_CLIENTMASKVISIBLE;
-				g_entities[i].r.singleClient |= (1 << ( ent->s.clientNum ) );
-				//G_Printf("%s %i %i\n", ent->client->pers.netname, ent->s.clientNum, i );
+	if( ent->client->pers.multiview > 1 && g_allowMultiview.integer && ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) ) {
+		for ( i = 0; i < level.maxclients && i < MAX_MVCLIENTS; i++ ) {
+			if ( level.clients[i].sess.sessionTeam != TEAM_SPECTATOR && level.clients[i].pers.connected == CON_CONNECTED ) {
+				if ( !ent->client->pers.mv[i].fActive ) {
+					G_AddViewInMV( ent, i );
+				}
 			}
 		}
 	}
-	//Referees can always spec a match 
+
+	// Referees can always spec a match 
 	if ( ent->client->sess.spectatorState == SPECTATOR_SCOREBOARD || 
 	   ( ( ent->client->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) && g_disableSpecs.integer && !level.warmupTime && !ent->client->referee )) {
 		ent->client->ps.pm_flags |= PMF_SCOREBOARD;
@@ -1330,7 +1511,7 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 
 	// if we are doing a chase cam or a remote view, grab the latest info
 	if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
-		int		clientNum, flags;
+		int clientNum, flags;
 
 		clientNum = ent->client->sess.spectatorClient;
 
@@ -1343,7 +1524,7 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 		//TODO: dont follow eliminated players
 		if ( clientNum >= 0 ) {
 			cl = &level.clients[ clientNum ];
-			if ( ( cl->pers.connected == CON_CONNECTED && cl->sess.sessionTeam != TEAM_SPECTATOR ) /*|| cl->pers.demoClient*/ ) {
+			if ( ( cl->pers.connected == CON_CONNECTED && cl->sess.sessionTeam != TEAM_SPECTATOR ) ) {
 				flags = (cl->ps.eFlags & ~(EF_VOTED | EF_TEAMVOTED)) | (ent->client->ps.eFlags & (EF_VOTED | EF_TEAMVOTED));
 				//this is here LMS/Elimination goes wrong with player follow
 				if(ent->client->sess.sessionTeam!=TEAM_SPECTATOR){
@@ -1374,15 +1555,15 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 	}
 }
 
- /*
- ==============
- G_PredictPmove
+/*
+==============
+G_PredictPmove
 
- Make use of the 'Pmove' functions to figure out where a player
- would have moved on their present course in frametime seconds.
- Link them at this predicted location and send it out in the next
- snapshot, BUT don't alter their location so subsequent cmds from
- this client process as though nothing has happened.
+Make use of the 'Pmove' functions to figure out where a player
+would have moved on their present course in frametime seconds.
+Link them at this predicted location and send it out in the next
+snapshot, BUT don't alter their location so subsequent cmds from
+this client process as though nothing has happened.
 ==============
 */
 static void G_PredictPmove( gentity_t *ent, float frametime )

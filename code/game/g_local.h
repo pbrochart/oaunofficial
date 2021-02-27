@@ -183,6 +183,9 @@ struct gentity_s {
 	
 	int		dropTime;
 	int		ammoCount;
+
+	int		targetFlag;
+	gentity_t	*tagParent;
 };
 
 typedef struct gitemInfos_s gitemInfos_t;
@@ -242,6 +245,12 @@ typedef struct {
 	qboolean	teamLeader;			// true when this client is a team leader
 	int			specOnly;
 } clientSession_t;
+
+typedef struct {
+	qboolean fActive;
+	int entID;
+	gentity_t *camera;
+} mview_t;
 
 //
 #define MAX_NETNAME			36
@@ -310,12 +319,13 @@ typedef struct {
 //Used To Track Name Changes
     int         nameChangeTime;
     int         nameChanges;
-    
-    int multiview;
-    int autoaction;
-    
-    //qboolean    demoClient;
-    
+ 
+    int         multiview;
+    int         autoaction;
+ 
+    //qboolean  demoClient;
+    mview_t     mv[MAX_MVCLIENTS];
+    int         mvCount;
 } clientPersistant_t;
 
 // demo commands
@@ -505,7 +515,6 @@ struct gclient_s {
 	int 		    elimRoundKills;
 	
 	//qboolean	    sendSpawnpoints;
-	
 };
 
 
@@ -992,6 +1001,7 @@ void ClientCommand( int clientNum );
 void ClientThink( int clientNum );
 void ClientEndFrame( gentity_t *ent );
 void G_RunClient( gentity_t *ent );
+qboolean G_RunCameraInMV( gentity_t *ent );
 
 //
 // g_team.c

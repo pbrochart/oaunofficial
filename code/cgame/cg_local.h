@@ -865,7 +865,8 @@ typedef struct {
 	int spawnTeam[MAX_SPAWNPOINTS];
 	int numSpawnpoints;
 	qboolean forceChat;
-
+	int chcn[MAX_MULTIVIEW];
+	int chct[MAX_MULTIVIEW];
 } cg_t;
 
 
@@ -1605,25 +1606,6 @@ extern  vmCvar_t                cg_vote_custom_commands;
 extern  vmCvar_t                cg_autovertex;
 
 extern	vmCvar_t		cg_crosshairPulse;
-/*extern	vmCvar_t		cg_differentCrosshairs;
-extern	vmCvar_t		cg_ch1;
-extern	vmCvar_t		cg_ch1size;
-extern	vmCvar_t		cg_ch2;
-extern	vmCvar_t		cg_ch2size;
-extern	vmCvar_t		cg_ch3;
-extern	vmCvar_t		cg_ch3size;
-extern	vmCvar_t		cg_ch4;
-extern	vmCvar_t		cg_ch4size;
-extern	vmCvar_t		cg_ch5;
-extern	vmCvar_t		cg_ch5size;
-extern	vmCvar_t		cg_ch6;
-extern	vmCvar_t		cg_ch6size;
-extern	vmCvar_t		cg_ch7;
-extern	vmCvar_t		cg_ch7size;
-extern	vmCvar_t		cg_ch8;
-extern	vmCvar_t		cg_ch8size;
-extern	vmCvar_t		cg_ch9;
-extern	vmCvar_t		cg_ch9size;*/
 
 extern	vmCvar_t                cg_crosshairColor;
 
@@ -1908,8 +1890,8 @@ qboolean CG_YourTeamHasFlag( void );
 qboolean CG_OtherTeamHasFlag( void );
 qhandle_t CG_StatusHandle(int task);
 
-void CG_DrawMVDhud ( stereoFrame_t stereoFrame );
-void CG_Draw2D ( stereoFrame_t stereoFrame );
+void CG_DrawMVDhud ( stereoFrame_t stereoFrame, int window );
+void CG_Draw2D ( stereoFrame_t stereoFrame, qboolean multiview );
 
 
 

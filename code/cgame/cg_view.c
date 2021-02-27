@@ -812,8 +812,11 @@ static void CG_PlayBufferedSounds( void ) {
     }
 }
 
-//=========================================================================
-
+/*
+=====================
+CG_SetMultiviewRect
+=====================
+*/
 static void CG_SetMultiviewRect( int j ) {
     switch (j) {
     case 2:
@@ -837,37 +840,53 @@ static void CG_SetMultiviewRect( int j ) {
     }
 }
 
-static qboolean CG_EntityNumIsAllowed( int i ) {
-    if ( cg_multiview.integer < 2 )
+/*
+=====================
+CG_EntityNumIsAllowed
+=====================
+*/
+static qboolean CG_EntityNumIsAllowed( int i, int j ) {
+    if ( cg_multiview.integer > 1 ) {
+        if ( cg_multiview.integer == 2 ) {
+            if ( j == 2 &&
+                cg_multiview2_client.integer == i )
+                return qtrue;
+        }
+        else if ( cg_multiview.integer == 3 ) {
+            if ( j == 2 &&
+                cg_multiview2_client.integer == i )
+                return qtrue;
+            if ( j == 3 &&
+                cg_multiview3_client.integer == i )
+                return qtrue;
+        }
+        else {
+            if ( j == 2 &&
+                cg_multiview2_client.integer == i )
+                return qtrue;
+            if ( j == 3 &&
+                cg_multiview3_client.integer == i )
+                return qtrue;
+            if ( j == 4 &&
+                cg_multiview4_client.integer == i )
+                return qtrue;
+        }
         return qfalse;
-    else if ( cg_multiview.integer == 2 ) {
-        if ( cg_multiview2_client.integer == i )
-            return qfalse;
     }
-    else if ( cg_multiview.integer == 3 ) {
-        if ( cg_multiview2_client.integer == i )
-            return qfalse;
-        if ( cg_multiview3_client.integer == i )
-            return qfalse;
-    }
-    else {
-        if ( cg_multiview2_client.integer == i )
-            return qfalse;
-        if ( cg_multiview3_client.integer == i )
-            return qfalse;
-        if ( cg_multiview4_client.integer == i )
-            return qfalse;
-    }
-    return qtrue;
+    else
+        return qfalse;
 }
 
-static int start;
-
-static int CG_GetEntityNumForMV( int window ) {
+/*
+=====================
+CG_GetEntityNumForMV
+=====================
+*/
+static int CG_GetEntityNumForMV( int window, int offset ) {
     int clientNum = -1;
     int i;
 
-    switch (window) {
+    switch ( window ) {
     case 2:
         clientNum = cg_multiview2_client.integer;
         break;
@@ -881,36 +900,31 @@ static int CG_GetEntityNumForMV( int window ) {
         return -1;
     }
 
-    if ( clientNum == -1 ) {
-        for ( i = start; i < cg.snap->numEntities; i++ ) {
-            if ( ( cg.snap->entities[i].eType == ET_PLAYER ) && ( cg.snap->ps.clientNum != cg.snap->entities[i].clientNum ) && CG_EntityNumIsAllowed( cg.snap->entities[i].clientNum ) ) {
-                if ( cg.snap->entities[i].eFlags & EF_DEAD )
-                    continue;
-                start = i+1;
-                return i;
-            }
-        }
-    }
-    else {
-        for ( i = 0; i < cg.snap->numEntities; i++ ) {
-            if ( cg.snap->entities[i].eType == ET_PLAYER && cg.snap->ps.clientNum != cg.snap->entities[i].clientNum && clientNum == cg.snap->entities[i].clientNum )
-                return i;
+    for ( i = offset; i < cg.snap->numEntities; i++ ) {
+        if ( ( cg.snap->entities[i].eType == ET_PLAYER ) &&
+             ( cg.snap->ps.clientNum != cg.snap->entities[i].clientNum ) &&
+             ( clientNum == -1 || CG_EntityNumIsAllowed( cg.snap->entities[i].clientNum, window ) ) ) {
+            if ( cg.snap->entities[i].eFlags & EF_DEAD )
+                continue;
+            return i;
         }
     }
     return -1;
-
 }
 
+/*
+=====================
+CG_AddMultiviewWindow
+=====================
+*/
 static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
-    int		i;
-    int 	j = 2;
+    int i, j, start = 0;
     int health, armor, team, weapon;
     int ammo[8];
-
-    start = 0;
+    float refdef[4];
 
     //Save the main-spec values, we will change the values for the MV-hud
-    for ( i = WP_MACHINEGUN ; i <= WP_BFG; i++ ) {
+    for ( i = WP_MACHINEGUN; i <= WP_BFG; i++ ) {
         ammo[i-WP_MACHINEGUN] = cg.snap->ps.ammo[i];
         cg.snap->ps.ammo[i] = -1;
     }
@@ -919,14 +933,26 @@ static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
     armor = cg.snap->ps.stats[STAT_ARMOR];
     team = cg.snap->ps.persistant[PERS_TEAM];
     weapon = cg_entities[cg.snap->ps.clientNum].currentState.weapon;
+    refdef[0] = cg.refdef.x;
+    refdef[1] = cg.refdef.y;
+    refdef[2] = cg.refdef.width;
+    refdef[3] = cg.refdef.height;
 
-    while ( j <= 4 && j <= cg_multiview.integer ) {
-        i = CG_GetEntityNumForMV(j);
-        CG_SetMultiviewRect(j);
-        j++;
+    for ( j = 1; j <= MAX_MULTIVIEW && j <= cg_multiview.integer; ++j ) {
+        i = CG_GetEntityNumForMV( j, start );
+        CG_SetMultiviewRect( j );
 
         if ( i == -1 )
             continue;
+        else if ( ( j == 2 &&
+                cg_multiview2_client.integer != -1 ) ||
+                ( j == 3 &&
+                cg_multiview3_client.integer != -1 ) ||
+                ( j == 4 &&
+                cg_multiview4_client.integer != -1 ) )
+            start = 0;
+        else
+            start = i+1;
 
         VectorCopy( cg_entities[cg.snap->entities[i].clientNum].lerpOrigin, cg.refdef.vieworg );
         AnglesToAxis( cg_entities[cg.snap->entities[i].clientNum].lerpAngles, cg.refdef.viewaxis );
@@ -936,11 +962,7 @@ static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
         cg.snap->ps.persistant[PERS_TEAM] = cgs.clientinfo[cg.snap->entities[i].clientNum].team;
         cg_entities[cg.snap->ps.clientNum].currentState.weapon = cg.snap->entities[i].weapon;
 
-
         cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight;
-
-        //Show the main-spec model in the MV-windows
-        cg.renderingThirdPerson = qtrue;
 
         // build the render lists
         if ( !cg.hyperspace ) {
@@ -951,7 +973,7 @@ static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
         }
         // actually issue the rendering calls
         CG_DrawActive( stereoView, qfalse );
-        CG_DrawMVDhud(stereoView);
+        CG_DrawMVDhud( stereoView, j-1 );
 
 	CG_DrawStringHud ( HUD_FOLLOW, qtrue, va ( "following %s", cgs.clientinfo[ cg.snap->entities[i].clientNum ].name ) );
     }
@@ -961,13 +983,21 @@ static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
     cg.snap->ps.stats[STAT_ARMOR] = armor;
     cg.snap->ps.persistant[PERS_TEAM] = team;
     cg_entities[cg.snap->ps.clientNum].currentState.weapon = weapon;
+    cg.refdef.x = refdef[0];
+    cg.refdef.y = refdef[1];
+    cg.refdef.width = refdef[2];
+    cg.refdef.height = refdef[3];
 
-    for ( i = WP_MACHINEGUN ; i <= WP_BFG; i++ ) {
+    for ( i = WP_MACHINEGUN; i <= WP_BFG; i++ ) {
         cg.snap->ps.ammo[i] = ammo[i-WP_MACHINEGUN];
     }
-
 }
 
+/*
+=====================
+CG_AddSpawnpoints
+=====================
+*/
 void CG_AddSpawnpoints( void ){
 	refEntity_t		re;
 	int i;
@@ -1055,10 +1085,8 @@ Generates and draws a game scene and status information at the given time.
 =================
 */
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback ) {
-    int		inwater;
-    //int i;
+    int inwater;
     vec4_t color;
-    //refEntity_t re;
 
     cg.time = serverTime;
 
@@ -1172,22 +1200,25 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
     // actually issue the rendering calls
     CG_DrawActive( stereoView, qtrue );
     
-    if( cg.snap->ps.stats[STAT_HEALTH] <= 0 && cgs.clientinfo[cg.clientNum].team != TEAM_SPECTATOR && cgs.fadeToBlack ){
-	    if( cg.deathtime == 0 )
-		    cg.deathtime = cg.time;
-	    if( !( cgs.allowMultiview && ( cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR ) && cg_multiview.integer > 1 ) ){
-		    color[0] = colorBlack[0];
-		    color[1] = colorBlack[1];
-		    color[2] = colorBlack[2];
-		    color[3] = (cg.time - cg.deathtime)/5000.0f;
-		    if( color[3] > 1.0 )
-			    color[3] = 1.0;
-		    CG_FillRect(0, 0, 640, 480, color);
-	    }
-	    
+    if( cg.snap->ps.stats[STAT_HEALTH] <= 0 &&
+        cgs.clientinfo[cg.clientNum].team != TEAM_SPECTATOR &&
+        cgs.fadeToBlack ) {
+        if( cg.deathtime == 0 )
+            cg.deathtime = cg.time;
+        if( !( cgs.allowMultiview && (
+            cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR ) &&
+            cg_multiview.integer > 1 ) ) {
+                color[0] = colorBlack[0];
+                color[1] = colorBlack[1];
+                color[2] = colorBlack[2];
+                color[3] = (cg.time - cg.deathtime)/5000.0f;
+                if( color[3] > 1.0 )
+                    color[3] = 1.0;
+                CG_FillRect(0, 0, 640, 480, color);
+        }
     }
     else
-	      cg.deathtime = 0;
+        cg.deathtime = 0;
     
     if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR &&
             ( cg.snap->ps.pm_flags & PMF_SCOREBOARD ) )
@@ -1196,15 +1227,16 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
     if ( cg_stats.integer ) {
         CG_Printf( "cg.clientFrame:%i\n", cg.clientFrame );
     }
-    if ( cgs.allowMultiview && ( cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR ) && cg_multiview.integer > 1 ) {
-        CG_AddMultiviewWindow( stereoView );
-        cg.refdef.x = 0;
-        cg.refdef.y = 0;
-        cg.refdef.width = 640 * cgs.screenXScale;
-        cg.refdef.height = 480 * cgs.screenYScale;
-    }
 
-    CG_Draw2D(stereoView);
+    if ( cgs.allowMultiview && (
+        cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR ) &&
+        cg_multiview.integer > 1 ) {
+        CG_DrawMVDhud ( stereoView, qfalse );
+        CG_AddMultiviewWindow( stereoView );
+        CG_Draw2D( stereoView, qtrue );
+    }
+    else
+        CG_Draw2D( stereoView, qfalse );
 
     //---------------------------Multiview end----------------------
 

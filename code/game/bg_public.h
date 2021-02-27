@@ -62,6 +62,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	DEFAULT_VIEWHEIGHT	26
 #define CROUCH_VIEWHEIGHT	12
 #define	DEAD_VIEWHEIGHT		-16
+#define MAX_MVCLIENTS		16
+#define MAX_MULTIVIEW		4
 
 //Domination points
 #define MAX_DOMINATION_POINTS 6
@@ -107,7 +109,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define CS_MAX				(CS_PARTICLES+MAX_LOCATIONS)
 
-#define REVISION			326
+#define REVISION			327
 #if (CS_MAX) > MAX_CONFIGSTRINGS
 #error overflow: (CS_MAX) > MAX_CONFIGSTRINGS
 #endif

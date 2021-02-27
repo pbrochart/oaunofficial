@@ -1436,82 +1436,10 @@ static void CG_DrawTeamOverlay ( qboolean right, qboolean upper ) {
                 CG_DrawPic ( x, y, hudelement.fontWidth, hudelement.fontWidth,
                              cgs.media.deferShader );
             }
-
-
-            /*xx = x + TINYCHAR_WIDTH;
-
-            CG_DrawStringExt( xx, y,
-            	ci->name, hcolor, qfalse, qfalse,
-            	TINYCHAR_WIDTH, TINYCHAR_HEIGHT, TEAM_OVERLAY_MAXNAME_WIDTH);
-
-            if (lwidth) {
-            	p = CG_ConfigString(CS_LOCATIONS + ci->location);
-            	if (!p || !*p)
-            		p = "unknown";
-            //	len = CG_DrawStrlen(p);
-            //	if (len > lwidth)
-            //		len = lwidth;
-
-            // 			xx = x + TINYCHAR_WIDTH * 2 + TINYCHAR_WIDTH * pwidth +
-            // 				((lwidth/2 - len/2) * TINYCHAR_WIDTH);
-            	xx = x + TINYCHAR_WIDTH * 2 + TINYCHAR_WIDTH * pwidth;
-            	CG_DrawStringExt( xx, y,
-            		p, hcolor, qfalse, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
-            		TEAM_OVERLAY_MAXLOCATION_WIDTH);
-            }
-
-            CG_GetColorForHealth( ci->health, ci->armor, hcolor );
-
-            Com_sprintf (st, sizeof(st), "%3i %3i", ci->health,	ci->armor);
-
-            xx = x + TINYCHAR_WIDTH * 3 +
-            	TINYCHAR_WIDTH * pwidth + TINYCHAR_WIDTH * lwidth;
-
-            CG_DrawStringExt( xx, y,
-            	st, hcolor, qfalse, qfalse,
-            	TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
-
-            // draw weapon icon
-            xx += TINYCHAR_WIDTH * 3;
-
-            if ( cg_weapons[ci->curWeapon].weaponIcon ) {
-            	CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
-            		cg_weapons[ci->curWeapon].weaponIcon );
-            } else {
-            	CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
-            		cgs.media.deferShader );
-            }
-
-            // Draw powerup icons
-            if (right) {
-            	xx = x;
-            } else {
-            	xx = x + w - TINYCHAR_WIDTH;
-            }
-
-            for (j = 0; j <= PW_NUM_POWERUPS; j++) {
-            	if (ci->powerups & (1 << j)) {
-
-            		item = BG_FindItemForPowerup( j );
-
-            		if (item) {
-            			CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
-            			trap_R_RegisterShader( item->icon ) );
-            			if (right) {
-            				xx -= TINYCHAR_WIDTH;
-            			} else {
-            				xx += TINYCHAR_WIDTH;
-            			}
-            		}
-            	}
-            }
-
-            y += TINYCHAR_HEIGHT;*/
         }
     }
 
     return;
-//#endif
 }
 
 /*static float CG_DrawFollowMessage( float y ) {
@@ -3428,9 +3356,9 @@ static void CG_GetHitColor( float *color ) {
 CG_DrawCrosshair
 =================
 */
-static void CG_DrawCrosshair ( void ) {
+static void CG_DrawCrosshair ( int multiview ) {
     float		w, h;
-    qhandle_t	hShader;
+    qhandle_t		hShader;
     float		f;
     float		x, y;
     int			ca = 0; //only to get rid of the warning(not useful)
@@ -3453,7 +3381,7 @@ static void CG_DrawCrosshair ( void ) {
         return;
     }
 
-    if ( cg_crosshairHitColorTime.integer > 0 && cg_crosshairHitColorStyle.integer ) {
+    if ( cg_crosshairHitColorTime.integer > 0 && cg_crosshairHitColorStyle.integer && !multiview ) {
 	if ( cg_crosshairHitColorStyle.integer == 3 || cg_crosshairHitColorStyle.integer == 4 ) {
 		if ( cg.time - cg.lastHitTime[0] < (int)( cg_crosshairHitColorTime.integer * ( cg.lastHitDamage[0]/100.0f ) ) ) {
 		    CG_GetHitColor(color);
@@ -3476,7 +3404,7 @@ static void CG_DrawCrosshair ( void ) {
 	}
     }
     // set color based on health
-    else if ( cg_crosshairHealth.integer ) {
+    else if ( cg_crosshairHealth.integer && !multiview ) {
         CG_ColorForHealth ( color );
     } else {
         color[0] = (g_color_table[ColorIndex(*(cg_crosshairColor.string))][0]);
@@ -3492,7 +3420,7 @@ static void CG_DrawCrosshair ( void ) {
         w = w * cgs.screenYScale / cgs.screenXScale;
     }
 
-    if ( cg_crosshairPulse.integer == 1 ) {
+    if ( cg_crosshairPulse.integer == 1 && !multiview ) {
         // pulse the size of the crosshair when picking up items
         f = cg.time - cg.itemPickupBlendTime;
         if ( f > 0 && f < ITEM_BLOB_TIME ) {
@@ -3502,7 +3430,7 @@ static void CG_DrawCrosshair ( void ) {
         }
     }
 
-    if ( cg_crosshairPulse.integer == 2 ) {
+    if ( cg_crosshairPulse.integer == 2 && !multiview ) {
         f = cg.time - cg.lastHitTime[0];
         if ( f > 0 && f < ITEM_BLOB_TIME ) {
             f = f/ ( ITEM_BLOB_TIME );
@@ -3621,7 +3549,7 @@ static void CG_DrawCrosshair3D ( void ) {
 CG_ScanForCrosshairEntity
 =================
 */
-static void CG_ScanForCrosshairEntity ( void ) {
+static void CG_ScanForCrosshairEntity ( int window ) {
     trace_t		trace;
     vec3_t		start, end;
     int			content;
@@ -3649,8 +3577,14 @@ static void CG_ScanForCrosshairEntity ( void ) {
     }
 
     // update the fade timer
-    cg.crosshairClientNum = trace.entityNum;
-    cg.crosshairClientTime = cg.time;
+    if ( window ) {
+         cg.chcn[window] = trace.entityNum;
+         cg.chct[window] = cg.time;
+    }
+    else {
+        cg.crosshairClientNum = trace.entityNum;
+        cg.crosshairClientTime = cg.time;
+    }
 }
 
 
@@ -3659,11 +3593,12 @@ static void CG_ScanForCrosshairEntity ( void ) {
 CG_DrawCrosshairNames
 =====================
 */
-static void CG_DrawCrosshairNames ( void ) {
+static void CG_DrawCrosshairNames ( int window ) {
     float		*color;
     char		*name;
-    int		armorcolor, healthcolor;
-
+    int			armorcolor, healthcolor;
+    int			crosshairClientNum, crosshairClientTime;
+ 
     if ( !cgs.hud[HUD_TARGETNAME].inuse )
         return;
 
@@ -3675,18 +3610,26 @@ static void CG_DrawCrosshairNames ( void ) {
         return;
     }
 
-
     // scan the known entities to see if the crosshair is sighted on one
-    CG_ScanForCrosshairEntity();
+    CG_ScanForCrosshairEntity( window );
+
+    if ( window ) {
+        crosshairClientNum = cg.chcn[window];
+        crosshairClientTime = cg.chct[window];
+    }
+    else {
+        crosshairClientNum = cg.crosshairClientNum;
+        crosshairClientTime = cg.crosshairClientTime;
+    }
 
     // draw the name of the player being looked at
-    color = CG_FadeColor ( cg.crosshairClientTime, cgs.hud[HUD_TARGETNAME].time );
+    color = CG_FadeColor ( crosshairClientTime, cgs.hud[HUD_TARGETNAME].time );
     if ( !color ) {
         trap_R_SetColor ( NULL );
         return;
     }
 
-    name = cgs.clientinfo[ cg.crosshairClientNum ].name;
+    name = cgs.clientinfo[ crosshairClientNum ].name;
 
     CG_DrawStringHud ( HUD_TARGETNAME, qtrue, name );
 
@@ -3695,27 +3638,27 @@ static void CG_DrawCrosshairNames ( void ) {
     if ( cg.snap->ps.persistant[PERS_TEAM] != TEAM_RED && cg.snap->ps.persistant[PERS_TEAM] != TEAM_BLUE )
         return;
 
-    if ( cg.snap->ps.persistant[PERS_TEAM] != cgs.clientinfo[ cg.crosshairClientNum ].team )
+    if ( cg.snap->ps.persistant[PERS_TEAM] != cgs.clientinfo[ crosshairClientNum ].team )
         return;
 
     if ( ( cgs.hud[HUD_TARGETSTATUS].inuse ) && ( cgs.clientinfo[cg.clientNum].team != TEAM_SPECTATOR ) ) {
-        if ( cgs.clientinfo[ cg.crosshairClientNum ].health >= 100 )
+        if ( cgs.clientinfo[ crosshairClientNum ].health >= 100 )
             healthcolor = 2;
-        else if ( cgs.clientinfo[ cg.crosshairClientNum ].health >= 50 )
+        else if ( cgs.clientinfo[ crosshairClientNum ].health >= 50 )
             healthcolor = 3;
         else
             healthcolor = 1;
 
-        if ( cgs.clientinfo[ cg.crosshairClientNum ].armor >= 100 )
+        if ( cgs.clientinfo[ crosshairClientNum ].armor >= 100 )
             armorcolor = 2;
-        else if ( cgs.clientinfo[ cg.crosshairClientNum ].armor >= 50 )
+        else if ( cgs.clientinfo[ crosshairClientNum ].armor >= 50 )
             armorcolor = 3;
         else
             armorcolor = 1;
 
-
-
-        CG_DrawStringHud ( HUD_TARGETSTATUS, qfalse, va ( "(^%i%i^7|^%i%i^7)", healthcolor, cgs.clientinfo[ cg.crosshairClientNum ].health, armorcolor, cgs.clientinfo[ cg.crosshairClientNum ].armor ) );
+        CG_DrawStringHud ( HUD_TARGETSTATUS, qfalse, va ( "(^%i%i^7|^%i%i^7)", healthcolor,
+            cgs.clientinfo[ crosshairClientNum ].health, armorcolor,
+            cgs.clientinfo[ crosshairClientNum ].armor ) );
     }
 }
 
@@ -4182,18 +4125,21 @@ static void CG_Postdecorate ( void ) {
 
 /*
 =================
-CG_Draw2D
+CG_DrawMVDhud
 =================
 */
-void CG_DrawMVDhud ( stereoFrame_t stereoFrame ) {
+void CG_DrawMVDhud ( stereoFrame_t stereoFrame, int window ) {
 
     if ( cg_draw2D.integer == 0 ) {
         return;
     }
 
-
     if ( stereoFrame == STEREO_CENTER )
-        CG_DrawCrosshair();		//TODO: thirdPersonView removes the CH from mv
+        CG_DrawCrosshair( window );
+    CG_DrawCrosshairNames( window );
+
+    if ( !window )
+        return;
 
     if ( !cg.showScores ) {
         CG_Predecorate();
@@ -4208,7 +4154,7 @@ void CG_DrawMVDhud ( stereoFrame_t stereoFrame ) {
 CG_Draw2D
 =================
 */
-void CG_Draw2D ( stereoFrame_t stereoFrame ) {
+void CG_Draw2D ( stereoFrame_t stereoFrame, qboolean multiview ) {
 #ifdef MISSIONPACK
     if ( cgs.orderPending && cg.time > cgs.orderTime ) {
         CG_CheckOrderPending();
@@ -4234,18 +4180,14 @@ void CG_Draw2D ( stereoFrame_t stereoFrame ) {
         return;
     }
 
-    /*
-    	if (cg.cameraMode) {
-    		return;
-    	}
-    */
-    if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR /*|| cg.snap->ps.pm_type == PM_SPECTATOR*/ ) {
+    if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
         CG_DrawSpectator();
 
-        if ( stereoFrame == STEREO_CENTER )
-            CG_DrawCrosshair();
+        if ( stereoFrame == STEREO_CENTER && !multiview )
+            CG_DrawCrosshair( qfalse );
 
-        CG_DrawCrosshairNames();
+        if ( !multiview )
+            CG_DrawCrosshairNames( qfalse );
 
         if ( cgs.gametype >= GT_TEAM && cgs.ffa_gt!=1 ) {
 #ifndef MISSIONPACK
@@ -4263,11 +4205,13 @@ void CG_Draw2D ( stereoFrame_t stereoFrame ) {
 
             CG_DrawAmmoWarning();
 
-            if ( stereoFrame == STEREO_CENTER )
-                CG_DrawCrosshair();
-            CG_DrawCrosshairNames();
-            CG_DrawWeaponSelect();
+            if ( stereoFrame == STEREO_CENTER && !multiview )
+                CG_DrawCrosshair( qfalse );
 
+            if ( !multiview )
+                CG_DrawCrosshairNames( qfalse );
+
+            CG_DrawWeaponSelect();
 
             CG_DrawHoldableItem();
             CG_DrawPersistantPowerup();
@@ -4299,8 +4243,9 @@ void CG_Draw2D ( stereoFrame_t stereoFrame ) {
     CG_DrawTimer();
     
     if ( cgs.gametype==GT_ELIMINATION || cgs.gametype == GT_CTF_ELIMINATION || cgs.gametype==GT_LMS ) {
-            CG_DrawEliminationTimer();
-        }
+        CG_DrawEliminationTimer();
+    }
+
     CG_DrawWarmup();
     CG_DrawTimeout();
     
@@ -4486,8 +4431,6 @@ void CG_DrawActive ( stereoFrame_t stereoView, qboolean draw2d ) {
     // draw 3D view
     trap_R_RenderScene ( &cg.refdef );
 
-    /*if( draw2d )
-          CG_Draw2D ( stereoView );*/
     // draw status bar and other floating elements
 
 }

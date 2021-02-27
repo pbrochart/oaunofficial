@@ -111,7 +111,7 @@ vmCvar_t	g_elimination_grapple;
 vmCvar_t	g_elimination_roundtime;
 vmCvar_t	g_elimination_warmup;
 vmCvar_t	g_elimination_activewarmup;
-vmCvar_t        g_elimination_allgametypes;
+vmCvar_t	g_elimination_allgametypes;
 vmCvar_t	g_elimination_machinegun;
 vmCvar_t	g_elimination_shotgun;
 vmCvar_t	g_elimination_grenade;
@@ -375,7 +375,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_truePing, "g_truePing", "0", CVAR_ARCHIVE, 0, qtrue },
 	// it's CVAR_SYSTEMINFO so the client's sv_fps will be automagically set to its value
 	{ &sv_fps, "sv_fps", "40", CVAR_SYSTEMINFO | CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse },
-        { &g_lagLightning, "g_lagLightning", "0", CVAR_ARCHIVE, 0, qtrue },
+	{ &g_lagLightning, "g_lagLightning", "0", CVAR_ARCHIVE, 0, qtrue },
 //unlagged - server options
 
 	{ &g_rankings, "g_rankings", "0", 0, 0, qfalse},
@@ -385,37 +385,34 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_elimination_startHealth, "elimination_startHealth", "200", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 	{ &g_elimination_startArmor, "elimination_startArmor", "150", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 	{ &g_elimination_bfg, "elimination_bfg", "0", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
-        { &g_elimination_grapple, "elimination_grapple", "0", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_grapple, "elimination_grapple", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 	{ &g_elimination_roundtime, "elimination_roundtime", "300", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-	{ &g_elimination_warmup, "elimination_warmup", "7", CVAR_ARCHIVE | CVAR_NORESTART , 0, qtrue },
-	{ &g_elimination_activewarmup, "elimination_activewarmup", "5", CVAR_ARCHIVE | CVAR_NORESTART , 0, qtrue },
-        { &g_elimination_allgametypes, "g_elimination", "0", CVAR_LATCH | CVAR_NORESTART, 0, qfalse },
+	{ &g_elimination_warmup, "elimination_warmup", "7", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_activewarmup, "elimination_activewarmup", "5", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_allgametypes, "g_elimination", "0", CVAR_LATCH | CVAR_NORESTART, 0, qfalse },
 
-	{ &g_elimination_machinegun, "elimination_machinegun", "200", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
-	{ &g_elimination_shotgun, "elimination_shotgun", "30", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
-	{ &g_elimination_grenade, "elimination_grenade", "20", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
-	{ &g_elimination_rocket, "elimination_rocket", "50", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
-	{ &g_elimination_railgun, "elimination_railgun", "20", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
-	{ &g_elimination_lightning, "elimination_lightning", "200", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
-	{ &g_elimination_plasmagun, "elimination_plasmagun", "150", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_machinegun, "elimination_machinegun", "200", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_shotgun, "elimination_shotgun", "30", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_grenade, "elimination_grenade", "20", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_rocket, "elimination_rocket", "50", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_railgun, "elimination_railgun", "20", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_lightning, "elimination_lightning", "200", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_plasmagun, "elimination_plasmagun", "150", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 #ifdef MISSIONPACK
-	{ &g_elimination_chain, "elimination_chain", "0", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
-	{ &g_elimination_mine, "elimination_mine", "0", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
-	{ &g_elimination_nail, "elimination_nail", "0", CVAR_ARCHIVE| CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_chain, "elimination_chain", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_mine, "elimination_mine", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_nail, "elimination_nail", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 #endif
-	{ &g_elimination_ctf_oneway, "elimination_ctf_oneway", "1", CVAR_CHEAT| CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_ctf_oneway, "elimination_ctf_oneway", "1", CVAR_CHEAT | CVAR_NORESTART, 0, qtrue },
+	{ &g_elimination_lockspectator, "elimination_lockspectator", "2", CVAR_NORESTART, 0, qtrue },
+	{ &g_awardpushing, "g_awardpushing", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 
-        { &g_elimination_lockspectator, "elimination_lockspectator", "2", CVAR_NORESTART, 0, qtrue },
-        
-        { &g_awardpushing, "g_awardpushing", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-
-        //g_persistantpowerups
-        #ifdef MISSIONPACK
-        { &g_persistantpowerups, "g_runes", "1", CVAR_LATCH, 0, qfalse },
-        #else
-        { &g_persistantpowerups, "g_runes", "0", CVAR_LATCH|CVAR_ARCHIVE, 0, qfalse },
-        #endif
-
+	//g_persistantpowerups
+	#ifdef MISSIONPACK
+	{ &g_persistantpowerups, "g_runes", "1", CVAR_LATCH, 0, qfalse },
+	#else
+	{ &g_persistantpowerups, "g_runes", "0", CVAR_LATCH | CVAR_ARCHIVE, 0, qfalse },
+	#endif
 
 	//nexuiz style rocket arena
 	{ &g_rockets, "g_rockets", "0", CVAR_SERVERINFO | CVAR_LATCH | CVAR_NORESTART, 0, qfalse },
@@ -521,7 +518,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_disableVotingTime, "g_disableVotingTime", "0", CVAR_ARCHIVE, 0 ,qfalse },
 	{ &g_maxWarp, "g_maxWarp", "0", CVAR_CHEAT, 0, qfalse  },
 	{ &g_skipCorrection, "g_skipCorrection", "0", CVAR_CHEAT, 0, qfalse  },
-	{ &g_selfdamage, "g_selfdamage", "1", CVAR_ARCHIVE , 0, qfalse  },
+	{ &g_selfdamage, "g_selfdamage", "1", CVAR_ARCHIVE, 0, qfalse  },
 	{ &g_overtime, "g_overtime", "120", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse  },
 	{ &g_overtime_ctf_respawnDelay, "g_overtime_ctf_respawnDelay", "5", CVAR_ARCHIVE, 0, qfalse  },
 	{ &g_thrufloors, "g_thrufloors", "0", CVAR_ARCHIVE, 0, qfalse  },
@@ -3386,6 +3383,11 @@ void G_RunFrame( int levelTime ) {
 
 		if ( i < MAX_CLIENTS ) {
 			G_RunClient( ent );
+			continue;
+		}
+
+		if ( ent->s.eType == ET_PORTAL ) {
+			G_RunCameraInMV( ent );
 			continue;
 		}
 
