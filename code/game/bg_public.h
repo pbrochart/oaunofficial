@@ -50,18 +50,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //new#define OUTERRADIUS 12000
 //new#define INNERRADIUS 4000
 
-#define	ITEM_RADIUS			15		// item sizes are needed for client side pickup detection
+#define ITEM_RADIUS		15		// item sizes are needed for client side pickup detection
 
-#define	LIGHTNING_RANGE		768
+#define LIGHTNING_RANGE		768
 
-#define	SCORE_NOT_PRESENT	-9999	// for the CS_SCORES[12] when only one player is present
+#define SCORE_NOT_PRESENT	-9999	// for the CS_SCORES[12] when only one player is present
 
-#define	VOTE_TIME			30000	// 30 seconds before vote times out
+#define VOTE_TIME		30000	// 30 seconds before vote times out
 
-#define	MINS_Z				-24
-#define	DEFAULT_VIEWHEIGHT	26
+#define MINS_Z			-24
+#define DEFAULT_VIEWHEIGHT	26
 #define CROUCH_VIEWHEIGHT	12
-#define	DEAD_VIEWHEIGHT		-16
+#define DEAD_VIEWHEIGHT		-16
 #define MAX_MVCLIENTS		16
 #define MAX_MULTIVIEW		4
 
@@ -109,7 +109,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define CS_MAX				(CS_PARTICLES+MAX_LOCATIONS)
 
-#define REVISION			327
+#define REVISION			328
 #if (CS_MAX) > MAX_CONFIGSTRINGS
 #error overflow: (CS_MAX) > MAX_CONFIGSTRINGS
 #endif

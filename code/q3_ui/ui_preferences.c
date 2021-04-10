@@ -70,15 +70,15 @@ typedef struct {
 	menubitmap_s		framer;
 
 	menulist_s			crosshair;
-        menuradiobutton_s	crosshairHealth;
+	menuradiobutton_s	crosshairHealth;
 
-        //Crosshair colors:
-        menuslider_s            crosshairColorRed;
-        menuslider_s            crosshairColorGreen;
-        menuslider_s            crosshairColorBlue;
+	//Crosshair colors:
+	menuslider_s		crosshairColorRed;
+	menuslider_s		crosshairColorGreen;
+	menuslider_s		crosshairColorBlue;
 
 	menuradiobutton_s	simpleitems;
-        menuradiobutton_s	alwaysweaponbar;
+	menuradiobutton_s	alwaysweaponbar;
 	menuradiobutton_s	brass;
 	menuradiobutton_s	wallmarks;
 	menuradiobutton_s	dynamiclights;
@@ -87,7 +87,7 @@ typedef struct {
 	menuradiobutton_s	synceveryframe;
 	menuradiobutton_s	forcemodel;
 	menulist_s			drawteamoverlay;
-        menuradiobutton_s	delaghitscan;
+	menuradiobutton_s	delaghitscan;
 	menuradiobutton_s	allowdownload;
 	menubitmap_s		back;
 
@@ -106,23 +106,24 @@ static const char *teamoverlay_names[] =
 };
 
 static void Preferences_SetMenuItems( void ) {
-	s_preferences.crosshair.curvalue		= (int)trap_Cvar_VariableValue( "cg_drawCrosshair" ) % NUM_CROSSHAIRS;
-        s_preferences.crosshairHealth.curvalue          = trap_Cvar_VariableValue( "cg_crosshairHealth") != 0;
-        s_preferences.crosshairColorRed.curvalue        = trap_Cvar_VariableValue( "cg_crosshairColorRed")*255.0f;
-        s_preferences.crosshairColorGreen.curvalue      = trap_Cvar_VariableValue( "cg_crosshairColorGreen")*255.0f;
-        s_preferences.crosshairColorBlue.curvalue       = trap_Cvar_VariableValue( "cg_crosshairColorBlue")*255.0f;
+	s_preferences.crosshair.curvalue		= (int)trap_Cvar_VariableValue( "cg_drawCrosshair" ) % 10;
+	s_preferences.crosshairHealth.curvalue		= trap_Cvar_VariableValue( "cg_crosshairHealth") != 0;
+	s_preferences.crosshairColorRed.curvalue	= trap_Cvar_VariableValue( "cg_crosshairColorRed")*255.0f;
+	s_preferences.crosshairColorGreen.curvalue	= trap_Cvar_VariableValue( "cg_crosshairColorGreen")*255.0f;
+	s_preferences.crosshairColorBlue.curvalue	= trap_Cvar_VariableValue( "cg_crosshairColorBlue")*255.0f;
 	s_preferences.simpleitems.curvalue		= trap_Cvar_VariableValue( "cg_simpleItems" ) != 0;
-        s_preferences.alwaysweaponbar.curvalue		= trap_Cvar_VariableValue( "cg_alwaysWeaponBar" ) != 0;
+	s_preferences.alwaysweaponbar.curvalue		= trap_Cvar_VariableValue( "cg_alwaysWeaponBar" ) != 0;
 	s_preferences.brass.curvalue			= trap_Cvar_VariableValue( "cg_brassTime" ) != 0;
 	s_preferences.wallmarks.curvalue		= trap_Cvar_VariableValue( "cg_marks" ) != 0;
-	s_preferences.identifytarget.curvalue	= trap_Cvar_VariableValue( "cg_drawCrosshairNames" ) != 0;
-	s_preferences.dynamiclights.curvalue	= trap_Cvar_VariableValue( "r_dynamiclight" ) != 0;
-	s_preferences.highqualitysky.curvalue	= trap_Cvar_VariableValue ( "r_fastsky" ) == 0;
-	s_preferences.synceveryframe.curvalue	= trap_Cvar_VariableValue( "r_finish" ) != 0;
+	s_preferences.identifytarget.curvalue		= trap_Cvar_VariableValue( "cg_drawCrosshairNames" ) != 0;
+	s_preferences.dynamiclights.curvalue		= trap_Cvar_VariableValue( "r_dynamiclight" ) != 0;
+	s_preferences.highqualitysky.curvalue		= trap_Cvar_VariableValue ( "r_fastsky" ) == 0;
+	s_preferences.synceveryframe.curvalue		= trap_Cvar_VariableValue( "r_finish" ) != 0;
 	s_preferences.forcemodel.curvalue		= trap_Cvar_VariableValue( "cg_forcemodel" ) != 0;
-	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
-	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
-        s_preferences.delaghitscan.curvalue	= trap_Cvar_VariableValue( "cg_delag" ) != 0;
+	s_preferences.drawteamoverlay.curvalue		= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
+	s_preferences.allowdownload.curvalue		= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
+	s_preferences.delaghitscan.curvalue		= trap_Cvar_VariableValue( "cg_delag" ) != 0;
+
 }
 
 static void Preferences_Event( void* ptr, int notification ) {
@@ -139,32 +140,32 @@ static void Preferences_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue( "cg_drawCrosshair", s_preferences.crosshair.curvalue );
 		break;
 
-        case ID_CROSSHAIRHEALTH:
-                trap_Cvar_SetValue( "cg_crosshairHealth", s_preferences.crosshairHealth.curvalue );
-                if(s_preferences.crosshairHealth.curvalue) {
-                    //If crosshairHealth is on: Don't allow color selection
-                    s_preferences.crosshairColorRed.generic.flags       |= QMF_INACTIVE;
-                    s_preferences.crosshairColorGreen.generic.flags     |= QMF_INACTIVE;
-                    s_preferences.crosshairColorBlue.generic.flags      |= QMF_INACTIVE;
-                } else {
-                    //If crosshairHealth is off: Allow color selection
-                    s_preferences.crosshairColorRed.generic.flags       &= ~QMF_INACTIVE;
-                    s_preferences.crosshairColorGreen.generic.flags     &= ~QMF_INACTIVE;
-                    s_preferences.crosshairColorBlue.generic.flags      &= ~QMF_INACTIVE;
-                }
-                break;
+	case ID_CROSSHAIRHEALTH:
+		trap_Cvar_SetValue( "cg_crosshairHealth", s_preferences.crosshairHealth.curvalue );
+		if(s_preferences.crosshairHealth.curvalue) {
+			//If crosshairHealth is on: Don't allow color selection
+			s_preferences.crosshairColorRed.generic.flags       |= QMF_INACTIVE;
+			s_preferences.crosshairColorGreen.generic.flags     |= QMF_INACTIVE;
+			s_preferences.crosshairColorBlue.generic.flags      |= QMF_INACTIVE;
+		} else {
+			//If crosshairHealth is off: Allow color selection
+			s_preferences.crosshairColorRed.generic.flags       &= ~QMF_INACTIVE;
+			s_preferences.crosshairColorGreen.generic.flags     &= ~QMF_INACTIVE;
+			s_preferences.crosshairColorBlue.generic.flags      &= ~QMF_INACTIVE;
+		}
+		break;
 
-        case ID_COLORRED:
-                trap_Cvar_SetValue( "cg_crosshairColorRed", ((float)s_preferences.crosshairColorRed.curvalue)/255.f );
-                break;
+	case ID_COLORRED:
+		trap_Cvar_SetValue( "cg_crosshairColorRed", ((float)s_preferences.crosshairColorRed.curvalue)/255.f );
+		break;
 
-        case ID_COLORGREEN:
-                trap_Cvar_SetValue( "cg_crosshairColorGreen", ((float)s_preferences.crosshairColorGreen.curvalue)/255.f );
-                break;
+	case ID_COLORGREEN:
+		trap_Cvar_SetValue( "cg_crosshairColorGreen", ((float)s_preferences.crosshairColorGreen.curvalue)/255.f );
+		break;
 
-        case ID_COLORBLUE:
-                trap_Cvar_SetValue( "cg_crosshairColorBlue", ((float)s_preferences.crosshairColorBlue.curvalue)/255.f );
-                break;
+	case ID_COLORBLUE:
+		trap_Cvar_SetValue( "cg_crosshairColorBlue", ((float)s_preferences.crosshairColorBlue.curvalue)/255.f );
+		break;
 
 	case ID_SIMPLEITEMS:
 		trap_Cvar_SetValue( "cg_simpleItems", s_preferences.simpleitems.curvalue );
@@ -213,9 +214,9 @@ static void Preferences_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue( "cl_allowDownload", s_preferences.allowdownload.curvalue );
 		trap_Cvar_SetValue( "sv_allowDownload", s_preferences.allowdownload.curvalue );
 		break;
-               
-        case ID_DELAGHITSCAN:
-                trap_Cvar_SetValue( "g_delagHitscan", s_preferences.delaghitscan.curvalue );
+
+	case ID_DELAGHITSCAN:
+		trap_Cvar_SetValue( "g_delagHitscan", s_preferences.delaghitscan.curvalue );
 		trap_Cvar_SetValue( "cg_delag", s_preferences.delaghitscan.curvalue );
 		break;
 
@@ -237,7 +238,7 @@ static void Crosshair_Draw( void *self ) {
 	int			x, y;
 	int			style;
 	qboolean	focus;
-        vec4_t          color4;
+	vec4_t		color4;
 
 	s = (menulist_s *)self;
 	x = s->generic.x;
@@ -272,12 +273,12 @@ static void Crosshair_Draw( void *self ) {
 	if( !s->curvalue ) {
 		return;
 	}
-        color4[0]=((float)s_preferences.crosshairColorRed.curvalue)/255.f;
-        color4[1]=((float)s_preferences.crosshairColorGreen.curvalue)/255.f;
-        color4[2]=((float)s_preferences.crosshairColorBlue.curvalue)/255.f;
-        color4[3]=1.0f;
+	color4[0]=((float)s_preferences.crosshairColorRed.curvalue)/255.f;
+	color4[1]=((float)s_preferences.crosshairColorGreen.curvalue)/255.f;
+	color4[2]=((float)s_preferences.crosshairColorBlue.curvalue)/255.f;
+	color4[3]=1.0f;
 	trap_R_SetColor( color4 );
-	UI_DrawHandlePic( x + SMALLCHAR_WIDTH, y - 4, 24, 24, s_preferences.crosshairShader[s->curvalue] );
+	UI_DrawHandlePic( x + SMALLCHAR_WIDTH, y - 4, 24, 24, s_preferences.crosshairShader[s->curvalue-1] );
 }
 
 

@@ -1367,6 +1367,23 @@ qboolean G_LocateEntityInMVList( gentity_t *ent, int pID, qboolean fRemove )
 
 /*
 ==================
+G_AllRemoveSingleClientInMV
+
+==================
+*/
+void G_AllRemoveSingleClientInMV( int pID )
+{
+	int i;
+	gentity_t *ent;
+
+	for ( i = 0; i < level.numConnectedClients; i++ ) {
+		ent = g_entities + level.sortedClients[i];
+		G_LocateEntityInMVList( ent, pID, qtrue );
+	}
+}
+
+/*
+==================
 G_AddViewInMV
 
 ==================
@@ -1413,27 +1430,6 @@ void G_AddViewInMV( gentity_t *ent, int pID )
 	v->tagParent = ent;
 
 	G_GenerateClientInMVList( ent );
-}
-
-/*
-==================
-G_AllRemoveSingleClientInMV
-
-==================
-*/
-void G_AllRemoveSingleClientInMV( int pID )
-{
-	int i;
-	gentity_t *ent;
-
-	for ( i = 0; i < level.numConnectedClients; i++ ) {
-		ent = g_entities + level.sortedClients[i];
-
-		if ( ent->client->pers.mvCount < 1 ) {
-			continue;
-		}
-		G_LocateEntityInMVList( ent, pID, qtrue );
-	}
 }
 
 /*

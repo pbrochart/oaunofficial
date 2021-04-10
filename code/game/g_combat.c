@@ -1273,18 +1273,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			targ->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 		}
                 //Remeber the last person to hurt the player
-		if( /*!g_awardpushing.integer ||*/ targ==attacker || OnSameTeam (targ, attacker)) {
+		if( targ==attacker || OnSameTeam (targ, attacker)) {
 			targ->client->lastSentFlying = -1;
 		} else {
-	/*if ( pm->waterlevel <= 1 ) {
-		if ( pml.walking && !(pml.groundTrace.surfaceFlags & SURF_SLICK) ) {
-			// if getting knocked back, no friction
-			if ( ! (pm->ps->pm_flags & PMF_TIME_KNOCKBACK) ) {
-				control = speed < pm_stopspeed ? pm_stopspeed : speed;
-				drop += control*pm_friction*pml.frametime;
-			}
-		}
-	}*/
 		    targ->client->lastSentFlyingSave = targ->client->lastSentFlying;
                     targ->client->lastSentFlying = attacker->s.number;
                     targ->client->lastSentFlyingTime = level.time;
@@ -1297,7 +1288,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		// if TF_NO_FRIENDLY_FIRE is set, don't do damage to the target
 		// if the attacker was on the same team
 		if ( mod != MOD_JUICED && mod != MOD_CRUSH && targ != attacker && !(dflags & DAMAGE_NO_TEAM_PROTECTION) && OnSameTeam (targ, attacker)  ) {
-			if ( ( g_friendlyFire.value <= 0 && g_gametype.integer != GT_ELIMINATION && g_gametype.integer != GT_CTF_ELIMINATION ) || ( g_elimination_selfdamage.integer<2 &&	(g_gametype.integer == GT_ELIMINATION || g_gametype.integer == GT_CTF_ELIMINATION) ) ) {
+			if ( ( g_friendlyFire.value <= 0 && g_gametype.integer != GT_ELIMINATION && g_gametype.integer != GT_CTF_ELIMINATION ) ||
+				( g_elimination_selfdamage.integer < 2 && (g_gametype.integer == GT_ELIMINATION ||
+				g_gametype.integer == GT_CTF_ELIMINATION) ) ) {
 				return;
 			}
 		}
@@ -1453,8 +1446,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		damage = 1;
 	}
 
-	if ((g_gametype.integer == GT_ELIMINATION || /*g_gametype.integer == GT_CTF_ELIMINATION ||*/ g_gametype.integer == GT_LMS || g_elimination_allgametypes.integer)
-				&& g_elimination_selfdamage.integer<1 && ( targ == attacker ||  mod == MOD_FALLING )) {
+	if ((g_gametype.integer == GT_ELIMINATION || g_gametype.integer == GT_LMS || g_elimination_allgametypes.integer) &&
+		g_elimination_selfdamage.integer < 1 && ( targ == attacker || mod == MOD_FALLING )) {
 		damage = 0;
 	}
 
@@ -1463,7 +1456,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	}
 
 //So people can be telefragged!
-	if ((g_gametype.integer == GT_ELIMINATION || g_gametype.integer == GT_CTF_ELIMINATION || g_gametype.integer == GT_LMS) && level.time < level.roundStartTime && ((mod == MOD_LAVA) || (mod == MOD_SLIME)) ) {
+	if ((g_gametype.integer == GT_ELIMINATION || g_gametype.integer == GT_CTF_ELIMINATION || g_gametype.integer == GT_LMS) &&
+		level.time < level.roundStartTime && ((mod == MOD_LAVA) || (mod == MOD_SLIME)) ) {
 		damage = 0;
 	}
 

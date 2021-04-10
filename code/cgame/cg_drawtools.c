@@ -37,7 +37,7 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	// scale for screen sizes
 	if ( !cg_hudFullScreen.integer || ( cgs.allowMultiview &&
 		cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR &&
-		cg_multiview.integer > 1 ) ) {
+		cg_multiview.integer > 1 && cg.window ) ) {
 		*x = cg.refdef.x + *x*xscale;
 		*y = cg.refdef.y + *y*yscale;
 		*w *= xscale;

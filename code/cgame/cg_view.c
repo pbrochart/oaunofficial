@@ -963,6 +963,7 @@ static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
         cg_entities[cg.snap->ps.clientNum].currentState.weapon = cg.snap->entities[i].weapon;
 
         cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight;
+        cg.window = j-1;
 
         // build the render lists
         if ( !cg.hyperspace ) {
@@ -1231,12 +1232,15 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
     if ( cgs.allowMultiview && (
         cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR ) &&
         cg_multiview.integer > 1 ) {
-        CG_DrawMVDhud ( stereoView, qfalse );
+        CG_DrawMVDhud( stereoView, qfalse );
         CG_AddMultiviewWindow( stereoView );
+        cg.window = qfalse;
         CG_Draw2D( stereoView, qtrue );
     }
-    else
+    else {
+        cg.window = qfalse;
         CG_Draw2D( stereoView, qfalse );
+    }
 
     //---------------------------Multiview end----------------------
 

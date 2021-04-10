@@ -3356,18 +3356,18 @@ static void CG_GetHitColor( float *color ) {
 CG_DrawCrosshair
 =================
 */
-static void CG_DrawCrosshair ( int multiview ) {
+static void CG_DrawCrosshair ( int window ) {
     float		w, h;
     qhandle_t		hShader;
     float		f;
     float		x, y;
-    int			ca = 0; //only to get rid of the warning(not useful)
+    int			ca = 0; // only to get rid of the warning(not useful)
     int 		currentWeapon;
     vec4_t		color;
     float		xscale = ((float)cg.refdef.width)/640.0f;
     float		yscale = ((float)cg.refdef.height)/480.0f;
 
-    currentWeapon = cg.predictedPlayerState.weapon;
+    currentWeapon = cg_entities[cg.snap->ps.clientNum].currentState.weapon; // for ch/weapons in multiview
 
     if ( !cg_drawCrosshair.integer ) {
         return;
@@ -3381,7 +3381,7 @@ static void CG_DrawCrosshair ( int multiview ) {
         return;
     }
 
-    if ( cg_crosshairHitColorTime.integer > 0 && cg_crosshairHitColorStyle.integer && !multiview ) {
+    if ( cg_crosshairHitColorTime.integer > 0 && cg_crosshairHitColorStyle.integer && !window ) {
 	if ( cg_crosshairHitColorStyle.integer == 3 || cg_crosshairHitColorStyle.integer == 4 ) {
 		if ( cg.time - cg.lastHitTime[0] < (int)( cg_crosshairHitColorTime.integer * ( cg.lastHitDamage[0]/100.0f ) ) ) {
 		    CG_GetHitColor(color);
@@ -3404,7 +3404,7 @@ static void CG_DrawCrosshair ( int multiview ) {
 	}
     }
     // set color based on health
-    else if ( cg_crosshairHealth.integer && !multiview ) {
+    else if ( cg_crosshairHealth.integer && !window ) {
         CG_ColorForHealth ( color );
     } else {
         color[0] = (g_color_table[ColorIndex(*(cg_crosshairColor.string))][0]);
@@ -3414,13 +3414,13 @@ static void CG_DrawCrosshair ( int multiview ) {
     }
 
     ca = cgs.crosshair[currentWeapon];
-    w = h =cgs.crosshairSize[currentWeapon];
+    w = h = cgs.crosshairSize[currentWeapon];
 
     if ( cgs.screenXScale > cgs.screenYScale ) {
         w = w * cgs.screenYScale / cgs.screenXScale;
     }
 
-    if ( cg_crosshairPulse.integer == 1 && !multiview ) {
+    if ( cg_crosshairPulse.integer == 1 && !window ) {
         // pulse the size of the crosshair when picking up items
         f = cg.time - cg.itemPickupBlendTime;
         if ( f > 0 && f < ITEM_BLOB_TIME ) {
@@ -3430,7 +3430,7 @@ static void CG_DrawCrosshair ( int multiview ) {
         }
     }
 
-    if ( cg_crosshairPulse.integer == 2 && !multiview ) {
+    if ( cg_crosshairPulse.integer == 2 && !window ) {
         f = cg.time - cg.lastHitTime[0];
         if ( f > 0 && f < ITEM_BLOB_TIME ) {
             f = f/ ( ITEM_BLOB_TIME );

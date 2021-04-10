@@ -867,6 +867,7 @@ typedef struct {
 	qboolean forceChat;
 	int chcn[MAX_MULTIVIEW];
 	int chct[MAX_MULTIVIEW];
+	int window;
 } cg_t;
 
 

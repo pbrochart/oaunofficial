@@ -49,3 +49,4 @@ Revision 325: Safer and more secure handling of disconnected clients
 and clients with malformed or illegal info strings and fix some bugs.
 Revision 326: Make the damage plumes more readable and add cg_fovAdjust.
 Revision 327: Rewrite of multiview with some parts from etlegacy.
+Revision 328: Fix minor bugs.
