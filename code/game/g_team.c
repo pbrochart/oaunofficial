@@ -1938,7 +1938,7 @@ void TeamplaySpectatorMessage( void ) {
     
 	for (i = 0; i < MAX_CLIENTS; i++) {
 		ent = &g_entities[i];
-		if ( ( ent->inuse ) && ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) && g_allowMultiview.integer && ( ent->client->pers.multiview > 0 ) ) {
+		if ( ent->inuse && ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		      trap_SendServerCommand( ent-g_entities, va("tinfo %i %s", cnt, string) );
 		}
 	}

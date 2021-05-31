@@ -1367,23 +1367,6 @@ qboolean G_LocateEntityInMVList( gentity_t *ent, int pID, qboolean fRemove )
 
 /*
 ==================
-G_AllRemoveSingleClientInMV
-
-==================
-*/
-void G_AllRemoveSingleClientInMV( int pID )
-{
-	int i;
-	gentity_t *ent;
-
-	for ( i = 0; i < level.numConnectedClients; i++ ) {
-		ent = g_entities + level.sortedClients[i];
-		G_LocateEntityInMVList( ent, pID, qtrue );
-	}
-}
-
-/*
-==================
 G_AddViewInMV
 
 ==================
@@ -1473,6 +1456,22 @@ qboolean G_RunCameraInMV( gentity_t *ent )
 	trap_LinkEntity( ent );
 
 	return qtrue;
+}
+
+/*
+==================
+G_AllRemoveSingleClientInMV
+==================
+*/
+void G_AllRemoveSingleClientInMV( int pID )
+{
+	int i;
+	gentity_t *ent;
+
+	for ( i = 0; i < level.numConnectedClients; i++ ) {
+		ent = g_entities + level.sortedClients[i];
+		G_LocateEntityInMVList( ent, pID, qtrue );
+	}
 }
 
 /*
