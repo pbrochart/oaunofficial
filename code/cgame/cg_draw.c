@@ -621,7 +621,7 @@ CG_DrawStatusBar
 
 ================
 */
-static void CG_DrawStatusBar ( void ) {
+static void CG_DrawStatusBar ( int window ) {
     int			color;
     centity_t	*cent;
     playerState_t	*ps;
@@ -714,16 +714,16 @@ static void CG_DrawStatusBar ( void ) {
             trap_R_SetColor ( NULL );
 
         }
-        if ( cent->currentState.weapon && cg_weapons[ /*cg.predictedPlayerState.weapon*/ cent->currentState.weapon ].ammoIcon ) { /* for multiview */
-            CG_DrawHudIcon ( HUD_AMMOICON, qfalse, cg_weapons[ /*cg.predictedPlayerState.weapon*/ cent->currentState.weapon ].ammoIcon );
+        if ( cent->currentState.weapon && cg_weapons[ cent->currentState.weapon ].ammoIcon ) { /* for multiview */
+            CG_DrawHudIcon ( HUD_AMMOICON, qfalse, cg_weapons[ cent->currentState.weapon ].ammoIcon );
         }
     }
     /* TODO: color the flagshader used in the flagstatus, maybe this is faster and it will save memory */
-    if ( cg.predictedPlayerState.powerups[PW_REDFLAG] ) {
+    if ( cg.predictedPlayerState.powerups[PW_REDFLAG] && !window ) {
         CG_DrawHudIcon ( HUD_STATUSBARFLAG, qfalse, cgs.media.redFlagShader[0] );
-    } else if ( cg.predictedPlayerState.powerups[PW_BLUEFLAG] ) {
+    } else if ( cg.predictedPlayerState.powerups[PW_BLUEFLAG] && !window ) {
         CG_DrawHudIcon ( HUD_STATUSBARFLAG, qfalse, cgs.media.blueFlagShader[0] );
-    } else if ( cg.predictedPlayerState.powerups[PW_NEUTRALFLAG] ) {
+    } else if ( cg.predictedPlayerState.powerups[PW_NEUTRALFLAG] && !window ) {
         CG_DrawHudIcon ( HUD_STATUSBARFLAG, qfalse, cgs.media.neutralFlagShader[0] );
     } else if ( cgs.gametype == GT_CTF_ELIMINATION ) {
         if ( cgs.csStatus == 1 )
@@ -1295,6 +1295,10 @@ static void CG_DrawTeamOverlay ( qboolean right, qboolean upper ) {
     	return y;
     }*/
 
+    if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+        return;
+    }
+
     if ( cg.snap->ps.persistant[PERS_TEAM] != TEAM_RED && cg.snap->ps.persistant[PERS_TEAM] != TEAM_BLUE ) {
         return; // Not on any team
     }
@@ -1476,8 +1480,8 @@ static void CG_DrawLivingCount ( void ) {
     s = va ( "%i", s1 );
     t = va ( "%i", s2 );*/
 
-    CG_DrawHudIcon ( HUD_TI_OWN, qtrue, ( qhandle_t ) NULL ); //TODO: looks nasty
-    CG_DrawHudIcon ( HUD_TI_NME, qtrue, ( qhandle_t ) NULL ); //
+    CG_DrawHudIcon ( HUD_TI_OWN, qtrue, *( volatile qhandle_t *) NULL ); //TODO: looks nasty
+    CG_DrawHudIcon ( HUD_TI_NME, qtrue, *( volatile qhandle_t *) NULL ); //
 
     if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_RED ) {
         CG_DrawStringHud ( HUD_TC_NME, qtrue, va ( "%i", cgs.blueLivingCount ) );
@@ -2966,7 +2970,7 @@ static void CG_DrawLagometer ( void ) {
 
 	    trap_R_SetColor ( NULL );
 
-	    CG_DrawHudIcon ( HUD_NETGRAPH, qtrue, ( qhandle_t ) NULL );
+	    CG_DrawHudIcon ( HUD_NETGRAPH, qtrue, *( volatile qhandle_t *) NULL );
 	    //CG_DrawPic( x, y, 48, 48, cgs.media.lagometerShader );
 
 	    ax = cgs.hud[HUD_NETGRAPH].xpos;
@@ -4102,7 +4106,7 @@ static void CG_Predecorate ( void ) {
         //hudelement = cgs.hud[HUD_PREDECORATE1 + i];
         if ( !cgs.hud[HUD_PREDECORATE1+i].inuse )
             continue;
-        CG_DrawHudIcon ( HUD_PREDECORATE1+i, qtrue, ( qhandle_t ) NULL );
+        CG_DrawHudIcon ( HUD_PREDECORATE1+i, qtrue, *( volatile qhandle_t *) NULL );
         CG_DrawStringHud ( HUD_PREDECORATE1+i, qtrue, "" );
     }
 }
@@ -4118,7 +4122,7 @@ static void CG_Postdecorate ( void ) {
         //hudelement = cgs.hud[HUD_POSTDECORATE1 + i];
         if ( !cgs.hud[HUD_POSTDECORATE1 + i].inuse )
             continue;
-        CG_DrawHudIcon ( HUD_POSTDECORATE1+i, qtrue, ( qhandle_t ) NULL );
+        CG_DrawHudIcon ( HUD_POSTDECORATE1+i, qtrue, *( volatile qhandle_t *) NULL );
         CG_DrawStringHud ( HUD_POSTDECORATE1+i, qtrue, "" );
     }
 }
@@ -4143,7 +4147,7 @@ void CG_DrawMVDhud ( stereoFrame_t stereoFrame, int window ) {
 
     if ( !cg.showScores ) {
         CG_Predecorate();
-        CG_DrawStatusBar();
+        CG_DrawStatusBar( window );
         //CG_DrawPowerups(); //TODO
         CG_Postdecorate();
     }
@@ -4201,7 +4205,7 @@ void CG_Draw2D ( stereoFrame_t stereoFrame, qboolean multiview ) {
 
 
             CG_Predecorate();
-            CG_DrawStatusBar();
+            CG_DrawStatusBar( qfalse );
 
             CG_DrawAmmoWarning();
 
