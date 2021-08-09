@@ -3450,9 +3450,7 @@ void G_RunFrame( int levelTime ) {
 	// update to team status?
 	CheckTeamStatus();
 	
-	//TeamplayInfoMessage is running fine now with spectator (patch ioquake3)
-	//This function is no longer necessary and makes no sense
-	//TeamplaySpectatorMessage();
+	TeamplaySpectatorMessage();
 
 	// cancel vote if timed out
 	CheckVote();

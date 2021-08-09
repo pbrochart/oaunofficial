@@ -176,10 +176,6 @@ void AddTeamScore(vec3_t origin, int team, int score) {
 	    te->r.svFlags |= SVF_BROADCAST;
 	}
         
-	
-
-
-
         if ( team == TEAM_RED ) {
             if ( level.teamScores[ TEAM_RED ] + score == level.teamScores[ TEAM_BLUE ] ) {
                 //teams are tied sound
@@ -1935,13 +1931,14 @@ void TeamplaySpectatorMessage( void ) {
                 cnt++;
             }
         }
-    
-	for (i = 0; i < MAX_CLIENTS; i++) {
-		ent = &g_entities[i];
-		if ( ent->inuse && ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-		      trap_SendServerCommand( ent-g_entities, va("tinfo %i %s", cnt, string) );
-		}
-	}
+
+        for ( i = 0; i < MAX_CLIENTS; i++ ) {
+            ent = &g_entities[i];
+            if ( ent->inuse && ( ent->client->sess.sessionTeam == TEAM_SPECTATOR &&
+                g_allowMultiview.integer && ent->client->pers.multiview > 1 ) ) {
+                trap_SendServerCommand( ent-g_entities, va("tinfo %i %s", cnt, string) );
+            }
+        }
     }
 }
 
@@ -1969,16 +1966,11 @@ void TeamplayInfoMessage( gentity_t *ent ) {
     if ( ! ent->client->pers.teamInfo )
         return;
 
-    // send team info to spectator for team of followed client
     if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
-        if ( ent->client->sess.spectatorState != SPECTATOR_FOLLOW
-            || ent->client->sess.spectatorClient < 0 ) {
-            return;
-        }
-        team = g_entities[ ent->client->sess.spectatorClient ].client->sess.sessionTeam;
-    } else {
-        team = ent->client->sess.sessionTeam;
+        return;
     }
+
+    team = ent->client->sess.sessionTeam;
 
     if (team != TEAM_RED && team != TEAM_BLUE) {
         return;

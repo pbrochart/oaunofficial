@@ -918,12 +918,12 @@ CG_AddMultiviewWindow
 =====================
 */
 static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
-    int i, j, start = 0;
+    int i, j, renderingThirdPerson, start = 0;
     int health, armor, team, weapon;
     int ammo[8];
     float refdef[4];
 
-    //Save the main-spec values, we will change the values for the MV-hud
+    // Save the main-spec values, we will change the values for the MV-hud
     for ( i = WP_MACHINEGUN; i <= WP_BFG; i++ ) {
         ammo[i-WP_MACHINEGUN] = cg.snap->ps.ammo[i];
         cg.snap->ps.ammo[i] = -1;
@@ -933,6 +933,7 @@ static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
     armor = cg.snap->ps.stats[STAT_ARMOR];
     team = cg.snap->ps.persistant[PERS_TEAM];
     weapon = cg_entities[cg.snap->ps.clientNum].currentState.weapon;
+    renderingThirdPerson = cg.renderingThirdPerson;
     refdef[0] = cg.refdef.x;
     refdef[1] = cg.refdef.y;
     refdef[2] = cg.refdef.width;
@@ -965,6 +966,9 @@ static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
         cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight;
         cg.window = j-1;
 
+        // Show the main-spec model in the MV-windows
+        cg.renderingThirdPerson = qtrue;
+
         // build the render lists
         if ( !cg.hyperspace ) {
             CG_AddPacketEntities( cg.snap->entities[i].clientNum );			// adter calcViewValues, so predicted player state is correct
@@ -972,6 +976,8 @@ static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
             CG_AddParticles ();
             CG_AddLocalEntities();
         }
+        cg.renderingThirdPerson = renderingThirdPerson;
+
         // actually issue the rendering calls
         CG_DrawActive( stereoView, qfalse );
         CG_DrawMVDhud( stereoView, j-1 );
@@ -979,7 +985,7 @@ static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
 	CG_DrawStringHud ( HUD_FOLLOW, qtrue, va ( "following %s", cgs.clientinfo[ cg.snap->entities[i].clientNum ].name ) );
     }
 
-    //Set everything back to the main-spec values
+    // Set everything back to the main-spec values
     cg.snap->ps.stats[STAT_HEALTH] = health;
     cg.snap->ps.stats[STAT_ARMOR] = armor;
     cg.snap->ps.persistant[PERS_TEAM] = team;

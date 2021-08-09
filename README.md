@@ -44,10 +44,11 @@ Revision 324: Add cg_hudFullScreen (disabled by default): Make the hud
 independent from cg_viewsize and fix the crosshair position.
 Increase com_maxfps and pmove_accurate limit to 250.
 Rename trap_Printf() to trap_Print() and add missing traps from ioquake3.
-Add gcc attribute annotations for printf, non-returning functions...
 Revision 325: Safer and more secure handling of disconnected clients
 and clients with malformed or illegal info strings and fix some bugs.
 Revision 326: Make the damage plumes more readable and add cg_fovAdjust.
 Revision 327: Rewrite of multiview with some parts from etlegacy.
 Revision 328: Fix minor bugs.
-Revision 329: Fix cg_drawTeamOverlay with the follow mode in multiview.
+Revision 329: Fix cg_drawTeamOverlay with multiview.
+Revision 330: Better fix for cg_drawTeamOverlay and suppress warnings.
+Fix model in multiview spec windows.

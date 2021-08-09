@@ -1460,22 +1460,6 @@ qboolean G_RunCameraInMV( gentity_t *ent )
 
 /*
 ==================
-G_AllRemoveSingleClientInMV
-==================
-*/
-void G_AllRemoveSingleClientInMV( int pID )
-{
-	int i;
-	gentity_t *ent;
-
-	for ( i = 0; i < level.numConnectedClients; i++ ) {
-		ent = g_entities + level.sortedClients[i];
-		G_LocateEntityInMVList( ent, pID, qtrue );
-	}
-}
-
-/*
-==================
 SpectatorClientEndFrame
 
 ==================
