@@ -715,7 +715,9 @@ void CG_AddRefEntity( localEntity_t *le ) {
 CG_AddScorePlum
 ===================
 */
-#define NUMBER_SIZE		8
+#define NUMBER_SIZE			8
+#define MAX_DISTANCE_NOSCALE		350
+#define MAX_DISTANCE_ZOOM_NOSCALE	1750
 
 void CG_AddScorePlum( localEntity_t *le ) {
 	refEntity_t	*re;
@@ -852,15 +854,15 @@ void CG_AddDamagePlum( localEntity_t *le ) {
 		return;
 	}
 
-	if ( len > 350 && !cg.zoomed && ( !cg_zoomScaling.value ||
+	if ( len > MAX_DISTANCE_NOSCALE && !cg.zoomed && ( !cg_zoomScaling.value ||
 		( ( cg.time - cg.zoomTime ) / (float)( cg_zoomScaling.value * ZOOM_TIME ) > 1 ) ) )
-		scale = (float)len / 350;
+		scale = (float)len / MAX_DISTANCE_NOSCALE;
 	else
 		scale = 1.0f;
 
-	if ( len > 1750 && cg.zoomed && ( !cg_zoomScaling.value ||
+	if ( len > MAX_DISTANCE_ZOOM_NOSCALE && cg.zoomed && ( !cg_zoomScaling.value ||
 		( ( cg.time - cg.zoomTime ) / (float)( cg_zoomScaling.value * ZOOM_TIME ) > 1 ) ) )
-		scale *= (float)len / 1750;
+		scale = (float)len / MAX_DISTANCE_ZOOM_NOSCALE;
 
 	origin[2] += 49 - cos (c * 4.8) * 34 * scale;
 	re->radius = NUMBER_SIZE / 2 * scale;

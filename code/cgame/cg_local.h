@@ -1270,6 +1270,7 @@ typedef struct {
 	qhandle_t	sbNotReady;
 	qhandle_t	sbSkull;
 	qhandle_t       sbLocked;
+	qhandle_t	sbAccuracy;
 	
 	qhandle_t 	spawnPoint;
 	qhandle_t 	spawnPointShader;

@@ -918,10 +918,11 @@ CG_AddMultiviewWindow
 =====================
 */
 static void CG_AddMultiviewWindow( stereoFrame_t stereoView ) {
-    int i, j, renderingThirdPerson, start = 0;
+    int i, j, start = 0;
     int health, armor, team, weapon;
     int ammo[8];
     float refdef[4];
+    qboolean renderingThirdPerson;
 
     // Save the main-spec values, we will change the values for the MV-hud
     for ( i = WP_MACHINEGUN; i <= WP_BFG; i++ ) {

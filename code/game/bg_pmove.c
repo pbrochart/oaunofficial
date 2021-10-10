@@ -2125,12 +2125,6 @@ void PmoveSingle (pmove_t *pmove) {
 					}
 				}
 			}
-			// we can stand a little bit of rounding error for the sake
-			// of lower bandwidth
-			VectorScale(pm->ps->velocity, 64.0f, pm->ps->velocity);
-			// snap some parts of playerstate to save network bandwidth
-			//trap_SnapVector(pm->ps->velocity);
-			VectorScale(pm->ps->velocity, 1.0f / 64.0f, pm->ps->velocity);
 		}
 	}
 	else {

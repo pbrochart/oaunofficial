@@ -9,7 +9,6 @@ Revision 307: Add cg_damagePlums (enabled by default): Display damage
 indicator (works only if server has g_damagePlums enabled).
 Revision 308: With cg_damagePlums, sum the damages for the shotgun.
 Revision 309: Fix all compiler warnings, mapcycle and getmapcycle.
-Use damage without armour for cg_damagePlums and some minor bug fixes.
 Revision 310: Display damage indicator thru the walls.
 Fix duplicate damages with shotgun when they are multiple targets.
 Add cg_damagePlum: Controls which weapons will draw damage plumes.
@@ -35,15 +34,12 @@ It's an alternative to pmove_fixed which had drawbacks
 (choppy movement). Setting this to 125 will make all players jump
 as high and far as if they had 125 fps even when their
 actual fps is lower or unstable (but require more bandwidth).
-It's frame-rate independent physics and be fair for everyone.
-BoxOnPlaneSide rewrite from ioquake3 (by Diego de Estrada).
 Revision 322: Minor enhancements on CTF and small bug fixes from ioquake3.
 Revision 323: Fix broken AI by moving green armour at the end of list
 and remove unused-but-set gcc warnings.
 Revision 324: Add cg_hudFullScreen (disabled by default): Make the hud
 independent from cg_viewsize and fix the crosshair position.
 Increase com_maxfps and pmove_accurate limit to 250.
-Rename trap_Printf() to trap_Print() and add missing traps from ioquake3.
 Revision 325: Safer and more secure handling of disconnected clients
 and clients with malformed or illegal info strings and fix some bugs.
 Revision 326: Make the damage plumes more readable and add cg_fovAdjust.
@@ -51,4 +47,5 @@ Revision 327: Rewrite of multiview with some parts from etlegacy.
 Revision 328: Fix minor bugs.
 Revision 329: Fix cg_drawTeamOverlay with multiview.
 Revision 330: Better fix for cg_drawTeamOverlay and suppress warnings.
-Fix model in multiview spec windows.
+Fix the main spec model in multiview windows.
+Revision 331: Improve the scoreboard.

@@ -3386,8 +3386,7 @@ void G_RunFrame( int levelTime ) {
 			continue;
 		}
 
-		if ( ent->s.eType == ET_PORTAL ) {
-			G_RunCameraInMV( ent );
+		if ( ent->s.eType == ET_PORTAL && G_RunCameraInMV( ent ) ) {
 			continue;
 		}
 

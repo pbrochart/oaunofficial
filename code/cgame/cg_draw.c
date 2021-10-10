@@ -3059,7 +3059,6 @@ static void CG_DrawLagometer ( void ) {
 }
 
 
-
 /*
 ===============================================================================
 
@@ -3106,9 +3105,10 @@ void CG_CenterPrint ( const char *str, int y, int charWidth ) {
 CG_DrawCenterString
 ===================
 */
+#define MAX_STRING_LENGTH_COLORIZED	22
 static void CG_DrawCenterString ( void ) {
     char	*start;
-    int		l;
+    int		i, j, l, r;
     int		x, y, w;
 #ifdef MISSIONPACK // bk010221 - unused else
     int h;
@@ -3127,13 +3127,22 @@ static void CG_DrawCenterString ( void ) {
     trap_R_SetColor ( color );
 
     start = cg.centerPrint;
+    i = strlen ( cg.centerPrint );
+    j = Q_PrintStrlen ( cg.centerPrint );
+    r = i - j;
+
+    if ( r > MAX_STRING_LENGTH_COLORIZED ) {
+        r = MAX_STRING_LENGTH_COLORIZED;
+    } else if ( r < 0 ) {
+        r = 0;
+    }
 
     y = cg.centerPrintY - cg.centerPrintLines * BIGCHAR_HEIGHT / 2;
 
     while ( 1 ) {
         char linebuffer[1024];
 
-        for ( l = 0; l < 50; l++ ) {
+        for ( l = 0; l < 50 + r; l++ ) {
             if ( !start[l] || start[l] == '\n' ) {
                 break;
             }
@@ -3168,6 +3177,8 @@ static void CG_DrawCenterString ( void ) {
 
     trap_R_SetColor ( NULL );
 }
+
+
 /*
 ===================
 CG_DrawFragMessage
@@ -3186,6 +3197,8 @@ static void CG_DrawFragMessage ( void ) {
 
     CG_DrawStringHud ( HUD_FRAGMSG, qtrue, ( const char* ) cg.fragMessage );
 }
+
+
 /*
 ===================
 CG_DrawRankMessage
@@ -3252,12 +3265,13 @@ static void CG_DrawCenter1FctfString ( void ) {
     CG_DrawStringExt ( x, y, line, color, qfalse, qtrue,
                        cg.centerPrintCharWidth, ( int ) ( cg.centerPrintCharWidth * 1.5 ), 0 );
 
-
 #endif
 }
+
 #ifndef MISSIONPACK
 static int lastDDSec = -100;
 #endif
+
 /*
 =====================
 CG_DrawCenterDDString

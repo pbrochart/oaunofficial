@@ -1469,7 +1469,7 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 
 	int i, preservedScore[MAX_PERSISTANT]; //for keeping in elimination
 	
-	if( ent->client->pers.multiview > 1 && g_allowMultiview.integer && ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) ) {
+	if ( ent->client->pers.multiview > 1 && g_allowMultiview.integer && ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) ) {
 		for ( i = 0; i < level.maxclients && i < MAX_MVCLIENTS; i++ ) {
 			if ( level.clients[i].sess.sessionTeam != TEAM_SPECTATOR && level.clients[i].pers.connected == CON_CONNECTED ) {
 				if ( !ent->client->pers.mv[i].fActive ) {

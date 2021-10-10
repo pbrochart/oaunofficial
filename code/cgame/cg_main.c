@@ -1524,6 +1524,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.sbNotReady = trap_R_RegisterShaderNoMip( "sb_notready" );
 	cgs.media.sbSkull = trap_R_RegisterShaderNoMip( "sb_skull" );
 	cgs.media.sbLocked = trap_R_RegisterShaderNoMip( "sb_locked" );
+	cgs.media.sbAccuracy = trap_R_RegisterShaderNoMip( "icons/iconw_proxlauncher" );
 
 
 	memset( cg_items, 0, sizeof( cg_items ) );
