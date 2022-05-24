@@ -250,10 +250,6 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 		if( cgs.gametype >= GT_TEAM && cgs.ffa_gt != 1 ){
 			if( localPlayer->team != ci->team ){
 				CG_setRGBA(re->shaderRGBA, cg_enemyWeaponColor.string);
-				/*re->shaderRGBA[0] = hexToRed( cg_enemyWeaponColor.string );
-				re->shaderRGBA[1] = hexToGreen( cg_enemyWeaponColor.string );
-				re->shaderRGBA[2] = hexToBlue( cg_enemyWeaponColor.string );
-				re->shaderRGBA[3] = hexToAlpha( cg_enemyWeaponColor.string );*/
 	
 				le->color[0] = ((float)re->shaderRGBA[0])/255.0 * 0.75;
 				le->color[1] = ((float)re->shaderRGBA[1])/255.0 * 0.75;
@@ -262,10 +258,6 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 			}
 			else{
 				CG_setRGBA(re->shaderRGBA, cg_teamWeaponColor.string);
-				/*re->shaderRGBA[0] = hexToRed( cg_enemyWeaponColor.string );
-				re->shaderRGBA[1] = hexToGreen( cg_enemyWeaponColor.string );
-				re->shaderRGBA[2] = hexToBlue( cg_enemyWeaponColor.string );
-				re->shaderRGBA[3] = hexToAlpha( cg_enemyWeaponColor.string );*/
 	
 				le->color[0] = ((float)re->shaderRGBA[0])/255.0 * 0.75;
 				le->color[1] = ((float)re->shaderRGBA[1])/255.0 * 0.75;
@@ -275,10 +267,6 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 		}
 		else if( localPlayer != ci ){
 			CG_setRGBA(re->shaderRGBA, cg_enemyWeaponColor.string);
-			/*re->shaderRGBA[0] = hexToRed( cg_enemyWeaponColor.string );
-			re->shaderRGBA[1] = hexToGreen( cg_enemyWeaponColor.string );
-			re->shaderRGBA[2] = hexToBlue( cg_enemyWeaponColor.string );
-			re->shaderRGBA[3] = hexToAlpha( cg_enemyWeaponColor.string );*/
 
 			le->color[0] = ((float)re->shaderRGBA[0])/255.0 * 0.75;
 			le->color[1] = ((float)re->shaderRGBA[1])/255.0 * 0.75;
@@ -287,10 +275,6 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 		}
 		else{
 			CG_setRGBA(re->shaderRGBA, cg_teamWeaponColor.string);
-			/*re->shaderRGBA[0] = hexToRed( cg_enemyWeaponColor.string );
-			re->shaderRGBA[1] = hexToGreen( cg_enemyWeaponColor.string );
-			re->shaderRGBA[2] = hexToBlue( cg_enemyWeaponColor.string );
-			re->shaderRGBA[3] = hexToAlpha( cg_enemyWeaponColor.string );*/
 
 			le->color[0] = ((float)re->shaderRGBA[0])/255.0 * 0.75;
 			le->color[1] = ((float)re->shaderRGBA[1])/255.0 * 0.75;
@@ -357,10 +341,6 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 				if( cgs.gametype >= GT_TEAM && cgs.ffa_gt != 1 ){
 					if( localPlayer->team != ci->team ){
 						CG_setRGBA(re->shaderRGBA, cg_enemyWeaponColor.string);
-						/*re->shaderRGBA[0] = hexToRed( cg_enemyWeaponColor.string );
-						re->shaderRGBA[1] = hexToGreen( cg_enemyWeaponColor.string );
-						re->shaderRGBA[2] = hexToBlue( cg_enemyWeaponColor.string );
-						re->shaderRGBA[3] = hexToAlpha( cg_enemyWeaponColor.string );*/
 
 						le->color[0] = ((float)re->shaderRGBA[0])/255.0 * 0.75;
 						le->color[1] = ((float)re->shaderRGBA[1])/255.0 * 0.75;
@@ -369,10 +349,6 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 					}
 					else{
 						CG_setRGBA(re->shaderRGBA, cg_teamWeaponColor.string);
-						/*re->shaderRGBA[0] = hexToRed( cg_enemyWeaponColor.string );
-						re->shaderRGBA[1] = hexToGreen( cg_enemyWeaponColor.string );
-						re->shaderRGBA[2] = hexToBlue( cg_enemyWeaponColor.string );
-						re->shaderRGBA[3] = hexToAlpha( cg_enemyWeaponColor.string );*/
 
 						le->color[0] = ((float)re->shaderRGBA[0])/255.0 * 0.75;
 						le->color[1] = ((float)re->shaderRGBA[1])/255.0 * 0.75;
@@ -382,10 +358,6 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 				}
 				else if( localPlayer != ci ){
 					CG_setRGBA(re->shaderRGBA, cg_enemyWeaponColor.string);
-					/*re->shaderRGBA[0] = hexToRed( cg_enemyWeaponColor.string );
-					re->shaderRGBA[1] = hexToGreen( cg_enemyWeaponColor.string );
-					re->shaderRGBA[2] = hexToBlue( cg_enemyWeaponColor.string );
-					re->shaderRGBA[3] = hexToAlpha( cg_enemyWeaponColor.string );*/
 
 					le->color[0] = ((float)re->shaderRGBA[0])/255.0 * 0.75;
 					le->color[1] = ((float)re->shaderRGBA[1])/255.0 * 0.75;
@@ -394,10 +366,6 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 				}
 				else{
 					CG_setRGBA(re->shaderRGBA, cg_teamWeaponColor.string);
-					/*re->shaderRGBA[0] = hexToRed( cg_enemyWeaponColor.string );
-					re->shaderRGBA[1] = hexToGreen( cg_enemyWeaponColor.string );
-					re->shaderRGBA[2] = hexToBlue( cg_enemyWeaponColor.string );
-					re->shaderRGBA[3] = hexToAlpha( cg_enemyWeaponColor.string );*/
 
 					le->color[0] = ((float)re->shaderRGBA[0])/255.0 * 0.75;
 					le->color[1] = ((float)re->shaderRGBA[1])/255.0 * 0.75;
@@ -473,28 +441,16 @@ static void CG_RocketTrail( centity_t *ent, const weaponInfo_t *wi ) {
 		if( cgs.gametype >= GT_TEAM && cgs.ffa_gt != 1 ){
 			if( local->team != other->team ){
 				CG_setRGBA(color,cg_enemyWeaponColor.string);
-				/*red = ((float)hexToRed( cg_enemyWeaponColor.string ))/255.0f;
-				green = ((float)hexToGreen( cg_enemyWeaponColor.string ))/255.0f;
-				blue = ((float)hexToBlue( cg_enemyWeaponColor.string ))/255.0f;*/
 			}
 			else{
 				CG_setRGBA(color,cg_teamWeaponColor.string);
-				/*red = ((float)hexToRed( cg_teamWeaponColor.string ))/255.0f;
-				green = ((float)hexToGreen( cg_teamWeaponColor.string ))/255.0f;
-				blue = ((float)hexToBlue( cg_teamWeaponColor.string ))/255.0f;*/
 			}
 		}
 		else if( cg.clientNum != cg_entities[ent->currentState.otherEntityNum].currentState.number ){
 			CG_setRGBA(color,cg_enemyWeaponColor.string);
-			/*red = ((float)hexToRed( cg_enemyWeaponColor.string ))/255.0f;
-			green = ((float)hexToGreen( cg_enemyWeaponColor.string ))/255.0f;
-			blue = ((float)hexToBlue( cg_enemyWeaponColor.string ))/255.0f;*/
 		}
 		else{
 			CG_setRGBA(color,cg_teamWeaponColor.string);
-			/*red = ((float)hexToRed( cg_teamWeaponColor.string ))/255.0f;
-			green = ((float)hexToGreen( cg_teamWeaponColor.string ))/255.0f;
-			blue = ((float)hexToBlue( cg_teamWeaponColor.string ))/255.0f;*/
 		}
 	}
 	else{
@@ -1630,32 +1586,16 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 		if( cgs.gametype >= GT_TEAM && cgs.ffa_gt != 1 ){
 			if( local->team != other->team ){
 				CG_setRGBA(beam.shaderRGBA, cg_enemyWeaponColor.string);
-				/*beam.shaderRGBA[0] = hexToRed( cg_enemyWeaponColor.string );
-				beam.shaderRGBA[1] = hexToGreen( cg_enemyWeaponColor.string );
-				beam.shaderRGBA[2] = hexToBlue( cg_enemyWeaponColor.string );
-				beam.shaderRGBA[3] = hexToAlpha( cg_enemyWeaponColor.string );*/
 			}
 			else{
 				CG_setRGBA(beam.shaderRGBA, cg_teamWeaponColor.string);
-				/*beam.shaderRGBA[0] = hexToRed( cg_teamWeaponColor.string );
-				beam.shaderRGBA[1] = hexToGreen( cg_teamWeaponColor.string );
-				beam.shaderRGBA[2] = hexToBlue( cg_teamWeaponColor.string );
-				beam.shaderRGBA[3] = hexToAlpha( cg_teamWeaponColor.string );*/
 			}
 		}
 		else if( cg.clientNum != cent->currentState.number ){
 			CG_setRGBA(beam.shaderRGBA, cg_enemyWeaponColor.string);
-			/*beam.shaderRGBA[0] = hexToRed( cg_enemyWeaponColor.string );
-			beam.shaderRGBA[1] = hexToGreen( cg_enemyWeaponColor.string );
-			beam.shaderRGBA[2] = hexToBlue( cg_enemyWeaponColor.string );
-			beam.shaderRGBA[3] = hexToAlpha( cg_enemyWeaponColor.string );*/
 		}
 		else{
 			CG_setRGBA(beam.shaderRGBA, cg_teamWeaponColor.string);
-			/*beam.shaderRGBA[0] = hexToRed( cg_teamWeaponColor.string );
-			beam.shaderRGBA[1] = hexToGreen( cg_teamWeaponColor.string );
-			beam.shaderRGBA[2] = hexToBlue( cg_teamWeaponColor.string );
-			beam.shaderRGBA[3] = hexToAlpha( cg_teamWeaponColor.string );*/
 		}
 	}
 	else
@@ -1850,9 +1790,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	gun.renderfx = parent->renderfx;
 
 	// set custom shading for railgun refire rate
-	if ( ps || cent->currentState.clientNum == cg.predictedPlayerState.clientNum ) {
-		if ( cg.predictedPlayerState.weapon == WP_RAILGUN 
-			&& cg.predictedPlayerState.weaponstate == WEAPON_FIRING ) {
+	if ( weaponNum == WP_RAILGUN ) {
+		clientInfo_t *ci = &cgs.clientinfo[cent->currentState.clientNum];
+		if ( cent->pe.railFireTime + 1500 > cg.time ) {
 			float	f;
 
 			f = (float)cg.predictedPlayerState.weaponTime / 1500;
@@ -1860,10 +1800,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			gun.shaderRGBA[0] = 
 			gun.shaderRGBA[2] = 255 * ( 1.0 - f );
 		} else {
-			gun.shaderRGBA[0] = 255;
-			gun.shaderRGBA[1] = 255;
-			gun.shaderRGBA[2] = 255;
-			gun.shaderRGBA[3] = 255;
+			Byte4Copy( ci->c1RGBA, gun.shaderRGBA );
 		}
 	}
 
@@ -1872,9 +1809,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		return;
 	}
 	
-	if( weapon->brightSkin && cg_brightItems.integer == 1 )
+	if ( weapon->brightSkin && cg_brightItems.integer == 1 )
 		gun.customShader = weapon->brightSkin;
-	else if( cg_brightItems.integer == 2 && ( weapon->brightColor[0] || weapon->brightColor[1] || weapon->brightColor[2] ) ){
+	else if ( cg_brightItems.integer == 2 && ( weapon->brightColor[0] || weapon->brightColor[1] || weapon->brightColor[2] ) ) {
 		gun.customShader = trap_R_RegisterShader("models/players/flat");
 		
 		gun.shaderRGBA[0] = weapon->brightColor[0];
@@ -1902,9 +1839,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	VectorMA(gun.origin, lerped.origin[0], parent->axis[0], gun.origin);
 
 	// Make weapon appear left-handed for 2 and centered for 3 (also for 5 and 6 with ghost weapons)
-	if((ps && cg_drawGun.integer == 2) || (ps && cg_drawGun.integer == 5))
+	if ((ps && cg_drawGun.integer == 2) || (ps && cg_drawGun.integer == 5))
 		VectorMA(gun.origin, -lerped.origin[1], parent->axis[1], gun.origin);
-	else if(((!ps || cg_drawGun.integer != 3) && cg_drawGun.integer < DRAW_GUN_ELEMENTS+1) ||
+	else if (((!ps || cg_drawGun.integer != 3) && cg_drawGun.integer < DRAW_GUN_ELEMENTS+1) ||
 		((!ps || cg_drawGun.integer != 6) && cg_drawGun.integer > DRAW_GUN_ELEMENTS))
 		VectorMA(gun.origin, lerped.origin[1], parent->axis[1], gun.origin);
 
@@ -2677,6 +2614,10 @@ void CG_FireWeapon( centity_t *cent ) {
 		if ( cent->pe.lightningFiring ) {
 			return;
 		}
+	}
+
+	if ( ent->weapon == WP_RAILGUN ) {
+		cent->pe.railFireTime = cg.time;
 	}
 
 	// play quad sound if needed

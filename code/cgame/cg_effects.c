@@ -235,7 +235,7 @@ void CG_LaunchSparks( vec3_t origin ) {
 
 /*
 ==================
-CG_LaunchSparks
+CG_LaunchParticleTrail
 ==================
 */
 void CG_LaunchParticleTrail( vec3_t origin ) {

@@ -99,7 +99,7 @@ static void CG_DrawClientScore( int x, int y, int w, int h, score_t *score, floa
 	if ( score->ping >= 50 && score->ping < 100 ) Vector4Copy(colorYellow, colorPing);  
 	if ( score->ping >= 100 || score->ping < 0 ) Vector4Copy(colorRed, colorPing);  
 	CG_DrawStringExt( x + w*0.6, y - SB_MEDCHAR_HEIGHT/2, va( "%i", score->score ), colorWhite, qtrue, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
-	if ( score->accuracy > 0 ){
+	if( score->accuracy > 0 ){
 		CG_DrawStringExt( x + w*0.7, y - SB_MEDCHAR_HEIGHT/2, va( "%i%s", score->accuracy, "%" ), colorWhite, qtrue, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
 	}else{
 		CG_DrawStringExt( x + w*0.7, y - SB_MEDCHAR_HEIGHT/2, va( "%s", "-%" ), colorWhite, qtrue, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );

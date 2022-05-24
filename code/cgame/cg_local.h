@@ -132,29 +132,30 @@ typedef struct {
 	int			frame;
 	int			frameTime;			// time when ->frame will be exactly on
 
-	float		backlerp;
+	float			backlerp;
 
-	float		yawAngle;
-	qboolean	yawing;
-	float		pitchAngle;
-	qboolean	pitching;
+	float			yawAngle;
+	qboolean		yawing;
+	float			pitchAngle;
+	qboolean		pitching;
 
 	int			animationNumber;	// may include ANIM_TOGGLEBIT
-	animation_t	*animation;
+	animation_t		*animation;
 	int			animationTime;		// time when the first frame of the animation will be exact
 } lerpFrame_t;
 
 
 typedef struct {
-	lerpFrame_t		legs, torso, flag;
+	lerpFrame_t			legs, torso, flag;
 	int				painTime;
 	int				painDirection;	// flip from 0 to 1
 	int				lightningFiring;
 
+	int				railFireTime;
 	// machinegun spinning
-	float			barrelAngle;
+	float				barrelAngle;
 	int				barrelTime;
-	qboolean		barrelSpinning;
+	qboolean			barrelSpinning;
 } playerEntity_t;
 
 //=================================================
@@ -223,11 +224,11 @@ typedef enum {
 	LE_FADE_RGB,
 	LE_SCALE_FADE,
 	LE_SCOREPLUM,
-	LE_DAMAGEPLUM,
 	LE_KAMIKAZE,
 	LE_INVULIMPACT,
 	LE_INVULJUICED,
-	LE_SHOWREFENTITY
+	LE_SHOWREFENTITY,
+	LE_DAMAGEPLUM
 } leType_t;
 
 typedef enum {
@@ -339,30 +340,32 @@ typedef struct {
 	char			name[MAX_QPATH];
 	team_t			team;
 
-	int				botSkill;		// 0 = not bot, 1-5 = bot
+	int			botSkill;		// 0 = not bot, 1-5 = bot
 
 	vec3_t			color1;
 	vec3_t			color2;
 
-	int				score;			// updated by score servercmds
-	int				location;		// location index for team mode
-	int				health;			// you only get this info about your teammates
-	int				armor;
-	int				curWeapon;
+	byte			c1RGBA[4];
 
-	int				handicap;
-	int				wins, losses;	// in tourney mode
+	int			score;			// updated by score servercmds
+	int			location;		// location index for team mode
+	int			health;			// you only get this info about your teammates
+	int			armor;
+	int			curWeapon;
 
-	int				teamTask;		// task in teamplay (offence/defence)
+	int			handicap;
+	int			wins, losses;		// in tourney mode
+
+	int			teamTask;		// task in teamplay (offence/defence)
 	qboolean		teamLeader;		// true when this is a team leader
 
-	int				powerups;		// so can display quad/flag status
+	int			powerups;		// so can display quad/flag status
 
-	int				medkitUsageTime;
-	int				invulnerabilityStartTime;
-	int				invulnerabilityStopTime;
+	int			medkitUsageTime;
+	int			invulnerabilityStartTime;
+	int			invulnerabilityStopTime;
 
-	int				breathPuffTime;
+	int			breathPuffTime;
 
 	// when clientinfo is changed, the loading of models/skins/sounds
 	// can be deferred until you are dead, to prevent hitches in
@@ -810,6 +813,7 @@ typedef struct {
 	float		v_dmg_time;
 	float		v_dmg_pitch;
 	float		v_dmg_roll;
+	float		v_dmg_angle;
 
 	vec3_t		kick_angles;	// weapon kicks
 	vec3_t		kick_origin;
@@ -1269,7 +1273,7 @@ typedef struct {
 	qhandle_t	sbReady;
 	qhandle_t	sbNotReady;
 	qhandle_t	sbSkull;
-	qhandle_t       sbLocked;
+	qhandle_t	sbLocked;
 	qhandle_t	sbAccuracy;
 	
 	qhandle_t 	spawnPoint;

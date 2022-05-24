@@ -101,12 +101,10 @@ CG_DamageFeedback
 void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 	float		left, front, up;
 	float		kick;
-	int			health;
+	int		health;
 	float		scale;
 	vec3_t		dir;
 	vec3_t		angles;
-	float		dist;
-	float		yaw, pitch;
 
 	// show the attacking player's head and name in corner
 	cg.attackerTime = cg.time;
@@ -118,12 +116,8 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 	} else {
 		scale = 40.0 / health;
 	}
-	kick = damage * scale;
 
-	if (kick < 5)
-		kick = 5;
-	if (kick > 10)
-		kick = 10;
+	kick = Com_Clamp(5, 10, damage * scale);
 
 	// if yaw and pitch are both 255, make the damage always centered (falling, etc)
 	if ( yawByte == 255 && pitchByte == 255 ) {
@@ -131,13 +125,11 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 		cg.damageY = 0;
 		cg.v_dmg_roll = 0;
 		cg.v_dmg_pitch = -kick;
+		cg.v_dmg_angle = -1;
 	} else {
 		// positional
-		pitch = pitchByte / 255.0 * 360;
-		yaw = yawByte / 255.0 * 360;
-
-		angles[PITCH] = pitch;
-		angles[YAW] = yaw;
+		angles[PITCH] = pitchByte / 255.0f * 360;
+		angles[YAW] = yawByte / 255.0f * 360;
 		angles[ROLL] = 0;
 
 		AngleVectors( angles, dir, NULL, NULL );
@@ -148,50 +140,28 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 		up = DotProduct (dir, cg.refdef.viewaxis[2] );
 
 		dir[0] = front;
-		dir[1] = left;
-		dir[2] = 0;
-		dist = VectorLength( dir );
-		if ( dist < 0.1 ) {
-			dist = 0.1f;
-		}
+		dir[1] = -left;
+		dir[2] = up;
 
-		cg.v_dmg_roll = kick * left;
-		
+		vectoangles(dir, angles);
+
+		cg.v_dmg_roll  = kick * left;
 		cg.v_dmg_pitch = -kick * front;
+		cg.v_dmg_angle = angles[YAW];
 
-		if ( front <= 0.1 ) {
-			front = 0.1f;
-		}
-		cg.damageX = -left / front;
-		cg.damageY = up / dist;
-	}
-
-	// clamp the position
-	if ( cg.damageX > 1.0 ) {
-		cg.damageX = 1.0;
-	}
-	if ( cg.damageX < - 1.0 ) {
-		cg.damageX = -1.0;
-	}
-
-	if ( cg.damageY > 1.0 ) {
-		cg.damageY = 1.0;
-	}
-	if ( cg.damageY < - 1.0 ) {
-		cg.damageY = -1.0;
+		cg.damageX = -left;
+		cg.damageY = front;
 	}
 
 	// don't let the screen flashes vary as much
 	if ( kick > 10 ) {
 		kick = 10;
 	}
+
 	cg.damageValue = kick;
 	cg.v_dmg_time = cg.time + DAMAGE_TIME;
 	cg.damageTime = cg.snap->serverTime;
 }
-
-
-
 
 /*
 ================

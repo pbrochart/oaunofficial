@@ -259,8 +259,6 @@ static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, q
 
 }
 
-
-
 static void CG_DrawPlayerHead(rectDef_t *rect, qboolean draw2D) {
 	vec3_t		angles;
 	float		size, stretch;

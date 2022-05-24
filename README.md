@@ -35,8 +35,7 @@ It's an alternative to pmove_fixed which had drawbacks
 as high and far as if they had 125 fps even when their
 actual fps is lower or unstable (but require more bandwidth).
 Revision 322: Minor enhancements on CTF and small bug fixes from ioquake3.
-Revision 323: Fix broken AI by moving green armour at the end of list
-and remove unused-but-set gcc warnings.
+Revision 323: Fix broken AI by moving green armour at the end of list.
 Revision 324: Add cg_hudFullScreen (disabled by default): Make the hud
 independent from cg_viewsize and fix the crosshair position.
 Increase com_maxfps and pmove_accurate limit to 250.
@@ -46,6 +45,7 @@ Revision 326: Make the damage plumes more readable and add cg_fovAdjust.
 Revision 327: Rewrite of multiview with some parts from etlegacy.
 Revision 328: Fix minor bugs.
 Revision 329: Fix cg_drawTeamOverlay with multiview.
-Revision 330: Better fix for cg_drawTeamOverlay and suppress warnings.
+Revision 330: Better fix for cg_drawTeamOverlay.
 Fix the main spec model in multiview windows.
 Revision 331: Improve the scoreboard.
+Revision 332: Fix various bugs.

@@ -1815,7 +1815,6 @@ char *eventnames[] = {
 
 	"EV_GIB_PLAYER",			// gib a previously living player
 	"EV_SCOREPLUM",				// score plum
-	"EV_DAMAGEPLUM",			// damage plum
 
 //Not all of these are used in baseoa but we keep them to gurantie event numbers between version
 	"EV_PROXIMITY_MINE_STICK",
@@ -1836,7 +1835,10 @@ char *eventnames[] = {
 	"EV_TAUNT_FOLLOWME",
 	"EV_TAUNT_GETFLAG",
 	"EV_TAUNT_GUARDBASE",
-	"EV_TAUNT_PATROL"
+	"EV_TAUNT_PATROL",
+
+	"EV_WEAPONDROP",
+	"EV_DAMAGEPLUM"			// damage plum
 
 };
 

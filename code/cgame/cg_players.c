@@ -1188,6 +1188,11 @@ void CG_NewClientInfo( int clientNum ) {
 	v = Info_ValueForKey( configstring, "c1" );
 	CG_ColorFromString( v, newInfo.color1 );
 
+	newInfo.c1RGBA[0] = 255;
+	newInfo.c1RGBA[1] = 255;
+	newInfo.c1RGBA[2] = 255;
+	newInfo.c1RGBA[3] = 255;
+
 	v = Info_ValueForKey( configstring, "c2" );
 	CG_ColorFromString( v, newInfo.color2 );
 

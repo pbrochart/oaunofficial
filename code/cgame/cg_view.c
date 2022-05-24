@@ -652,8 +652,8 @@ static void CG_DamageBlendBlob( void ) {
     ent.renderfx = RF_FIRST_PERSON;
 
     VectorMA( cg.refdef.vieworg, 8, cg.refdef.viewaxis[0], ent.origin );
-    VectorMA( ent.origin, cg.damageX * -8, cg.refdef.viewaxis[1], ent.origin );
-    VectorMA( ent.origin, cg.damageY * 8, cg.refdef.viewaxis[2], ent.origin );
+    VectorMA( ent.origin, cg.damageX * -10, cg.refdef.viewaxis[1], ent.origin );
+    VectorMA( ent.origin, cg.damageY * 6, cg.refdef.viewaxis[2], ent.origin );
 
     ent.radius = cg.damageValue * 3;
     ent.customShader = cgs.media.viewBloodShader;
