@@ -807,7 +807,7 @@ CG_AddDamagePlum
 void CG_AddDamagePlum( localEntity_t *le ) {
 	refEntity_t	*re;
 	vec3_t		origin, delta, dir, vec, up = {0, 0, 1};
-	float		c, len, scale;
+	float		c, len, scale, cgscale;
 	int		i, damage, digits[10], numdigits, negative;
 
 	re = &le->refEntity;
@@ -844,12 +844,13 @@ void CG_AddDamagePlum( localEntity_t *le ) {
 	VectorNormalize(vec);
 
 	VectorMA(origin, -8 + 6 * sin(c * 2 * M_PI), vec, origin);
+	cgscale = Com_Clamp(1, 2, cg_damagePlumScale.value);
 
 	// if the view would be "inside" the sprite, kill the sprite
 	// so it doesn't add too much overdraw
 	VectorSubtract( origin, cg.refdef.vieworg, delta );
 	len = VectorLength( delta );
-	if ( len < 20 ) {
+	if ( len < 20 * cgscale ) {
 		CG_FreeLocalEntity( le );
 		return;
 	}
@@ -864,8 +865,8 @@ void CG_AddDamagePlum( localEntity_t *le ) {
 		( ( cg.time - cg.zoomTime ) / (float)( cg_zoomScaling.value * ZOOM_TIME ) > 1 ) ) )
 		scale = (float)len / MAX_DISTANCE_ZOOM_NOSCALE;
 
-	origin[2] += 49 - cos (c * 4.8) * 34 * scale;
-	re->radius = NUMBER_SIZE / 2 * scale;
+	origin[2] += 49 - cos (c * 4.8) * 34 * scale * cgscale;
+	re->radius = NUMBER_SIZE / 2 * scale * cgscale;
 
 	negative = qfalse;
 	if (damage < 0) {
@@ -884,7 +885,7 @@ void CG_AddDamagePlum( localEntity_t *le ) {
 	}
 
 	for (i = 0; i < numdigits; i++) {
-		VectorMA(origin, (float) (((float) numdigits / 2) - i) * NUMBER_SIZE * scale, vec, re->origin);
+		VectorMA(origin, (float) (((float) numdigits / 2) - i) * NUMBER_SIZE * scale * cgscale, vec, re->origin);
 		re->customShader = cgs.media.numberShaders[digits[numdigits-1-i]];
 		re->renderfx = RF_DEPTHHACK;
 		trap_R_AddRefEntityToScene( re );

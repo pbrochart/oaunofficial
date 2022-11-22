@@ -2064,7 +2064,7 @@ void ClientBegin( int clientNum ) {
         if(strlen(custom_vote_info))
             SendCustomVoteCommands(clientNum);
 	
-	SendReadymask( ent-g_entities );
+	SendReadymask( -1 );
 	
 	if( level.timeout )
 		Cmd_Timeout_f( ent );

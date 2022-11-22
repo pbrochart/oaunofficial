@@ -1530,7 +1530,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if( g_gametype.integer == GT_CTF_ELIMINATION && g_elimination_ctf_oneway.integer != 0 && targ == attacker)
 		return;
 
- 	if ( damage && targ->client && targ != attacker && g_damagePlums.integer ) {
+ 	if ( damage && targ->client && targ != attacker && g_damagePlums.integer && targ->health > 0 ) {
 		if ( mod != MOD_SHOTGUN ) {
 			DamagePlum( attacker, targ->r.currentOrigin, damage, mod );
 		}

@@ -321,7 +321,7 @@ void ProximityMine_RemoveAll() {
     
     mine = NULL;
     
-    while ((mine = G_Find (mine, FOFS(classname), "grenade")) != NULL) {
+    while ((mine = G_Find (mine, FOFS(classname), "prox mine")) != NULL) {
         mine->think = ProximityMine_Explode;
 	mine->nextthink = level.time + 1;
     }
@@ -338,7 +338,7 @@ void Grenade_RemoveAll( void ) {
     
     grenade = NULL;
     
-    while ((grenade = G_Find (grenade, FOFS(classname), "prox mine")) != NULL) {
+    while ((grenade = G_Find (grenade, FOFS(classname), "grenade")) != NULL) {
         grenade->think = G_ExplodeMissile;
 	grenade->nextthink = level.time + 1;
     }

@@ -1219,9 +1219,9 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
                 color[0] = colorBlack[0];
                 color[1] = colorBlack[1];
                 color[2] = colorBlack[2];
-                color[3] = (cg.time - cg.deathtime)/5000.0f;
-                if( color[3] > 1.0 )
-                    color[3] = 1.0;
+                color[3] = (cg.time - cg.deathtime)/3000.0f;
+                if( color[3] > 0.3f )
+                    color[3] = 0.3f;
                 CG_FillRect(0, 0, 640, 480, color);
         }
     }

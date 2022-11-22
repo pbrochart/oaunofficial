@@ -145,7 +145,7 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 
 		vectoangles(dir, angles);
 
-		cg.v_dmg_roll  = kick * left;
+		cg.v_dmg_roll = kick * left;
 		cg.v_dmg_pitch = -kick * front;
 		cg.v_dmg_angle = angles[YAW];
 

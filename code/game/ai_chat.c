@@ -237,8 +237,7 @@ char *BotMapTitle(void) {
 
 	trap_GetServerinfo(info, sizeof(info));
 
-	strncpy(mapname, Info_ValueForKey( info, "mapname" ), sizeof(mapname)-1);
-	mapname[sizeof(mapname)-1] = '\0';
+	Q_strncpyz(mapname, Info_ValueForKey( info, "mapname" ), sizeof(mapname));
 
 	return mapname;
 }
@@ -921,9 +920,9 @@ BotChatTime
 ==================
 */
 float BotChatTime(bot_state_t *bs) {
-	int cpm;
+	//int cpm;
 
-	cpm = trap_Characteristic_BInteger(bs->character, CHARACTERISTIC_CHAT_CPM, 1, 4000);
+	//cpm = trap_Characteristic_BInteger(bs->character, CHARACTERISTIC_CHAT_CPM, 1, 4000);
 
 	return 2.0;	//(float) trap_BotChatLength(bs->cs) * 30 / cpm;
 }

@@ -1384,6 +1384,7 @@ extern vmCvar_t   g_autoRestart;
 extern vmCvar_t   g_writePlayerCoords;
 extern vmCvar_t   g_crosshairNamesFog;
 extern vmCvar_t   g_damagePlums;
+extern vmCvar_t   g_adminChatText;
 
 void	trap_Print( const char *text );
 void	trap_Error( const char *text ) __attribute__((noreturn));

@@ -87,7 +87,7 @@ static void CG_DrawClientScore( int x, int y, int w, int h, score_t *score, floa
 	}
 	
 	// don't draw the client while he's connecting
-	if( score->ping == -1 )return;
+	if( score->ping == -1 ) return;
 	
 	ci = &cgs.clientinfo[ score->client ];
 	
@@ -189,7 +189,7 @@ static int CG_TeamScoreboard( int x, int y, int w, int h, team_t team, float *co
 		
 			notEnough = qtrue;
 			// we don't break the loop, so we can get the local client, and display it later
-			if( score->client == cg.clientNum )localClient = score;
+			if( score->client == cg.clientNum ) localClient = score;
 			
 		}else{
 			
@@ -205,7 +205,6 @@ static int CG_TeamScoreboard( int x, int y, int w, int h, team_t team, float *co
 	}
 	
 	if( notEnough ){
-	
 		CG_DrawStringExt( x, y, "...", colorWhite, qtrue, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
 		
 		// draw the local client if he hasn't been drawn yet
@@ -221,7 +220,6 @@ static int CG_TeamScoreboard( int x, int y, int w, int h, team_t team, float *co
 	}
 	
 	return count;
-	
 }
 
 static void CG_DrawSpecs( void ){
@@ -255,11 +253,8 @@ static void CG_DrawSpecs( void ){
 		}
 		
 		if( notEnough ){
-		
-			if( score->client == cg.clientNum )localClient = score;
-			
+			if( score->client == cg.clientNum ) localClient = score;
 		}else{
-		
 			if( CG_DrawStrlen( string ) + CG_DrawStrlen( ci->name ) + 3 > SB_SPEC_MAXCHAR && strlen( string ) ){
 				CG_DrawStringExt( SB_SPEC_X, y, string, colorWhite, qfalse, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
 				if( cgs.gametype == GT_TOURNAMENT ){
@@ -269,7 +264,6 @@ static void CG_DrawSpecs( void ){
 						strcpy( string, va("^7(^2%i^7/^1%i^7)%s^7(^2%i^7)", ci->wins, ci->losses, ci->name, queueNumber ) );
 						queueNumber++;
 					}
-					
 				}
 				else
 					strcpy( string, va( "^7%s", ci->name ) );
@@ -278,7 +272,7 @@ static void CG_DrawSpecs( void ){
 				numLine++;
 				if( numLine >= 2 ){
 					notEnough = qtrue;
-					if( score->client == cg.clientNum )localClient = score;
+					if( score->client == cg.clientNum ) localClient = score;
 				}
 			}else{
 				if( strlen( string ) )
@@ -295,20 +289,15 @@ static void CG_DrawSpecs( void ){
 				else
 					strcat( string, va( "^7%s", ci->name ) );
 			}
-			
 		}
 	}
 	
 	if( notEnough ){
-		
 		strcpy( string, "... " );
-		if( localClient != NULL )strcat( string, cgs.clientinfo[ score->client ].name ); // draw the local client if he hasn't been drawn yet
+		if( localClient != NULL ) strcat( string, cgs.clientinfo[ score->client ].name ); // draw the local client if he hasn't been drawn yet
 		CG_DrawStringExt( SB_SPEC_X, y, string, colorWhite, qfalse, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
-		
 	}else if( strlen( string ) ){
-	
 		CG_DrawStringExt( SB_SPEC_X, y, string, colorWhite, qfalse, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
-	
 	}
 }
 
@@ -325,7 +314,6 @@ static void CG_DrawPicBar( picBar_t *tab, int count, int x, int y, int w, int h 
 		if( tab[ i ].percent )strcat( string, "%" );
 		CG_DrawStringExt( picBarX + h + 3, y - SB_MEDCHAR_HEIGHT/2, string, colorWhite, qtrue, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
 	}
-	
 }
 
 static void CG_DrawMapInfo( void ){
@@ -355,7 +343,6 @@ static void CG_DrawMapInfo( void ){
 	strcat( string, " // " );
 	strcat( string, gameNames[ cgs.gametype ] );
 	CG_DrawStringExt( SB_XPOS + 10, SB_YPOS + 2, string, colorWhite, qtrue, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
-	
 }
 
 qboolean CG_DrawOldScoreboard( void ){
@@ -431,7 +418,6 @@ qboolean CG_DrawOldScoreboard( void ){
 		if( cgs.blueLocked )
 		  CG_DrawPic( 640-32, SB_TEAM_Y, 32, 32, cgs.media.sbLocked );
 	}else{
-		
 		// current rank
 		if( cg.snap->ps.persistant[ PERS_TEAM ] != TEAM_SPECTATOR ){
 			strcpy( string, va( "%s place with %i", CG_PlaceString( cg.snap->ps.persistant[ PERS_RANK ] + 1 ), cg.snap->ps.persistant[ PERS_SCORE ] ) );
@@ -444,7 +430,6 @@ qboolean CG_DrawOldScoreboard( void ){
 		color[ 2 ] = 0.7;
 		color[ 3 ] = 0.25;
 		CG_TeamScoreboard( SB_FFA_X, SB_FFA_Y + 50, SB_FFA_WIDTH, SB_FFA_HEIGHT, TEAM_FREE, color, SB_MAXDISPLAY );
-		
 	}
 	
 	// informations about the local/specced player (acc + awards)
@@ -527,9 +512,7 @@ qboolean CG_DrawOldScoreboard( void ){
 	}
 	
 	return qtrue;
-	
 }
-
 
 qboolean CG_DrawOldTourneyScoreboard( void ){
 	
@@ -583,7 +566,7 @@ qboolean CG_DrawOldTourneyScoreboard( void ){
 	loop = -1; // loop is used when displaying the stats. -1 : no player, 0 : left player only, 2 : both players
 	
 	for( i=0; i<cg.numScores; i++ ){
-		if( cgs.clientinfo[ cg.scores[ i ].client ].team != TEAM_FREE )continue;
+		if( cgs.clientinfo[ cg.scores[ i ].client ].team != TEAM_FREE ) continue;
 		if( p1 == NULL ){
 			loop = 0;
 			p1 = &cgs.clientinfo[ cg.scores[ i ].client ];
@@ -627,7 +610,7 @@ qboolean CG_DrawOldTourneyScoreboard( void ){
 		p = side < 0? p1 : p2;
 		score = side < 0? p1Score : p2Score;
 		
-		if( p == NULL )break;
+		if( p == NULL ) break;
 	
 		CG_DrawStringExt( x + side*w/2 - SMALLCHAR_WIDTH*CG_DrawStrlen( va("^7(^2%i^7/^1%i^7) %s",p->wins, p->losses, p->name ) )/2, y + 15, va("^7(^2%i^7/^1%i^7) %s",p->wins, p->losses, p->name ), colorWhite, qfalse, qtrue, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 		CG_DrawPic( x + side*w*0.8 - offset*SB_INFOICON_SIZE, y + 30, SB_INFOICON_SIZE, SB_INFOICON_SIZE, cgs.media.sbPing );
@@ -684,8 +667,7 @@ qboolean CG_DrawOldTourneyScoreboard( void ){
 					strcpy( string, "-/-" );
 				}
 				CG_DrawStringExt( x + side*0.6*w - SB_MEDCHAR_WIDTH*CG_DrawStrlen( string )/2, y, string, colorWhite, qtrue, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
-				
-		}
+			}
 			y += h + 10;
 		}
 	}
@@ -722,7 +704,6 @@ qboolean CG_DrawOldTourneyScoreboard( void ){
 		CG_DrawStringExt( x + side*w - offset*SB_MEDCHAR_WIDTH*CG_DrawStrlen( string ), y + h/2 - SB_MEDCHAR_HEIGHT/2, string, colorWhite, qtrue, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
 		strcpy( string, va( "%i", score->dmgdone ) );
 		CG_DrawStringExt( x + side*( w - h*2 ) - offset*SB_MEDCHAR_WIDTH*CG_DrawStrlen( string ), y + h/2 - SB_MEDCHAR_HEIGHT/2, string, colorWhite, qtrue, qfalse, SB_MEDCHAR_WIDTH, SB_MEDCHAR_HEIGHT, 0 );
-		
 	}
 	
 	// awards
@@ -762,7 +743,7 @@ qboolean CG_DrawOldTourneyScoreboard( void ){
 		
 		awardCount = 0;
 		for( i=0; i<SB_TOURNEY_MAX_AWARDS; i++ ){
-			if( picBar[ i ].val == 0 )continue;
+			if( picBar[ i ].val == 0 ) continue;
 			for( j=0; j<awardCount; j++ ){
 				if( picBar[ i ].val > sortedPicBar[ j ].val ){
 					for( k=awardCount-1; k>=j; k-- ){
@@ -777,11 +758,9 @@ qboolean CG_DrawOldTourneyScoreboard( void ){
 			sortedPicBar[ j ].val = picBar[ i ].val;
 			sortedPicBar[ j ].percent = picBar[ i ].percent;
 			awardCount++;
-			if( awardCount >= SB_TOURNEY_AWARDS )break;
+			if( awardCount >= SB_TOURNEY_AWARDS ) break;
 		}
-		
 		CG_DrawPicBar( sortedPicBar, awardCount, x + side*w/2, y, w*0.8, h );
-		
 	}
 	
 	// spectators
@@ -793,5 +772,4 @@ qboolean CG_DrawOldTourneyScoreboard( void ){
 	}
 	
 	return qtrue;
-	
 }

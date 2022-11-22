@@ -615,7 +615,7 @@ void CG_DamagePlum( int client, vec3_t org, int damage, int mod ) {
 	retDamagePlum = CG_ParseDamagePlum ( mod );
 
 	// only visualize for the client that damaged
-	if (client != cg.predictedPlayerState.clientNum || !cg_damagePlums.integer || !retDamagePlum) {
+	if (client != cg.predictedPlayerState.clientNum || cg_damagePlums.integer == 0 || !retDamagePlum) {
 		return;
 	}
 

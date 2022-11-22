@@ -3052,7 +3052,11 @@ static void CG_DrawLagometer ( void ) {
     CG_DrawStringHud ( HUD_NETGRAPHPING, qtrue, ( const char* ) va ( "%ims", cg.snap->ping ) );
 
     if ( cg_nopredict.integer || cg_synchronousClients.integer ) {
-        CG_DrawBigString ( ax, ay, "snc", 1.0 );
+        if ( !cgs.hud[HUD_NETGRAPHPING].inuse ) {
+            ax = 640 - 48;
+            ay = 480 - 48;
+            CG_DrawBigString ( ax, ay, "snc", 1.0 );
+        }
     }
 
     CG_DrawDisconnect();
@@ -3561,7 +3565,6 @@ static void CG_DrawCrosshair3D ( void ) {
 }
 
 
-
 /*
 =================
 CG_ScanForCrosshairEntity
@@ -3595,14 +3598,8 @@ static void CG_ScanForCrosshairEntity ( int window ) {
     }
 
     // update the fade timer
-    if ( window ) {
-         cg.chcn[window] = trace.entityNum;
-         cg.chct[window] = cg.time;
-    }
-    else {
-        cg.crosshairClientNum = trace.entityNum;
-        cg.crosshairClientTime = cg.time;
-    }
+    cg.crosshairClientNum[window] = trace.entityNum;
+    cg.crosshairClientTime[window] = cg.time;
 }
 
 
@@ -3615,7 +3612,6 @@ static void CG_DrawCrosshairNames ( int window ) {
     float		*color;
     char		*name;
     int			armorcolor, healthcolor;
-    int			crosshairClientNum, crosshairClientTime;
  
     if ( !cgs.hud[HUD_TARGETNAME].inuse )
         return;
@@ -3631,23 +3627,14 @@ static void CG_DrawCrosshairNames ( int window ) {
     // scan the known entities to see if the crosshair is sighted on one
     CG_ScanForCrosshairEntity( window );
 
-    if ( window ) {
-        crosshairClientNum = cg.chcn[window];
-        crosshairClientTime = cg.chct[window];
-    }
-    else {
-        crosshairClientNum = cg.crosshairClientNum;
-        crosshairClientTime = cg.crosshairClientTime;
-    }
-
     // draw the name of the player being looked at
-    color = CG_FadeColor ( crosshairClientTime, cgs.hud[HUD_TARGETNAME].time );
+    color = CG_FadeColor ( cg.crosshairClientTime[window], cgs.hud[HUD_TARGETNAME].time );
     if ( !color ) {
         trap_R_SetColor ( NULL );
         return;
     }
 
-    name = cgs.clientinfo[ crosshairClientNum ].name;
+    name = cgs.clientinfo[ cg.crosshairClientNum[window] ].name;
 
     CG_DrawStringHud ( HUD_TARGETNAME, qtrue, name );
 
@@ -3656,27 +3643,27 @@ static void CG_DrawCrosshairNames ( int window ) {
     if ( cg.snap->ps.persistant[PERS_TEAM] != TEAM_RED && cg.snap->ps.persistant[PERS_TEAM] != TEAM_BLUE )
         return;
 
-    if ( cg.snap->ps.persistant[PERS_TEAM] != cgs.clientinfo[ crosshairClientNum ].team )
+    if ( cg.snap->ps.persistant[PERS_TEAM] != cgs.clientinfo[ cg.crosshairClientNum[window] ].team )
         return;
 
     if ( ( cgs.hud[HUD_TARGETSTATUS].inuse ) && ( cgs.clientinfo[cg.clientNum].team != TEAM_SPECTATOR ) ) {
-        if ( cgs.clientinfo[ crosshairClientNum ].health >= 100 )
+        if ( cgs.clientinfo[ cg.crosshairClientNum[window] ].health >= 100 )
             healthcolor = 2;
-        else if ( cgs.clientinfo[ crosshairClientNum ].health >= 50 )
+        else if ( cgs.clientinfo[ cg.crosshairClientNum[window] ].health >= 50 )
             healthcolor = 3;
         else
             healthcolor = 1;
 
-        if ( cgs.clientinfo[ crosshairClientNum ].armor >= 100 )
+        if ( cgs.clientinfo[ cg.crosshairClientNum[window] ].armor >= 100 )
             armorcolor = 2;
-        else if ( cgs.clientinfo[ crosshairClientNum ].armor >= 50 )
+        else if ( cgs.clientinfo[ cg.crosshairClientNum[window] ].armor >= 50 )
             armorcolor = 3;
         else
             armorcolor = 1;
 
         CG_DrawStringHud ( HUD_TARGETSTATUS, qfalse, va ( "(^%i%i^7|^%i%i^7)", healthcolor,
-            cgs.clientinfo[ crosshairClientNum ].health, armorcolor,
-            cgs.clientinfo[ crosshairClientNum ].armor ) );
+            cgs.clientinfo[ cg.crosshairClientNum[window] ].health, armorcolor,
+            cgs.clientinfo[ cg.crosshairClientNum[window] ].armor ) );
     }
 }
 

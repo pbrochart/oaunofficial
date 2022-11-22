@@ -609,8 +609,6 @@ enum{
 
 //=========================SUPERHUD END==================================
 
-#define MAX_MULTIVIEW 4
-
 #define MAX_REWARDSTACK		10
 #define MAX_SOUNDBUFFER		20
 
@@ -753,8 +751,8 @@ typedef struct {
 	int			lastKillTime;
 
 	// crosshair client ID
-	int			crosshairClientNum;
-	int			crosshairClientTime;
+	int			crosshairClientNum[MAX_MULTIVIEW];
+	int			crosshairClientTime[MAX_MULTIVIEW];
 
 	// powerup active flashing
 	int			powerupActive;
@@ -869,8 +867,6 @@ typedef struct {
 	int spawnTeam[MAX_SPAWNPOINTS];
 	int numSpawnpoints;
 	qboolean forceChat;
-	int chcn[MAX_MULTIVIEW];
-	int chct[MAX_MULTIVIEW];
 	int window;
 } cg_t;
 
@@ -1756,6 +1752,7 @@ extern vmCvar_t 		cg_drawSpawnpoints;
 extern vmCvar_t 		cg_mapoverview;
 extern vmCvar_t			cg_damagePlums;
 extern vmCvar_t			cg_damagePlum;
+extern vmCvar_t			cg_damagePlumScale;
 extern vmCvar_t			cg_waterWarp;
 extern vmCvar_t			cg_hudFullScreen;
 extern vmCvar_t			cg_fovAdjust;

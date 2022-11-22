@@ -373,7 +373,7 @@ static void UI_Challenges_Init( void ) {
             challenges.entryIntText[i].style = UI_RIGHT;
             challenges.entryIntText[i].string           = challenges.entryIntString[i];
 
-            strncpy(challenges.entryIntString[i],va("%u",challenges.entryInt[i]),MAX_INT_AS_STRING);
+            Q_snprintf(challenges.entryIntString[i], MAX_INT_AS_STRING, "%u", challenges.entryInt[i]);
             y += BIGCHAR_HEIGHT+2;
         }
 

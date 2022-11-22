@@ -73,7 +73,8 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 		perfect = ( cl->ps.persistant[PERS_RANK] == 0 && cl->ps.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
 
 		if ( g_gametype.integer == GT_TOURNAMENT ) {
-			if ( ( ent->client->ps.clientNum == cl->ps.clientNum ) || level.intermissiontime || ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+			if ( ( ent->client->ps.clientNum == cl->ps.clientNum ) || level.intermissiontime ||
+				ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 				Com_sprintf (entry, sizeof(entry),
 					" %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i ", level.sortedClients[i],
 					cl->ps.persistant[PERS_SCORE], ping, (level.time - cl->pers.enterTime)/60000,
@@ -138,7 +139,8 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 					);
 			}
 		} else {
-			if ( ( ent->client->ps.clientNum == cl->ps.clientNum ) || level.intermissiontime || ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+			if ( ( ent->client->ps.clientNum == cl->ps.clientNum ) || level.intermissiontime ||
+				ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 				Com_sprintf (entry, sizeof(entry),
 					" %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i ", level.sortedClients[i],
 					cl->ps.persistant[PERS_SCORE], ping, (level.time - cl->pers.enterTime)/60000,
@@ -474,10 +476,14 @@ void G_StartServerDemos( void ) {
 		count = 0;
 		
 		for ( j = 0; j < 128 ; j++ ) {
-			if ( playerName[j] == '^' && ( ( playerName[j+1] >= '0' && playerName[j+1] <= '9' ) || ( playerName[j+1] >= 'a' && playerName[j+1] <= 'z' ) || ( playerName[j+1] >= 'A' && playerName[j+1] <= 'Z' ) ) ) {
+			if ( playerName[j] == '^' && ( ( playerName[j+1] >= '0' && playerName[j+1] <= '9' ) ||
+				( playerName[j+1] >= 'a' && playerName[j+1] <= 'z' ) ||
+				( playerName[j+1] >= 'A' && playerName[j+1] <= 'Z' ) ) ) {
 				j++;
 				continue;
-			} else if ( ( ! ( playerName[j] >= '0' && playerName[j] <= '9' ) && ! ( playerName[j] >= 'a' && playerName[j] <= 'z' ) && ! ( playerName[j] >= 'A' && playerName[j] <= 'Z' ) ) ) {
+			} else if ( ( ! ( playerName[j] >= '0' && playerName[j] <= '9' ) &&
+				! ( playerName[j] >= 'a' && playerName[j] <= 'z' ) &&
+				! ( playerName[j] >= 'A' && playerName[j] <= 'Z' ) ) ) {
 				continue;
 			}
 
@@ -1097,7 +1103,6 @@ void Cmd_TeamTask_f( gentity_t *ent ) {
 }
 
 
-
 /*
 =================
 Cmd_Kill_f
@@ -1690,14 +1695,20 @@ void Cmd_FollowCycle_f( gentity_t *ent ) {
     // leave it where it was
 }
 
+static qboolean FindWordChatText( char *text, char *pattern ) {
+    if ( Q_stristr(text, pattern) && Q_PrintStrlen(text) == Q_PrintStrlen(pattern) )
+        return qtrue;
+    else
+        return qfalse;
+}
 
 /*
 ==================
-G_Say
+G_SayTo
 ==================
 */
 
-static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message ) {
+static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message, qboolean nobeep ) {
     if (!other) {
         return;
     }
@@ -1723,31 +1734,40 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
         return;
     }
 
-    trap_SendServerCommand( other-g_entities, va("%s \"%s%c%c%s\"",
+    trap_SendServerCommand( other-g_entities, va("%s \"%s%c%c%s\" \"%d\"",
                             mode == SAY_TEAM ? "tchat" : "chat",
-                            name, Q_COLOR_ESCAPE, color, message));
+                            name, Q_COLOR_ESCAPE, color, message, nobeep));
 }
 
+/*
+==================
+G_Say
+==================
+*/
 #define EC		"\x19"
 
 void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) {
+    qboolean		console = qfalse;
     int 		counter;
     int			j;
-    gentity_t	*other;
+    gentity_t		*other;
     int			color;
     char		name[64];
     // don't let text be too long for malicious reasons
     char		text[MAX_SAY_TEXT];
-    char		location[64];
+    char		location[64] = {0};
     trace_t		tr;
     vec3_t		end, forward, right, up, muzzle;
-    int		count;
-    int 		enemies;
-    qboolean	powerup;
-    char	userinfo[MAX_INFO_STRING];
+    int			count;
+    int 		enemies = 0;
+    qboolean		powerup;
+    char		userinfo[MAX_INFO_STRING];
     float		fov;
     vec3_t		angles;
     vec3_t		dist;
+    char		console_text[MAX_SAY_TEXT] = {0};
+    char		mapname[MAX_MAPNAME];
+    qtime_t		now;
 
     if ((ent->r.svFlags & SVF_BOT) && trap_Cvar_VariableValue( "bot_nochat" )>1) return;
 
@@ -1758,8 +1778,6 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
     if ( (g_gametype.integer < GT_TEAM || g_ffa_gt == 1) && mode == SAY_TEAM ) {
         mode = SAY_ALL;
     }
-
-
 
     switch ( mode ) {
     default:
@@ -1792,7 +1810,6 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
     }
 
     Q_strncpyz( text, chatText, sizeof(text) );
-
 
     if ( mode == SAY_TEAM  && ent->client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
         for ( counter = 0 ; counter < MAX_SAY_TEXT ; counter++ ) {
@@ -1843,8 +1860,6 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
                     text[counter] = '%';
                     text[counter + 1] = 's';
 
-                    enemies = 0;
-
                     AngleVectors (ent->client->ps.viewangles, forward, right, up);
                     CalcMuzzlePoint ( ent, forward, right, up, muzzle );
 
@@ -1854,8 +1869,8 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
                     for ( count = 0; count < MAX_GENTITIES; count++ ) {
 
                         if ( g_entities[count].inuse && g_entities[count].s.eType == ET_PLAYER &&
-                                ( g_entities[count].client->ps.persistant[PERS_TEAM] != ent->client->ps.persistant[PERS_TEAM] ) && ( ent->health > 0 ) &&
-                                g_entities[count].client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
+                            ( g_entities[count].client->ps.persistant[PERS_TEAM] != ent->client->ps.persistant[PERS_TEAM] ) &&
+                            ( ent->health > 0 ) && g_entities[count].client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 
                             trap_Trace(&tr, muzzle, NULL, NULL, g_entities[count].r.currentOrigin, ENTITYNUM_NONE, MASK_SOLID);
 
@@ -1864,8 +1879,6 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
                             dist[2] = g_entities[count].r.currentOrigin[2]-muzzle[2];
 
                             vectoangles(dist, angles);
-
-                            //G_Printf(" %f   %f   %f\n", angles[0], angles[1], angles[2]);
 
                             angles[1] = ent->client->ps.viewangles[1] - angles[1];
 
@@ -1881,9 +1894,8 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
                             if ( angles[0] > 180 )
                                 angles[0] -= 360;
 
-                            //G_Printf("angle %f   %f\n", angles[1], angles[0] );
-
-                            if ( tr.fraction == 1.0 && ( angles[1] >= -fov/2 && angles[1] <= fov/2) && ( angles[0] >= -fov/2 && angles[0] <= fov/2) ) {
+                            if ( tr.fraction == 1.0 && ( angles[1] >= -fov/2 && angles[1] <= fov/2) &&
+                                ( angles[0] >= -fov/2 && angles[0] <= fov/2) ) {
                                 powerup = qfalse;
                                 if ( g_entities[tr.entityNum].client->ps.powerups[PW_BLUEFLAG] == INT_MAX ) {
                                     Com_sprintf( text, sizeof(text), text, va("%s %s", "^4FLAG", "%s" ));
@@ -1897,8 +1909,6 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
                                     Com_sprintf( text, sizeof(text), text, va("%s %s", "^7FLAG", "%s" ));
                                     powerup = qtrue;
                                 }
-                                /*if( g_entities[tr.entityNum].client->ps.powerups[PW_INVIS] == INT_MAX )
-                                	Com_sprintf( text, sizeof(text), text, va("%s %s", "^7INVIS", "%s" ));*/
                                 if ( g_entities[tr.entityNum].client->ps.powerups[PW_QUAD] == INT_MAX ) {
                                     Com_sprintf( text, sizeof(text), text, va("%s %s", "^5QUAD", "%s" ));
                                     powerup = qtrue;
@@ -1922,13 +1932,8 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
                             }
                         }
                     }
-                    if ( enemies == 0 )
-                        Com_sprintf( text, sizeof(text), text, "0 enemies");
-                    else if ( enemies == 1 )
-                        Com_sprintf( text, sizeof(text), text, "1 enemy");
-                    else
-                        Com_sprintf( text, sizeof(text), text, va("%i enemies", enemies ));
-                }
+                    Com_sprintf( text, sizeof(text), text, va("%i %s", enemies, enemies == 1 ? "enemy" : "enemies" ));
+               }
                 else if ( text[counter + 1] == 'F' ) {
                     text[counter] = '%';
                     text[counter + 1] = 's';
@@ -2080,9 +2085,43 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
         }
     }
 
+    if ( g_adminChatText.integer && mode == SAY_ALL ) {
+        if ( FindWordChatText( text, "@revision" ) ) {
+            console_text[0] = '%';
+            console_text[1] = 's';
+            console = qtrue;
+            Com_sprintf( console_text, sizeof(console_text), console_text, va("^3%s ^6%i", "Aftershock revision", REVISION ) );
+        }
+        else if ( FindWordChatText( text, "@next" ) ) {
+            console_text[0] = '%';
+            console_text[1] = 's';
+            console = qtrue;
+            if ( g_useMapcycle.integer ) {
+                trap_Cvar_VariableStringBuffer( "mapname", mapname, sizeof(mapname) );
+                Com_sprintf( console_text, sizeof(console_text), console_text, va("^3%s ^6%s", "The next map is", G_GetNextMap(mapname) ) );
+            }
+            else
+                Com_sprintf( console_text, sizeof( console_text ), console_text, va("%s", "^3Not available without ^6g_useMapcycle" ) );
+        }
+        else if ( FindWordChatText( text, "@time" ) ) {
+            console_text[0] = '%';
+            console_text[1] = 's';
+            console = qtrue;
+            trap_RealTime ( &now );
+            Com_sprintf( console_text, sizeof(console_text), console_text, va("^3%s ^6%04d-%02d-%02d %02d:%02d:%02d",
+                "The server time is",
+                1900 + now.tm_year,
+                1 + now.tm_mon,
+                now.tm_mday,
+                now.tm_hour,
+                now.tm_min,
+                now.tm_sec ) );
+        }
+    }
+
     if ( target ) {
         if ( !target->client->mute[ent->s.clientNum] )
-            G_SayTo( ent, target, mode, color, name, text );
+            G_SayTo( ent, target, mode, color, name, text, qfalse );
         return;
     }
 
@@ -2095,7 +2134,9 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
     for (j = 0; j < level.maxclients; j++) {
         other = &g_entities[j];
         if ( !other->client->mute[ent->s.clientNum] )
-            G_SayTo( ent, other, mode, color, name, text );
+            G_SayTo( ent, other, mode, color, name, text, qfalse );
+        if ( !other->client->mute[ent->s.clientNum] && console )
+            G_SayTo( ent, other, mode, color, "", console_text, qtrue ); // no beep for console reply and preserve rcon compatibility
     }
     //KK-OAX Admin Command Check from Say/SayTeam line
     if ( g_adminParseSay.integer )
@@ -2121,7 +2162,7 @@ KK-OAX Modified this to trap the additional arguments from console.
 ==================
 */
 static void Cmd_Say_f( gentity_t *ent ) {
-    char		*p;
+    char        *p;
     char        arg[MAX_TOKEN_CHARS];
     int         mode = SAY_ALL;
 
@@ -2196,7 +2237,6 @@ static void Cmd_Tell_f( gentity_t *ent ) {
         G_Say( ent, ent, SAY_TELL, p );
     }
 }
-
 
 static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboolean voiceonly ) {
     int color;
@@ -2424,8 +2464,7 @@ static void Cmd_VoiceTaunt_f( gentity_t *ent ) {
 }
 
 
-
-static char	*gc_orders[] = {
+static char *gc_orders[] = {
     "hold your position",
     "hold this position",
     "come here",
@@ -2620,7 +2659,7 @@ void Cmd_Ref_f( gentity_t *ent ) {
             trap_Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
 
         if (*s) {
-            Com_sprintf( command, sizeof( command ), "%s %d; map_restart; set nextmap \"%s\"", arg1, i,s );
+            Com_sprintf( command, sizeof( command ), "%s %d; map_restart; set nextmap \"%s\"", arg1, i, s );
         } else {
             Com_sprintf( command, sizeof( command ), "%s %d; map_restart", arg1, i );
         }
@@ -2778,7 +2817,6 @@ void Cmd_Ref_f( gentity_t *ent ) {
     }
 
     trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", command ) );
-
 }
 
 /*
@@ -3005,7 +3043,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
         if ( g_useMapcycle.integer ) {
             trap_Cvar_VariableStringBuffer("mapname", mapname, sizeof(mapname));
             Com_sprintf(level.voteString, sizeof( level.voteString ),"map %s", G_GetNextMap(mapname));
-	    Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s (%s)", "Next map?", G_GetNextMap(mapname) );
+            Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s (%s)", "Next map?", G_GetNextMap(mapname) );
         }
         else {
             trap_Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
@@ -3014,7 +3052,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
                 return;
             }
             Com_sprintf( level.voteString, sizeof( level.voteString ), "vstr nextmap");
-	    Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s (%s)", "Next map?", G_GetNextMap(mapname) );
+            Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", "Next map?" );
         }
         //Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
         
@@ -3587,7 +3625,8 @@ void Cmd_DropFlag_f( gentity_t *other ) {
 
 void Cmd_Drop_f( gentity_t *ent ) {
 
-    if ( ( ent->client->ps.powerups[PW_NEUTRALFLAG] || ent->client->ps.powerups[PW_REDFLAG] || ent->client->ps.powerups[PW_BLUEFLAG] ) && g_itemDrop.integer & 1 )
+    if ( ( ent->client->ps.powerups[PW_NEUTRALFLAG] || ent->client->ps.powerups[PW_REDFLAG] ||
+        ent->client->ps.powerups[PW_BLUEFLAG] ) && g_itemDrop.integer & 1 )
         Cmd_DropFlag_f( ent );
     else if ( g_itemDrop.integer & 2 )
         Cmd_DropWeapon_f( ent );
@@ -3609,7 +3648,6 @@ void Cmd_Lock_f( gentity_t *ent ) {
         trap_Cvar_Set("g_blueLocked","1");
         trap_SendServerCommand( -1, va("screenPrint \"" S_COLOR_BLUE "Blue team" S_COLOR_YELLOW" locked\"") );
     }
-
 }
 
 void Cmd_Unlock_f( gentity_t *ent ) {
@@ -3627,7 +3665,6 @@ void Cmd_Unlock_f( gentity_t *ent ) {
         trap_Cvar_Set("g_blueLocked","0");
         trap_SendServerCommand( -1, va("screenPrint \"" S_COLOR_BLUE "Blue team" S_COLOR_YELLOW" unlocked\"") );
     }
-
 }
 
 void Cmd_Listplayers_f( gentity_t *ent ) {

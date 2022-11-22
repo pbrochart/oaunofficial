@@ -799,13 +799,13 @@ static void PM_WalkMove( void ) {
 	if ( pm->ps->pm_flags & PMF_DUCKED ) {
 		float* velocity = pm->ps->velocity;
 		vec3_t vec;
-		float speed;
+		//float speed;
 		VectorCopy( velocity, vec );
 		if ( pml.walking ) {
 			vec[2] = 0;	// ignore slope movement
 		}
 
-		speed = VectorLength(vec);
+		//speed = VectorLength(vec);
 		if ( wishspeed > pm->ps->speed * pm_duckScale ) {
 			wishspeed = pm->ps->speed * pm_duckScale;
 		}

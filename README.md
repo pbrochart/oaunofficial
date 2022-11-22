@@ -13,7 +13,7 @@ Revision 310: Display damage indicator thru the walls.
 Fix duplicate damages with shotgun when they are multiple targets.
 Add cg_damagePlum: Controls which weapons will draw damage plumes.
 Default is all: "/g/mg/sg/gl/rl/lg/rg/pg/bfg/cg/ng/pl/".
-Revision 311: Added new features for cg_drawGun (4,5,6).
+Revision 311: Add new feature for cg_drawGun (4,5,6).
 Same as 1,2,3 but the weapons are transparent.
 Revision 312: Some bug fixes from ioquake3.
 Revision 313: Add double jump, air control and extra
@@ -49,3 +49,4 @@ Revision 330: Better fix for cg_drawTeamOverlay.
 Fix the main spec model in multiview windows.
 Revision 331: Improve the scoreboard.
 Revision 332: Fix various bugs.
+Revision 333: Bug fixes and cleanup, allow keywords in the text chat.

@@ -270,6 +270,7 @@ vmCvar_t     g_autoRestart;
 vmCvar_t     g_writePlayerCoords;
 vmCvar_t     g_crosshairNamesFog;
 vmCvar_t     g_damagePlums;
+vmCvar_t     g_adminChatText;
 
 // bk001129 - made static to avoid aliasing
 static cvarTable_t		gameCvarTable[] = {
@@ -480,7 +481,7 @@ static cvarTable_t		gameCvarTable[] = {
 	
 	{ &g_allowRespawnTimer, "g_allowRespawnTimer", "0", CVAR_ARCHIVE, 0, qfalse},
 	{ &g_startWhenReady, "g_startWhenReady", "1", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
-		{ &g_autoReady, "g_autoReady", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
+	{ &g_autoReady, "g_autoReady", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
 	
 	{ &g_timeoutAllowed, "g_timeoutAllowed", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
 	{ &g_timeoutTime, "g_timeoutTime", "30000", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
@@ -529,7 +530,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_autoRestart, "g_autoRestart", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_writePlayerCoords, "g_writePlayerCoords", "0", CVAR_CHEAT, 0, qfalse },
 	{ &g_crosshairNamesFog, "g_crosshairNamesFog", "0", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qfalse },
-	{ &g_damagePlums, "g_damagePlums", "0", CVAR_ARCHIVE, 0, qfalse }
+	{ &g_damagePlums, "g_damagePlums", "0", CVAR_ARCHIVE, 0, qfalse },
+	{ &g_adminChatText, "g_adminChatText", "0", CVAR_ARCHIVE, 0, qfalse }
 };
 
 // bk001129 - made static to avoid aliasing
@@ -2918,9 +2920,10 @@ void CheckTournament( void ) {
 		if ( level.warmupTime < 0 ) {
 			if ( level.numPlayingClients == 2 ) {
 				if( ( g_startWhenReady.integer && 
-				  ( g_entities[level.sortedClients[0]].client->ready || ( g_entities[level.sortedClients[0]].r.svFlags & SVF_BOT ) ) && 
-				  ( g_entities[level.sortedClients[1]].client->ready || ( g_entities[level.sortedClients[1]].r.svFlags & SVF_BOT ) ) ) || 
-				  !g_startWhenReady.integer || !g_doWarmup.integer || ( g_autoReady.integer > 0 && g_autoReady.integer*1000 < ( level.time - level.timeComplete ) ) ){
+				  ( g_entities[level.sortedClients[0]].client->ready || ( g_entities[level.sortedClients[0]].r.svFlags & SVF_BOT ) ) &&
+				  ( g_entities[level.sortedClients[1]].client->ready || ( g_entities[level.sortedClients[1]].r.svFlags & SVF_BOT ) ) ) ||
+				  !g_startWhenReady.integer || !g_doWarmup.integer || ( g_autoReady.integer > 0 &&
+				  g_autoReady.integer*1000 < ( level.time - level.timeComplete ) ) ){
 					// fudge by -1 to account for extra delays
 					if ( g_warmup.integer > 1 ) {
 						level.warmupTime = level.time + ( g_warmup.integer - 1 ) * 1000;
@@ -2966,14 +2969,17 @@ void CheckTournament( void ) {
 		
 		if( g_startWhenReady.integer ){
 			for( i = 0; i < level.numPlayingClients; i++ ){
-				if( ( g_entities[level.sortedClients[i]].client->ready || g_entities[level.sortedClients[i]].r.svFlags & SVF_BOT ) && g_entities[level.sortedClients[i]].inuse )
+				if( ( g_entities[level.sortedClients[i]].client->ready || g_entities[level.sortedClients[i]].r.svFlags & SVF_BOT ) &&
+					g_entities[level.sortedClients[i]].inuse )
 					clientsReady++;
 			}
 		}
 		
-		if( g_doWarmup.integer && g_startWhenReady.integer == 1 && ( clientsReady < level.numPlayingClients/2 + 1 ) && !( g_autoReady.integer > 0 && g_autoReady.integer*1000 < ( level.time - level.timeComplete ) ) )
+		if( g_doWarmup.integer && g_startWhenReady.integer == 1 && ( clientsReady < level.numPlayingClients/2 + 1 ) &&
+			!( g_autoReady.integer > 0 && g_autoReady.integer*1000 < ( level.time - level.timeComplete ) ) )
 			notEnough = qtrue;
-		if( g_doWarmup.integer && g_startWhenReady.integer == 2 && ( clientsReady < level.numPlayingClients ) && !( g_autoReady.integer > 0 && g_autoReady.integer*1000 < ( level.time - level.timeComplete ) ) )
+		if( g_doWarmup.integer && g_startWhenReady.integer == 2 && ( clientsReady < level.numPlayingClients ) &&
+			!( g_autoReady.integer > 0 && g_autoReady.integer*1000 < ( level.time - level.timeComplete ) ) )
 			notEnough = qtrue;
 		
 

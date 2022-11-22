@@ -101,10 +101,14 @@ void CG_SetGameString ( void ) {
 
     count = 0;
     for ( i = 0; i < 128 ; i++ ) {
-        if ( playerName[i] == '^' && ( ( playerName[i+1] >= '0' && playerName[i+1] <= '9' ) || ( playerName[i+1] >= 'a' && playerName[i+1] <= 'z' ) || ( playerName[i+1] >= 'A' && playerName[i+1] <= 'Z' ) ) ) {
+        if ( playerName[i] == '^' && ( ( playerName[i+1] >= '0' && playerName[i+1] <= '9' ) ||
+            ( playerName[i+1] >= 'a' && playerName[i+1] <= 'z' ) ||
+            ( playerName[i+1] >= 'A' && playerName[i+1] <= 'Z' ) ) ) {
             i++;
             continue;
-        } else if ( ( ! ( playerName[i] >= '0' && playerName[i] <= '9' ) && ! ( playerName[i] >= 'a' && playerName[i] <= 'z' ) && ! ( playerName[i] >= 'A' && playerName[i] <= 'Z' ) ) ) {
+        } else if ( ( ! ( playerName[i] >= '0' && playerName[i] <= '9' ) &&
+            ! ( playerName[i] >= 'a' && playerName[i] <= 'z' ) &&
+            ! ( playerName[i] >= 'A' && playerName[i] <= 'Z' ) ) ) {
             continue;
         }
 
@@ -762,7 +766,7 @@ static void CG_ParseRespawnTimer ( void ) {
 
 /*
 =================
-CG_ParseRespawnTimer
+CG_ParseReadyMask
 
 =================
 */
@@ -774,9 +778,11 @@ static void CG_ParseReadyMask ( void ) {
         return;
 
     if ( readyMask != cg.readyMask ) {
-        for ( i = 0; i < 32 ; i++ ) {
-            if ( ( cg.readyMask & ( 1 << i ) ) != ( readyMask & ( 1 << i ) ) ) {
-
+        for ( i = 0; i < cgs.maxclients ; i++ ) {
+            // does not notify if it's a bot because it's always ready
+            if ( cgs.clientinfo[ i ].botSkill > 0 && cgs.clientinfo[ i ].botSkill <= 5 )
+                continue;
+            if ( ( cg.readyMask & ( 1 << i ) ) != ( readyMask & ( 1 << i ) ) && cgs.clientinfo[ i ].infoValid ) {
                 if ( readyMask & ( 1 << i ) )
                     CG_CenterPrint ( va ( "%s ^2is ready", cgs.clientinfo[ i ].name ), 120, BIGCHAR_WIDTH );
                 else
@@ -1161,21 +1167,18 @@ void CG_ShaderStateChanged ( void ) {
     while ( o && *o ) {
         n = strstr ( o, "=" );
         if ( n && *n ) {
-            strncpy ( originalShader, o, n-o );
-            originalShader[n-o] = 0;
+            Q_strncpyz( originalShader, o, n-o+1 );            
             n++;
             t = strstr ( n, ":" );
             if ( t && *t ) {
-                strncpy ( newShader, n, t-n );
-                newShader[t-n] = 0;
+                Q_strncpyz( newShader, n, t-n+1 );
             } else {
                 break;
             }
             t++;
             o = strstr ( t, "@" );
             if ( o ) {
-                strncpy ( timeOffset, t, o-t );
-                timeOffset[o-t] = 0;
+                Q_strncpyz( timeOffset, t, o-t+1 );
                 o++;
                 trap_R_RemapShader ( originalShader, newShader, timeOffset );
             }
@@ -2022,15 +2025,19 @@ static void CG_ServerCommand ( void ) {
 //#endif
         return;
     }
+
     if ( !strcmp ( cmd, "screenPrint" ) ) {
         Q_strncpyz ( text, CG_Argv ( 1 ), MAX_SAY_TEXT );
         CG_RemoveChatEscapeChar ( text );
         CG_AddToChat ( text );
         return;
     }
+
     if ( !strcmp ( cmd, "chat" ) ) {
+        qboolean nobeep;
+        nobeep = atoi( CG_Argv( 2 ) );
         if ( !cg_teamChatsOnly.integer && !cg_noChat.integer ) {
-            if ( cg_chatBeep.integer )
+            if ( cg_chatBeep.integer && !nobeep )
                 trap_S_StartLocalSound ( cgs.media.talkSound, CHAN_LOCAL_SOUND );
             Q_strncpyz ( text, CG_Argv ( 1 ), MAX_SAY_TEXT );
             CG_RemoveChatEscapeChar ( text );
@@ -2041,8 +2048,10 @@ static void CG_ServerCommand ( void ) {
     }
 
     if ( !strcmp ( cmd, "tchat" ) ) {
+        qboolean nobeep;
+        nobeep = atoi( CG_Argv( 2 ) );
         if ( !cg_noChat.integer ) {
-            if ( cg_teamChatBeep.integer )
+            if ( cg_teamChatBeep.integer && !nobeep )
                 trap_S_StartLocalSound ( cgs.media.talkSound, CHAN_LOCAL_SOUND );
             Q_strncpyz ( text, CG_Argv ( 1 ), MAX_SAY_TEXT );
             CG_RemoveChatEscapeChar ( text );
@@ -2051,6 +2060,7 @@ static void CG_ServerCommand ( void ) {
         }
         return;
     }
+
     if ( !strcmp ( cmd, "scores" ) ) {
         CG_ParseScores();
         return;
